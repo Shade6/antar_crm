@@ -1,18 +1,8 @@
 {
-    "python.defaultInterpreterPath": "frappe-bench/env/bin/python",
-    "debug.node.autoAttach": "disabled",
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default"
-            },
-            "previewLimit": 50,
-            "server": "mariadb",
-            "port": 3306,
-            "driver": "MariaDB",
-            "name": "MariaDB",
-            "username": "root",
-            "password": "123"
-        }
-    ]
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "tsconfig.json": "tsconfig.*.json, env.d.ts",
+    "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*",
+    "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .prettier*, prettier*, .editorconfig"
+  }
 }
