@@ -4,7 +4,7 @@
 
 <template>
     <div class="p-5">
-       dashboard 
+        notes
     </div>
 </template>
 

@@ -1,6 +1,7 @@
 <script setup>
 import { h } from "vue";
 import ListIcon from "@/components/Icons/ListIcon.vue";
+import CommonNav from "./secondNav/CommonNav.vue"
 import { Dropdown, FeatherIcon, Button } from "frappe-ui";
 </script>
 
@@ -70,6 +71,7 @@ import { Dropdown, FeatherIcon, Button } from "frappe-ui";
       </div>
     </div>
   </div>
+  <CommonNav/>
 </template>
 
 <style scoped></style>

@@ -3,18 +3,24 @@ import {ref,h,watch} from 'vue'
 import "@/assets/style.css";
 import CRMLogo from "@/components/icons/CRMLogo.vue"
 import CollapseSidebar from "@/components/icons/CollapseSidebar.vue"
-import AppsIcon from "@/components/icons/AppsIcon.vue"
-import ContactIcon from "@/components/icons/ContactIcon.vue"
-import WebsiteIcon from "@/components/icons/WebsiteIcon.vue"
-import DialpadIcon from "@/components/icons/DialpadIcon.vue"
-import SettingsIcon from "@/components/icons/SettingsIcon.vue"
 import OrganizationsIcon from "@/components/icons/OrganizationsIcon.vue"
 import FileTextIcon from "@/components/icons/FileTextIcon.vue"
 import {FeatherIcon} from 'frappe-ui'
 import LeadsIcon from "@/components/icons/LeadsIcon.vue"
-import TerritoryIcon from "@/components/icons/TerritoryIcon.vue"
-import RightSideLayoutIcon from "@/components/icons/RightSideLayoutIcon.vue"
-import CertificateIcon from "@/components/icons/CertificateIcon.vue"
+import DealsIcon from "@/components/icons/DealsIcon.vue"
+import ContactsIcon from "@/components/icons/ContactsIcon.vue"
+import TaskIcon from "@/components/icons/TaskIcon.vue"
+import PhoneIcon from "@/components/icons/PhoneIcon.vue"
+import Email2Icon from "@/components/icons/Email2Icon.vue"
+import PinIcon from "@/components/icons/PinIcon.vue"
+
+
+
+
+
+
+
+
 
 import { useRouter } from 'vue-router';
 import { useSwitchStore } from '@/stores/switch';
@@ -29,7 +35,7 @@ const handle_side_bar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };
 watch(()=>switchStore.page,(new_)=>{
-  if(new_ == 'dashboard'){
+  if(new_ == 'Leads'){
     router.push(`/antar_`);
   }else{
     router.push(`/antar_/${new_}`);
@@ -40,73 +46,77 @@ watch(()=>switchStore.page,(new_)=>{
 
 <template>
   <div
-    class="sidebar text-black h-screen relative  inline-block   transition-all duration-300"
-    :class="{ 'hide-nav transition-all duration-300': sidebarOpen }"
+    class="sidebar text-black h-screen relative  inline-block   transition-all duration-100"
+    :class="{ 'hide-nav transition-all duration-100': sidebarOpen }"
   >
     <div class="sidebar__head"></div>
 
-    <ul class="nav  text-lg h-[100%] ease-out transition-all duration-300 fixed  p-2 bg-gray-100">
-      <li class="nav-item flex my-2">
+    <ul class="nav w-full text-lg h-[100%] ease-out transition-all duration-100 sticky  p-3 bg-gray-50">
+      <li class="nav-item flex ">
         <CRMLogo class="w-[30px] h-[30px]" />
         
-        <div class="nav-item__text m-0 text-sm mx-2">
-           {{ switchStore?.page }}
+        <div class="nav-item__text m-0 text-xl mx-2 text-black">
+           CRM
         </div>
       </li>
-      <li @click="switchStore.changePage('dashboard')" class="nav-item flex my-2">
+     
+      <li @click="switchStore.changePage('Leads')" class="nav-item flex my-4">
         <div class="nav-item__icon ml-1">
-          <AppsIcon />
+          <!-- <AppsIcon /> -->
+          <PinIcon />
         </div>
-        <div class="nav-item__text m-0 text-sm mx-2">Dashboard</div>
+        <div class="nav-item__text m-0 text-sm mx-2">Notification</div>
       </li>
-      <li @click="switchStore.changePage('campaigns')" class="nav-item flex my-2">
+      <li @click="switchStore.changePage('Leads')" class="nav-item flex my-2">
         <div class="nav-item__icon ml-1">
-          <TerritoryIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Campaigns</div>
-      </li>
-      <li @click="switchStore.changePage('workflow')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-1">
-          <RightSideLayoutIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Workflows</div>
-      </li>
-      <li @click="switchStore.changePage('customer-journey')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-1">
-          <DialpadIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Customer Journeys</div>
-      </li>
-      <li @click="switchStore.changePage('audience-management')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-1">
+          <!-- <AppsIcon /> -->
           <LeadsIcon />
         </div>
-        <div class="nav-item__text text-sm mx-2">Audience Management</div>
+        <div class="nav-item__text m-0 text-sm mx-2">Leads</div>
       </li>
-      <li @click="switchStore.changePage('content-library')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-0">
+      <li @click="switchStore.changePage('deals')" class="nav-item flex my-2">
+        <div class="nav-item__icon ml-1">
+          <DealsIcon />
+        </div>
+        <div class="nav-item__text text-sm mx-2">Deals</div>
+      </li>
+      <li @click="switchStore.changePage('contacts')" class="nav-item flex my-2">
+        <div class="nav-item__icon ml-1">
+          <ContactsIcon />
+        </div>
+        <div class="nav-item__text text-sm mx-2">Contacts</div>
+      </li>
+      <li @click="switchStore.changePage('organizations')" class="nav-item flex my-2">
+        <div class="nav-item__icon ml-1">
           <OrganizationsIcon />
         </div>
-        <div class="nav-item__text  text-sm mx-2">Content Library</div>
+        <div class="nav-item__text text-sm mx-2">Organizations</div>
       </li>
-      <li @click="switchStore.changePage('analytics')" class="nav-item flex my-2">
+      <li @click="switchStore.changePage('notes')" class="nav-item flex my-2">
         <div class="nav-item__icon ml-1">
-          <FileTextIcon />
+          <FileTextIcon /> 
         </div>
-        <div class="nav-item__text  text-sm mx-2">Analytics</div>
+        <div class="nav-item__text text-sm mx-2">Notes</div>
       </li>
-      <li @click="switchStore.changePage('create-post')" class="nav-item flex my-2">
+      <li @click="switchStore.changePage('task')" class="nav-item flex my-2">
+        <div class="nav-item__icon ml-0">
+          <TaskIcon />
+        </div>
+        <div class="nav-item__text  text-sm mx-2">Tasks</div>
+      </li>
+      <li @click="switchStore.changePage('call-logs')" class="nav-item flex my-2">
+        <div class="nav-item__icon ">
+          <PhoneIcon />
+        </div>
+        <div class="nav-item__text  text-sm mx-2">Call Logs</div>
+      </li>
+      <li @click="switchStore.changePage('email-template')" class="nav-item flex my-2">
         <div class="nav-item__icon ml-1">
-          <CertificateIcon />
+          <Email2Icon />
         </div>
-        <div class="nav-item__text  text-sm mx-2">Create Post</div>
+        <div class="nav-item__text  text-sm mx-2">Email Template</div>
       </li>
-      <li @click="switchStore.changePage('settings')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-1">
-          <SettingsIcon/>
-        </div>
-        <div class="nav-item__text  text-sm mx-2">Settings</div>
-      </li>
+      
       
       <li class="nav-item flex my-3 absolute bottom-0">
         <button @click="handle_side_bar" class="p-0 m-0 flex ">
@@ -121,11 +131,12 @@ watch(()=>switchStore.page,(new_)=>{
 <style scoped>
  li{
   cursor: pointer;
-  padding: 10px 4px;
+  padding: 4px 4px;
   border-radius: 3%;
+  color:#525252
  }
  li:hover{
-   background-color: rgb(233, 233, 233);
+   background-color: white;
    box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 15px;
  }
 </style>

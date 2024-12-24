@@ -41,41 +41,37 @@ const router = createRouter({
       children:[
         {
           path:'/antar_/',
-          name:'dashboard',
-          component:() => import('../views/antar_/dashboard/dashboard.vue'),
+          name:'leads',
+          component:() => import('../views/antar_/leads/leads.vue'),
         },
         {
-          path:'/antar_/analytics',
-          name:'analytics',
-          component:() => import('../views/antar_/analytics/analytics.vue'),
+          path:'/antar_/deals',
+          name:'deals',
+          component:() => import('../views/antar_/deals/deals.vue'),
         }, {
-          path:'/antar_/audience-management',
-          name:'audience-management',
-          component:() => import('../views/antar_/audiencemanagement/audiance.vue'),
+          path:'/antar_/contacts',
+          name:'contacts',
+          component:() => import('../views/antar_/contacts/contacts.vue'),
         }, {
-          path:'/antar_/campaigns',
-          name:'campaigns',
-          component:() => import('../views/antar_/campaigns/campains.vue'),
+          path:'/antar_/organizations',
+          name:'organizations',
+          component:() => import('../views/antar_/organizations/organizations.vue'),
         }, {
-          path:'/antar_/content-library',
-          name:'content-library',
-          component:() => import('../views/antar_/contentlibrary/library.vue'),
+          path:'/antar_/notes',
+          name:'notes',
+          component:() => import('../views/antar_/notes/notes.vue'),
         }, {
-          path:'/antar_/customer-journey',
-          name:'customer-journey',
-          component:() => import('../views/antar_/customerjourneys/consumer.vue'),
+          path:'/antar_/task',
+          name:'task',
+          component:() => import('../views/antar_/task/task.vue'),
         }, {
-          path:'/antar_/settings',
-          name:'settings',
-          component:() => import('../views/antar_/settings/settings.vue'),
+          path:'/antar_/call-logs',
+          name:'call-logs',
+          component:() => import('../views/antar_/call-logs/callLogs.vue'),
         }, {
-          path:'/antar_/workflow',
-          name:'workflow',
-          component:() => import('../views/antar_/workflows/workflow.vue'),
-        }, {
-          path:'/antar_/create-post',
-          name:'create-post',
-          component:() => import('../views/antar_/createpost/CreatePost.vue'),
+          path:'/antar_/email-template',
+          name:'email-template',
+          component:() => import('../views/antar_/email-template/emailTemplate.vue'),
         }
       ]
     },

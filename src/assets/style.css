@@ -1,24 +1,30 @@
+.sidebar {
+    width: 270px;
+    transition: width 0.5s ease-in-out;
 
+    &.hide-nav {
+        width: 50px;
 
-.sidebar{
-	width: 240px;
-	transition: width .5s ease-in-out;
-	
-	&.hide-nav{
-		width: 50px;
-		.sidebar__footer,
-		.nav-item .nav-item__text{ display: none; }
-	}
-	
-	&__head{
-		
-	}
-	
-	&__nav{
-		
-	}
-	
-	&__footer{
-		
-	}	
+        .sidebar__footer,
+        .nav-item .nav-item__text {
+            display: none;
+        }
+
+        .sidebar__nav { /* Ensure width is 50px when sidebar is hidden */
+            width: 50px;
+        }
+    }
+
+    &__head {
+        /* Optional styles for head */
+    }
+
+    &__nav {
+        width: 270px; /* Default width when expanded */
+        transition: width 0.5s ease-in-out; /* Smooth transition */
+    }
+
+    &__footer {
+        /* Optional styles for footer */
+    }
 }

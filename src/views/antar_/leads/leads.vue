@@ -1,10 +1,11 @@
 <script setup>
+import { ListView, FeatherIcon } from "frappe-ui";
 
 </script>
 
 <template>
     <div class="p-5">
-       workflow 
+       leads 
     </div>
 </template>
 
