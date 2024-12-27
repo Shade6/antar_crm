@@ -4,6 +4,12 @@ module.exports = app => {
 
   var router = require("express").Router();
 
-  router.get("/create_user", product.create_user);
+  router.post("/create_user", product.create_user);
+  router.put("/update_user", product.create_user);
+  router.get("/get_user", product.create_user);
+  router.delete("/delete_user", product.create_user);
+
+
+
   app.use('/api/', router);
 };
