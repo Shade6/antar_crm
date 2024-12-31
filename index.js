@@ -43,8 +43,15 @@ app.use(
 
 app.options("*", cors());
 
+app.get('/',(req,res)=>{
+    return res.json({message:'welcome to antar_crm',statusCode:200})
+})
+require("./app/router/userAccess/User.routes")(app);
+require("./app/router/userAccess/Docs_.routes")(app)
+require("./app/router/userAccess/DocPermisson_.routes")(app)
+require("./app/router/userAccess/Module_.routes")(app)
+require("./app/router/userAccess/Role_.routes")(app)
 
-require("./app/router/User.routes")(app);
 
 const PORT =  8088;
 app.listen(PORT, () => {

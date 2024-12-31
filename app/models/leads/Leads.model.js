@@ -1,29 +1,31 @@
+const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
-    const Opportunities = sequelize.define("Opportunities", {
-      id: {
-        type: Sequelize.INTEGER,
+    const Leads = sequelize.define("Leads", {
+      lead_id: {
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
       },
-      lead: {
+      lead_name: {
         type: Sequelize.STRING,
       },
-      opportunity_name: {
+      company: {
         type: Sequelize.STRING,
       },
-      expected_closing_date:{
-        type:Sequelize.DATE
+      contact: {
+        type: Sequelize.STRING,
       },
-      deal_size: {
-        type: Sequelize.INTEGER,
+      email: {
+        type: Sequelize.STRING,
       },
       phone_number: {
         type: Sequelize.STRING,
       },
-      address: {
+      lead_source: {
         type: Sequelize.STRING,
       },
       status: {
@@ -33,17 +35,18 @@ module.exports = (sequelize, Sequelize) => {
       assigned_to: {
         type: Sequelize.STRING,
       },
-      probability:{
-        type:Sequelize.INTEGER
-      },
-      CreatedBy: {
+      created_by: {
         type: Sequelize.INTEGER,
       },
-      ChangedBy: {
+      changed_by: {
         type: Sequelize.INTEGER,
       },
+      created_at:{
+        type:Sequelize.DATE
+      }
     });
-  
-    return Opportunities;
+    Leads.beforeCreate((data, options) => {
+      data.lead_id = uuidv4();
+    });
+    return Leads;
   };
-  

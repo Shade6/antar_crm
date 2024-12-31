@@ -1,9 +1,12 @@
+const { v4: uuidv4 } = require("uuid");
+
 module.exports = (sequelize, Sequelize) => {
     const Contacts = sequelize.define("Contacts", {
-      id: {
-        type: Sequelize.INTEGER,
+      contact_id: {
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
@@ -27,13 +30,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ["Active", "Inactive"],
       },
-      CreatedBy: {
+      created_by: {
         type: Sequelize.INTEGER,
       },
-      ChangedBy: {
+      changed_by: {
         type: Sequelize.INTEGER,
       },
+      created_at:{
+        type:Sequelize.DATE
+      }
     });
-  
+    Contacts.beforeCreate((data, options) => {
+      data.contact_id = uuidv4();
+    });
     return Contacts;
   };

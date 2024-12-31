@@ -1,9 +1,12 @@
+const { v4: uuidv4 } = require("uuid");
+
 module.exports = (sequelize, Sequelize) => {
     const Communication = sequelize.define("Communication", {
-      id: {
-        type: Sequelize.INTEGER,
+      communication_id: {
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
@@ -31,7 +34,15 @@ module.exports = (sequelize, Sequelize) => {
       created_by: {
         type: Sequelize.INTEGER,
       },
+      changed_by: {
+        type: Sequelize.INTEGER,
+      },
+      created_at:{
+        type:Sequelize.DATE
+      }
     });
-  
+    Communication.beforeCreate((data, options) => {
+      data.communication_id = uuidv4();
+    });
     return Communication;
   };

@@ -1,9 +1,11 @@
+const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
     const SalesInvoices = sequelize.define("SalesInvoices", {
-      id: {
-        type: Sequelize.INTEGER,
+      sales_invoice_id: {
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
@@ -21,13 +23,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ['Draft', 'Paid', 'Unpaid'],
       },
-      CreatedBy: {
+      created_by: {
         type: Sequelize.INTEGER,
       },
-      ChangedBy: {
+      changed_by: {
         type: Sequelize.INTEGER,
       },
+      created_at:{
+        type:Sequelize.DATE
+      }
     });
-  
+    SalesInvoices.beforeCreate((data, options) => {
+      data.sales_invoice_id = uuidv4();
+    });
     return SalesInvoices;
   };

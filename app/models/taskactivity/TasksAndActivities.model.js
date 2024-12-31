@@ -1,9 +1,12 @@
+
+const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
     const TasksAndActivities = sequelize.define("TasksAndActivities", {
-      id: {
-        type: Sequelize.INTEGER,
+      task_activity_id: {
+        type: Sequelize.UUID,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
@@ -31,13 +34,18 @@ module.exports = (sequelize, Sequelize) => {
       reference_name:{
        type:Sequelize.STRING
       },
-      CreatedBy: {
+      created_by: {
         type: Sequelize.INTEGER,
       },
-      ChangedBy: {
+      changed_by: {
         type: Sequelize.INTEGER,
       },
+      created_at:{
+        type:Sequelize.DATE
+      }
     });
-  
+    TasksAndActivities.beforeCreate((data, options) => {
+      data.task_activity_id = uuidv4();
+    });
     return TasksAndActivities;
   };
