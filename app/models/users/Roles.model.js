@@ -26,6 +26,10 @@ module.exports = (sequelize, Sequelize) => {
       is_active:{
         type:Sequelize.BOOLEAN
       },
+      is_deletable:{
+        type:Sequelize.BOOLEAN,
+        defaultValue:false,
+      },
       created_by: {
         type: Sequelize.INTEGER,
       },

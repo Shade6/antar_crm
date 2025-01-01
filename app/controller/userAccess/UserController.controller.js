@@ -2,6 +2,7 @@ const field_checker = require("../../utils/validate_body");
 const db = require("../../models");
 const Users = db.users;
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken')
 
 exports.create_user = async (req, res) => {
   try {
@@ -10,6 +11,7 @@ exports.create_user = async (req, res) => {
     const validation = field_checker.checkNullValues({
       email: email,
       password: password,
+      role :role_id
     });
 
     if (!validation.isValid) {
@@ -32,6 +34,7 @@ exports.create_user = async (req, res) => {
         first_name:first_name ?? '',
         last_name:last_name ?? '',
         email:email ?? '',
+        role_id:role_id,
         password:hashedPassword,
         created_by:1,
         created_at:new Date()
@@ -45,6 +48,47 @@ exports.create_user = async (req, res) => {
     res.json({ message: error.message, statusCode: 500 });
   }
 };
+
+exports.login=async(req,res)=>{
+    try {
+        const {email,password} = req.body
+        const validation = field_checker.checkNullValues(req.body);
+          if (!validation.isValid) {
+            return res.json({
+              message: `${validation.field} cannot be null`,
+              statusCode: 400,
+            });
+          }
+        const find_user_with_email = await Users.findOne({where:{email:email}})
+         if(!find_user_with_email){
+            return res.json({message:'Email is invalid !',statusCode:400})
+         }
+        
+         
+    const isMatch = await bcrypt.compare(password, find_user_with_email.password);
+
+    if (isMatch) {
+      const token = jwt.sign({ user_id: find_user_with_email.user_id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: "5d",
+      });
+
+      return res.send({
+        status: "success",
+        message: "Login Success",
+        user_id: find_user_with_email.user_id,
+        role_id: find_user_with_email.role_id,
+        token: token,
+      });
+    } else {
+      return res.send({
+        status: "failed",
+        message: "Email or Password does not match",
+      });
+    }
+    } catch (error) {
+        res.json({ message: error.message, statusCode: 500 });
+    }
+}
 
 exports.update_user = async(req,res)=>{
     try {

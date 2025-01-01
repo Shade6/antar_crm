@@ -11,6 +11,6 @@ module.exports = app => {
   
   
   
-    app.use('/api/', router);
+    app.use('/api/v1/', router);
   };
   

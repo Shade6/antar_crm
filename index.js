@@ -2,14 +2,14 @@ const express = require('express')
 const app = express()
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
+require("dotenv").config();
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
     cors({
-      origin: ["http://localhost:3000"],
+      origin: ["http://localhost:5173"],
       credentials: true,
     })
   );
@@ -47,8 +47,9 @@ app.get('/',(req,res)=>{
     return res.json({message:'welcome to antar_crm',statusCode:200})
 })
 require("./app/router/userAccess/User.routes")(app);
-require("./app/router/userAccess/Docs_.routes")(app)
-require("./app/router/userAccess/DocPermisson_.routes")(app)
+require("./app/router/userAccess/Access.routes")(app);
+
+require("./app/router/userAccess/ModulePermisson_.routes")(app)
 require("./app/router/userAccess/Module_.routes")(app)
 require("./app/router/userAccess/Role_.routes")(app)
 

@@ -1,9 +1,9 @@
 module.exports = app => {
-    const controller = require("../../controller/userAccess/DocsPermission.controller");
+    const controller = require("../../controller/userAccess/ModulePermission.controller");
   
     var router = require("express").Router();
   
-    router.post("/create_docs_permission", controller.create_docs_permission);
+    router.post("/create_docs_permission", controller.create_module_permission);
     router.put("/update_docs_permission", controller.update_docs_permission);
     router.get("/get_docs_permission", controller.get_docs_permission);
     router.get("/get_all_docs_permission", controller.find_all_docs_permission);
@@ -11,6 +11,6 @@ module.exports = app => {
   
   
   
-    app.use('/api/', router);
+    app.use('/api/v1/', router);
   };
   

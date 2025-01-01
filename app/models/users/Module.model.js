@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
       module_name: {
         type: Sequelize.STRING,
       },
+      docs_type:{
+         type:Sequelize.STRING
+      },
       is_active: {
         type: Sequelize.BOOLEAN,
       },

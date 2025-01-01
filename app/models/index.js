@@ -26,9 +26,8 @@ db.sequelize = sequelize;
 
 db.users = require("./users/Users.model.js")(sequelize, Sequelize);
 db.module = require("./users/Module.model.js")(sequelize,Sequelize)
-db.docs = require("./users/Docs_.model.js")(sequelize,Sequelize)
 db.role = require("./users/Roles.model.js")(sequelize,Sequelize)
-db.docs_perm = require("./users/DocsPermissions.model.js")(sequelize,Sequelize)
+db.module_permission = require("./users/ModulePermissions.model.js")(sequelize,Sequelize)
 
 
 

@@ -4,7 +4,7 @@ const Module = db.module;
 
 exports.create_module = async (req, res) => {
   try {
-    const { module_name, is_active } = req.body;
+    const { module_name, is_active,docs_type } = req.body;
     console.log(req.body, "this is the body");
     const validation = await validate.checkNullValues(req.body);
 
@@ -23,6 +23,7 @@ exports.create_module = async (req, res) => {
     const create = await Module.create({
       module_name: module_name,
       is_active: is_active,
+      docs_type:docs_type,
       created_by: 1,
       created_at: new Date(),
     });
