@@ -54,14 +54,14 @@ const logout =()=>{
     {
       group: 'User Manage',
       items: [
-        switchStore.menu.includes('user') && {
+        switchStore.menu.some((val)=>val.module.module_name == 'user') && {
           label: 'Users',
           icon: () => h(FeatherIcon, { name: 'user' }),
           onClick: () => {
             switchStore.changePage('user');
           }
         },
-        switchStore.menu.find((val)=>val.module.docs_type == 'user-settings') && {
+        switchStore.menu.find((val)=>val.module.module_name == 'user-settings') && {
           label: 'User Settings',
           icon: () => h(FeatherIcon, { name: 'users' }),
           onClick: () => {
@@ -103,9 +103,20 @@ const logout =()=>{
       </li>
 
 
-      <li v-for="menu in switchStore.menu.filter((val)=>val.module.docs_type == 'crm')" @click="switchStore.changePage('Leads')" class="nav-item flex my-2">
+      <li v-for="menu in switchStore.menu.filter((val)=>val.module.docs_type == 'crm')" @click="switchStore.changePage(menu.module.module_name)" class="nav-item flex my-2">
         <div class="nav-item__icon">
-          <LeadsIcon />
+          <LeadsIcon v-if="menu.module.module_name == 'leads'"/>
+          <DealsIcon v-else-if="menu.module.module_name == 'deals'"/>
+          <PhoneIcon v-else-if="menu.module.module_name == 'call-logs'"/>
+          <ContactsIcon v-else-if="menu.module.module_name == 'contacts'"/>
+          <TaskIcon v-else-if="menu.module.module_name == 'task'"/>
+          <FileTextIcon v-else-if="menu.module.module_name == 'notes'"/>
+          <OrganizationsIcon v-else-if="menu.module.module_name == 'organizations'"/>
+          <Email2Icon v-else-if="menu.module.module_name == 'email-template'"/>
+      
+
+       
+
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">{{ menu.module.module_name }}</div>
       </li>

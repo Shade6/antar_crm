@@ -46,7 +46,7 @@ const dialog2 = ref(false);
       >
         <Button class="mx-2 hover:bg-gray-300 px-2 rounded-sm">
           <div class="flex gap-2">
-            <div>
+            <div class="my-auto">
               <ListIcon />
             </div>
             <div>
