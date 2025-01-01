@@ -12,6 +12,7 @@
     "axios": "^1.7.9",
     "frappe-ui": "^0.1.93",
     "pinia": "^2.2.6",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "vue": "^3.5.13",
     "vue-router": "^4.4.5",
     "vue-toast-notification": "^3.1.3"

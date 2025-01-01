@@ -41,7 +41,12 @@ const router = createRouter({
       children:[
         {
           path:'/antar_/',
-          name:'leads',
+          name:'dashboard_home',
+          component:() => import('../views/antar_/home.vue'),
+        },
+        {
+          path:'/antar_/leads',
+          name:'dashboard',
           component:() => import('../views/antar_/leads/leads.vue'),
         },
         {
@@ -72,6 +77,16 @@ const router = createRouter({
           path:'/antar_/email-template',
           name:'email-template',
           component:() => import('../views/antar_/email-template/emailTemplate.vue'),
+        },
+        {
+          path:'/antar_/user',
+          name:'user',
+          component:() => import('../views/antar_/user-management/User.vue'),
+        },
+        {
+          path:'/antar_/user-settings',
+          name:'user-settings',
+          component:() => import('../views/antar_/user-management/UserSettings.vue'),
         }
       ]
     },

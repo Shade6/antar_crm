@@ -8,5 +8,9 @@ import axiosInstance from "./APIintercepter";
 
 
 export const userLogin = async (data) => {
-  return (await axiosInstance.post(`userLogin`,data)).data;
+  return (await axiosInstance.post(`login`,data)).data;
 };
+
+export const menu = async(data)=>{
+  return(await axiosInstance.get(`menu?role_id=${data}`)).data;
+}

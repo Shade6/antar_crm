@@ -65,20 +65,23 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Card, Input, Button } from "frappe-ui";
-import { userLogin } from "@/api/userApi";
-import { useRouter } from "vue-router";  // Importing Vue Router
-import "@/assets/toast.css"
+import { userLogin, menu } from "@/api/userApi";
+import { useRouter } from "vue-router"; // Importing Vue Router
+import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-const router = useRouter();  // Use router instance to navigate
+const router = useRouter(); // Use router instance to navigate
 const email = ref("");
 const password = ref("");
 const loading = ref(false);
 const error = ref("");
 
+import { useSwitchStore } from "@/stores/switch";
+const switchStore = useSwitchStore();
+
 const login_handler = async () => {
   const res = await userLogin({
-    user_email: email.value,
+    email: email.value,
     password: password.value,
   });
   if (res.status == "success") {
@@ -87,60 +90,79 @@ const login_handler = async () => {
       position: "top-right",
       duration: 3000,
       dismissible: true,
-      style: {  
-        background: "white", 
-        color: "black", 
-        padding: "4px 20px", 
-        borderRadius: "8px", 
-        fontSize: "16px", 
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
         borderLeft: "5px solid green",
       },
     });
-            localStorage.setItem("token",res.token)
-            localStorage.setItem("role",res.role)
-            router.push('/antar_')
+    const menu_res = await menu(res.role_id);
+    if (menu_res.statusCode == 200) {
+      switchStore.AddMenu(menu_res.data);
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("role", res.role_id);
+      router.push("/antar_");
+    } else {
+      toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+    }
   } else {
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
       style: {
-        background: "#FFF5F5", 
-        color: "black", 
-        padding: "4px 20px", 
-        borderRadius: "8px", 
-        fontSize: "16px", 
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
         borderLeft: "5px solid red",
       },
     });
   }
 };
-const check_user_ = ()=>{
-  const token = localStorage.getItem('token')
-  if(token){
-    router.push('/antar_')
-    toast.success('sorry ! logged user cannot have access ', {
+const check_user_ = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    router.push("/antar_");
+    toast.success("sorry ! logged user cannot have access ", {
       position: "top-right",
       duration: 3000,
       dismissible: true,
       style: {
-        background: "#FFF5F5", 
-        color: "black", 
-        padding: "4px 20px", 
-        borderRadius: "8px", 
-        fontSize: "16px", 
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
         borderLeft: "5px solid red",
       },
     });
     // router.push(from);  // Redirect back to the previous route
-  }else{
-    router.push('/login')
+  } else {
+    router.push("/login");
   }
-}
-onMounted(check_user_)
+};
+onMounted(check_user_);
 </script>
 
 <style scoped>

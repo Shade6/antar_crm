@@ -27,3 +27,13 @@ npm run dev
 ```sh
 npm run build
 ```
+
+
+## store
+import { useSwitchStore } from '@/stores/switch';
+const switchStore = useSwitchStore();
+
+
+
+
+https://crm.shade6.com/
