@@ -67,6 +67,7 @@ import { onMounted, ref } from "vue";
 import { Card, Input, Button } from "frappe-ui";
 import { userLogin, menu } from "@/api/userApi";
 import { useRouter } from "vue-router"; // Importing Vue Router
+import CryptoJS from "crypto-js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -102,7 +103,10 @@ const login_handler = async () => {
     });
     const menu_res = await menu(res.role_id);
     if (menu_res.statusCode == 200) {
-      switchStore.AddMenu(menu_res.data);
+      const bytes = CryptoJS.AES.decrypt(menu_res.data, 'your-secret-key');
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+      switchStore.AddMenu(decryptedData);
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.role_id);
       router.push("/antar_");

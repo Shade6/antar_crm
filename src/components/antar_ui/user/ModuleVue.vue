@@ -1,32 +1,24 @@
-<script setup>
-import { ref ,onMounted} from "vue";
-import {
-  ListView,
-  ListSelectBanner,
-  ListRows,
-  ListRowItem,
-  FeatherIcon,
-} from "frappe-ui";
-import {findAllUsers} from '@/api/userApi.js'
+<script setup >
+import {ref,h,onMounted,watch} from 'vue'
+import {ListView} from 'frappe-ui'
+import {findAllModule} from '@/api/userApi.js'
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-const single = ref();
-const users = ref([])
-const fetch_users=async()=>{
-  const res = await findAllUsers()
-  
-  if(res.statusCode == 200){
-    users.value = res.data.map((val, i) => ({
+import { useReloadStore } from "@/stores/reload";
+const ReloadStore = useReloadStore();
+const modules = ref([])
+const fetch_module = async()=>{
+    const res = await findAllModule()
+    if(res.statusCode == 200){
+        modules.value = res.data.map((val, i) => ({
         id: i + 1,
-        name: `${val.first_name} ${val.last_name}`,
-        email: val.email,
-        status: val.enabled ? "Active" : "Inactive",
-        role: val.role.role_name,
-        user_image: val.user_image, // Assuming `user_image` is present
+        name: val.module_name,
+        type: val.docs_type,
+        active: val.is_active ? "Active" : "Inactive",
       }));
-  }else{
-    toast.success(res.message, {
+    }else{
+        toast.success(res.message, {
         position: "top-right",
         duration: 3000,
         dismissible: true,
@@ -40,21 +32,21 @@ const fetch_users=async()=>{
           borderLeft: "5px solid red",
         },
       });
-  }
+    }
 }
-onMounted(()=>{
-  fetch_users()
+onMounted(fetch_module)
+watch(()=>ReloadStore.reload_module,()=>{
+    fetch_module()
 })
 </script>
 
 <template>
-  <div class="p-1">
-    <div class="p-7">
-      <ListView
+    <div class="p-4">
+        <ListView
         class="h-2/3"
         :columns="[
           {
-            label: 'Name',
+            label: 'name',
             key: 'name',
             
             getLabel: ({ row }) => row.name,
@@ -67,20 +59,16 @@ onMounted(()=>{
             },
           },
           {
-            label: 'Email',
-            key: 'email',
+            label: 'docs type',
+            key: 'type',
            
           },
           {
-            label: 'Role',
-            key: 'role',
-          },
-          {
-            label: 'Status',
-            key: 'status',
-          },
+            label: 'active',
+            key: 'active',
+          }
         ]"
-        :rows="users"
+        :rows="modules"
         :options="{
           selectable: true,
           showTooltip: true,
@@ -104,7 +92,8 @@ onMounted(()=>{
         </template>
       </ListView>
     </div>
-  </div>
 </template>
 
-<style scoped></style>
+<style  scoped>
+
+</style>

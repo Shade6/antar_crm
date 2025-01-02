@@ -7,6 +7,7 @@ export const useSwitchStore = defineStore("switch", () => {
   const notification = ref(false);
   const profileView = ref(null);
   const menu = ref([])
+  const pageId = ref(null)
 
   // Actions
   const changeProfileView = (data) => {
@@ -16,10 +17,14 @@ export const useSwitchStore = defineStore("switch", () => {
     notification.value = !notification.value;
   };
   const changePage = (data) => {
-    page.value = data;
+    page.value = data.module_name;
+    pageId.value = data.module_id;
   };
  const AddMenu = (data)=>{
   menu.value = data
+ }
+ const AddPageId=(data)=>{
+  pageId.value = data
  }
  const clearPersist = () => {
   localStorage.removeItem("switch-store"); // Remove stored data
@@ -27,6 +32,8 @@ export const useSwitchStore = defineStore("switch", () => {
   menu.value = []; // Clear menu
 };
   return {
+    AddPageId,
+    pageId,
     page,
     changePage,
     notification,
@@ -44,7 +51,7 @@ export const useSwitchStore = defineStore("switch", () => {
       {
         key: "switch-store", // Key for storage
         storage: localStorage, // Store data in localStorage
-        paths: ["page","menu"], // Persist only the 'page' state
+        paths: ["page","pageId","menu"], // Persist only the 'page' state
       },
     ],
   },

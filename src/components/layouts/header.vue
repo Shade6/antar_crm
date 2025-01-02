@@ -58,14 +58,14 @@ const logout =()=>{
           label: 'Users',
           icon: () => h(FeatherIcon, { name: 'user' }),
           onClick: () => {
-            switchStore.changePage('user');
+            switchStore.changePage({module_name:'user',module_id:'87c9139e-1586-40c8-8a96-436ca33ad952'});
           }
         },
         switchStore.menu.find((val)=>val.module.module_name == 'user-settings') && {
           label: 'User Settings',
           icon: () => h(FeatherIcon, { name: 'users' }),
           onClick: () => {
-            switchStore.changePage('user-settings');
+            switchStore.changePage({module_name:'user-settings',module_id:'ff5e2c3b-dd8a-45da-bcf4-0f8900902a92'});
           }
         }
       ].filter(Boolean) // Filter out null values if conditions fail
@@ -103,7 +103,7 @@ const logout =()=>{
       </li>
 
 
-      <li v-for="menu in switchStore.menu.filter((val)=>val.module.docs_type == 'crm')" @click="switchStore.changePage(menu.module.module_name)" class="nav-item flex my-2">
+      <li v-for="menu in switchStore.menu.filter((val)=>val.module.docs_type == 'crm')" @click="switchStore.changePage(menu.module)" class="nav-item flex my-2">
         <div class="nav-item__icon">
           <LeadsIcon v-if="menu.module.module_name == 'leads'"/>
           <DealsIcon v-else-if="menu.module.module_name == 'deals'"/>

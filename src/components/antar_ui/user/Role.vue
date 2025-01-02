@@ -1,32 +1,27 @@
-<script setup>
-import { ref ,onMounted} from "vue";
-import {
-  ListView,
-  ListSelectBanner,
-  ListRows,
-  ListRowItem,
-  FeatherIcon,
-} from "frappe-ui";
-import {findAllUsers} from '@/api/userApi.js'
+<script setup >
+import {ref,h,onMounted,watch} from 'vue'
+import {ListView} from 'frappe-ui'
+import {findAllRole} from '@/api/userApi.js'
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
+import { useReloadStore } from "@/stores/reload";
+const ReloadStore = useReloadStore();
 const toast = useToast();
-const single = ref();
-const users = ref([])
-const fetch_users=async()=>{
-  const res = await findAllUsers()
-  
-  if(res.statusCode == 200){
-    users.value = res.data.map((val, i) => ({
+const roles = ref([])
+const fetch_role = async()=>{
+    const res = await findAllRole()
+    if(res.statusCode == 200){
+        roles.value = res.data.map((val, i) => ({
         id: i + 1,
-        name: `${val.first_name} ${val.last_name}`,
-        email: val.email,
-        status: val.enabled ? "Active" : "Inactive",
-        role: val.role.role_name,
-        user_image: val.user_image, // Assuming `user_image` is present
+        name: `${val.role_name}`,
+        type: val.role_type,
+        // status: val.is_active ? "Active" : "Inactive",
+        owner:val.owner,
+        // created: val.role.role_name,
+        created: val.created_at, // Assuming `user_image` is present
       }));
-  }else{
-    toast.success(res.message, {
+    }else{
+        toast.success(res.message, {
         position: "top-right",
         duration: 3000,
         dismissible: true,
@@ -40,21 +35,21 @@ const fetch_users=async()=>{
           borderLeft: "5px solid red",
         },
       });
-  }
+    }
 }
-onMounted(()=>{
-  fetch_users()
+onMounted(fetch_role)
+watch(()=>ReloadStore.reload_role,()=>{
+    fetch_role()
 })
 </script>
 
 <template>
-  <div class="p-1">
-    <div class="p-7">
-      <ListView
+    <div class="p-4">
+        <ListView
         class="h-2/3"
         :columns="[
           {
-            label: 'Name',
+            label: 'role name',
             key: 'name',
             
             getLabel: ({ row }) => row.name,
@@ -67,20 +62,20 @@ onMounted(()=>{
             },
           },
           {
-            label: 'Email',
-            key: 'email',
+            label: 'role type',
+            key: 'type',
            
           },
           {
-            label: 'Role',
-            key: 'role',
+            label: 'owner',
+            key: 'owner',
           },
           {
-            label: 'Status',
-            key: 'status',
+            label: 'created at',
+            key: 'created',
           },
         ]"
-        :rows="users"
+        :rows="roles"
         :options="{
           selectable: true,
           showTooltip: true,
@@ -104,7 +99,8 @@ onMounted(()=>{
         </template>
       </ListView>
     </div>
-  </div>
 </template>
 
-<style scoped></style>
+<style  scoped>
+
+</style>

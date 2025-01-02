@@ -1,32 +1,26 @@
-<script setup>
-import { ref ,onMounted} from "vue";
-import {
-  ListView,
-  ListSelectBanner,
-  ListRows,
-  ListRowItem,
-  FeatherIcon,
-} from "frappe-ui";
-import {findAllUsers} from '@/api/userApi.js'
+<script setup >
+import {ref,h,onMounted} from 'vue'
+import {ListView} from 'frappe-ui'
+import {findAllPermission} from '@/api/userApi.js'
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-const single = ref();
-const users = ref([])
-const fetch_users=async()=>{
-  const res = await findAllUsers()
-  
-  if(res.statusCode == 200){
-    users.value = res.data.map((val, i) => ({
+const permissions = ref([])
+const fetch_permission = async()=>{
+    const res = await findAllPermission()
+    if(res.statusCode == 200){
+        permissions.value = res.data.map((val, i) => ({
         id: i + 1,
-        name: `${val.first_name} ${val.last_name}`,
-        email: val.email,
-        status: val.enabled ? "Active" : "Inactive",
+        name:val.module_perm_name,
+        module:val.module.module_name,
         role: val.role.role_name,
-        user_image: val.user_image, // Assuming `user_image` is present
+        read: val.read,
+        create: val.create,
+        amend: val.amend, // Assuming `user_image` is present
+        delete: val.delete, // Assuming `user_image` is present
       }));
-  }else{
-    toast.success(res.message, {
+    }else{
+        toast.success(res.message, {
         position: "top-right",
         duration: 3000,
         dismissible: true,
@@ -40,17 +34,14 @@ const fetch_users=async()=>{
           borderLeft: "5px solid red",
         },
       });
-  }
+    }
 }
-onMounted(()=>{
-  fetch_users()
-})
+onMounted(fetch_permission)
 </script>
 
 <template>
-  <div class="p-1">
-    <div class="p-7">
-      <ListView
+    <div class="p-4">
+        <ListView
         class="h-2/3"
         :columns="[
           {
@@ -67,8 +58,8 @@ onMounted(()=>{
             },
           },
           {
-            label: 'Email',
-            key: 'email',
+            label: 'module',
+            key: 'module',
            
           },
           {
@@ -76,11 +67,23 @@ onMounted(()=>{
             key: 'role',
           },
           {
-            label: 'Status',
-            key: 'status',
+            label: 'read',
+            key: 'read',
+          },
+          {
+            label: 'create',
+            key: 'create',
+          },
+          {
+            label: 'amend',
+            key: 'amend',
+          },
+          {
+            label: 'delete',
+            key: 'delete',
           },
         ]"
-        :rows="users"
+        :rows="permissions"
         :options="{
           selectable: true,
           showTooltip: true,
@@ -104,7 +107,8 @@ onMounted(()=>{
         </template>
       </ListView>
     </div>
-  </div>
 </template>
 
-<style scoped></style>
+<style  scoped>
+
+</style>
