@@ -1,7 +1,7 @@
 const { Op } = require('sequelize'); // Import Op from Sequel
 const db = require('../../models')
 const Module = db.module
-
+const CryptoJS = require("crypto-js");
 const Users = db.users
 const Role = db.role
 const ModulePermission = db.module_permission
@@ -41,33 +41,34 @@ exports.get_user_menu = async (req, res) => {
         }
 
         const find_role = await Role.findOne({ where: { role_id: role_id } });
-
         if (!find_role) {
             return res.json({ message: 'Cannot find role', statusCode: 400 });
         }
+        const find_permissions = await ModulePermission.findAll({
+            where: { role_id: role_id },
+            include: {
+                model: Module,
+                as: 'module',
+                attributes: ['module_name', 'module_id','docs_type'] 
+            },
+            attributes: ['read', 'create', 'delete', 'amend'] 
+        });
 
-        if (find_role.role_name === 'system admin') {
-            const find_all_modules = await Module.findAll({ where: { docs_type:{
-                [Op.or]: ['crm', 'user'] // Matches 'crm' OR 'user'
-              }} });
-            const modulesWithAccess = find_all_modules.map(module => ({
-                module:{...module.toJSON()},
-                module_permission: {
-                    read: true,
-                    create: true,
-                    amend: true,
-                    delete: true
-                }
-            }));
-
-            return res.json({
-                message: 'Navbar fetched successfully',
-                statusCode: 200,
-                data: modulesWithAccess
-            });
+        if (!find_permissions.length) {
+            return res.json({ message: 'No permissions assigned for this role', statusCode: 400 });
         }
 
-        const find_all_permission = await ModulePermission.findAll({where:{role_id:role_id}})
+        const encryptedData = CryptoJS.AES.encrypt(
+            JSON.stringify(find_permissions),
+            'your-secret-key'
+        ).toString();
+
+        // Send encrypted response
+        return res.json({
+            message: 'Navbar fetched successfully',
+            statusCode: 200,
+            data: encryptedData
+        });
 
     } catch (error) {
         // Handle server errors

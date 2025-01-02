@@ -42,5 +42,38 @@ db.salesOrders = require("./salesorder/SalesOrders.model.js")(sequelize, Sequeli
 db.tasksAndActivities = require("./taskactivity/TasksAndActivities.model.js")(sequelize, Sequelize);
 
 
+//-------------------------------------------------------------------------------------------
+db.module.hasMany(db.module_permission, { //---this is the reference 
+  foreignKey: 'module_id',
+  as: 'permissions'      
+});
+db.module_permission.belongsTo(db.module, { //---this is the original table
+  foreignKey: 'module_id', 
+  targetKey: 'module_id',         
+  as: 'module'             
+});
+db.role.hasMany(db.module_permission, { //---this is the reference 
+  foreignKey: 'role_id',
+  as: 'permissions'      
+});
+db.module_permission.belongsTo(db.role, { //---this is the original table
+  foreignKey: 'role_id', 
+  targetKey: 'role_id',         
+  as: 'role'             
+});
+
+
+
+//-------------------------------------------------------------------------------------------
+db.role.hasMany(db.users, { //---this is the reference 
+  foreignKey: 'role_id',
+  as: 'module'      
+});
+db.users.belongsTo(db.role, { //---this is the original table
+  foreignKey: 'role_id', 
+  targetKey: 'role_id',         
+  as: 'role'             
+});
+
 
 module.exports = db;

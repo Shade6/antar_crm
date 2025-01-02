@@ -57,7 +57,8 @@ exports.get_module = async(req,res)=>{
 
 exports.find_all_module= async(req,res)=>{
     try {
-        res.json({ message: 'finding all   on maintanance', statusCode: 200 });
+      const find_all_modules = await Module.findAll()
+        res.json({ message: 'module find successfully', statusCode: 200 ,data:find_all_modules??[]});
     } catch (error) {
         res.json({ message: error.message, statusCode: 500 });
     }

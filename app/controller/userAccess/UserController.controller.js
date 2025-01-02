@@ -1,6 +1,7 @@
 const field_checker = require("../../utils/validate_body");
 const db = require("../../models");
 const Users = db.users;
+const Role = db.role
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
 
@@ -68,7 +69,7 @@ exports.login=async(req,res)=>{
     const isMatch = await bcrypt.compare(password, find_user_with_email.password);
 
     if (isMatch) {
-      const token = jwt.sign({ user_id: find_user_with_email.user_id }, process.env.JWT_SECRET_KEY, {
+      const token = jwt.sign({ user_id: find_user_with_email.user_id,role_id:find_user_with_email.role_id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "5d",
       });
 
@@ -107,7 +108,9 @@ exports.get_user = async(req,res)=>{
 
 exports.find_all_user = async(req,res)=>{
     try {
-        res.json({ message: 'finding all user  on maintanance', statusCode: 200 });
+         const find_users = await Users.findAll({ attributes: ['user_id', 'first_name', 'last_name', 'email','profile','created_at'],include:{model:Role,as:'role'} })
+
+        res.json({ message: 'user find successful', statusCode: 200 ,data:find_users??[]});
     } catch (error) {
         res.json({ message: error.message, statusCode: 500 });
     }

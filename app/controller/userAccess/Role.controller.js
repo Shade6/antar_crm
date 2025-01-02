@@ -25,7 +25,7 @@ exports.create_role=async(req,res)=>{
         role_type:role_type ?? '',
         page_status:page_status ?? false,
         page:page ?? '',
-        owner:owner ?? '',
+        owner:owner ?? false,
         is_active:is_active ?? true,
         created_by:1,
         created_at:new Date()
@@ -56,7 +56,8 @@ exports.get_role = async(req,res)=>{
 
 exports.find_all_role= async(req,res)=>{
     try {
-        res.json({ message: 'finding all   on maintanance', statusCode: 200 });
+        const find_all_role = await Role.findAll()
+        res.json({ message: 'roles find successful', statusCode: 200 ,data:find_all_role??[]});
     } catch (error) {
         res.json({ message: error.message, statusCode: 500 });
     }
