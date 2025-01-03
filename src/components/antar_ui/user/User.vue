@@ -1,5 +1,5 @@
 <script setup>
-import { ref ,onMounted} from "vue";
+import { ref ,onMounted,watch} from "vue";
 import {
   ListView,
   ListSelectBanner,
@@ -10,6 +10,9 @@ import {
 import {findAllUsers} from '@/api/userApi.js'
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
+import { useReloadStore } from "@/stores/reload.js";
+const ReloadStore = useReloadStore();
+
 const toast = useToast();
 const single = ref();
 const users = ref([])
@@ -43,6 +46,9 @@ const fetch_users=async()=>{
   }
 }
 onMounted(()=>{
+  fetch_users()
+})
+watch(()=>ReloadStore.reload_user,()=>{
   fetch_users()
 })
 </script>

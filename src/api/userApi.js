@@ -48,5 +48,12 @@ export const create_module = async(data)=>{
   return (await axiosInstance.post(`create_module?mdl=${switchStore.pageId}`,data)).data
 }
 
+export const findAllRolePermission = async(data)=>{
+  return (await axiosInstance.get(`find_all_role_permissions?mdl=${switchStore.pageId}&&role=${data}`)).data
+}
 
 
+
+export const permission_giver = async(data)=>{
+  return (await axiosInstance.put(`permission_giver?mdl=${switchStore.pageId}`,data)).data
+}

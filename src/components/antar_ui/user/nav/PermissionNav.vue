@@ -1,14 +1,22 @@
 <script setup>
-import { ref, h ,defineEmits  } from "vue";
+import { ref, h ,defineEmits ,onMounted } from "vue";
 import { Button, Dropdown, FeatherIcon, Dialog ,TextInput,Autocomplete} from "frappe-ui";
-import { useReloadStore } from "@/stores/reload.js";
-import {create_permission} from '@/api/userApi.js'
+import { useReloadStore } from "@/stores/reload";
+import {create_permission,findAllModule,findAllRole} from '@/api/userApi.js'
+import "@/assets/toast.css";
+import { useToast } from "vue-toast-notification";
+const toast = useToast();
 const ReloadStore = useReloadStore();
 const emit = defineEmits(["go_back"]);
 
 // State to manage modal visibility
 const isDialogVisible = ref(false);
 const single = ref('')
+const selected_module=ref(null)
+const selected_role = ref(null)
+const module_list =ref([])
+const role_list = ref([])
+const permission_type = ref("")
 // Function to open modal
 const openDialog = () => {
   isDialogVisible.value = true;
@@ -22,13 +30,103 @@ const closeDialog = () => {
 const handle_back =()=>{
     emit("go_back");
 }
-const handle_save = async () => {
-  const data = {
-    role_name: Role_name.value,
-    role_type: Role_type.value,
-  };
-  const res = await create_permission(data);
-  if (res.statusCode == 200) {
+// const handle_save = async () => {
+//   const data = {
+//     role_name: Role_name.value,
+//     role_type: Role_type.value,
+//   };
+//   const res = await create_permission(data);
+//   if (res.statusCode == 200) {
+//     toast.success(res.message, {
+//       position: "top-right",
+//       duration: 3000,
+//       dismissible: true,
+//       style: {
+//         background: "white",
+//         color: "black",
+//         padding: "4px 20px",
+//         borderRadius: "8px",
+//         fontSize: "16px",
+//         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+//         borderLeft: "5px solid green",
+//       },
+//     });
+//     ReloadStore.set_permission_reload();
+//   } else {
+//     toast.success(res.message, {
+//       position: "top-right",
+//       duration: 3000,
+//       dismissible: true,
+//       style: {
+//         background: "#FFF5F5",
+//         color: "black",
+//         padding: "4px 20px",
+//         borderRadius: "8px",
+//         fontSize: "16px",
+//         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+//         borderLeft: "5px solid red",
+//       },
+//     });
+//   }
+// };
+const fetch_details = async () => {
+  try {
+    // Await results from Promise.all
+    const [module_res, role_res] = await Promise.all([findAllModule(), findAllRole()]);
+
+    // Handle module response
+    if (module_res.statusCode === 200) {
+      module_list.value =  module_res.data.map((val, i) => ({
+        label: val.module_name,
+        value: val.module_id
+      }));
+    } else {
+      showErrorToast(module_res.message);
+    }
+
+    // Handle role response
+    if (role_res.statusCode === 200) {
+      role_list.value =  role_res.data.map((val, i) => ({
+        label: val.role_name,
+        value: val.role_id
+      }));
+    } else {
+      showErrorToast(role_res.message);
+    }
+  } catch (error) {
+    // Catch network or unexpected errors
+    console.error("Error fetching details:", error);
+    showErrorToast("Failed to fetch details. Please try again.");
+  }
+};
+
+// Reusable error toast function
+const showErrorToast = (message) => {
+  toast.success(message, {
+    position: "top-right",
+    duration: 3000,
+    dismissible: true,
+    style: {
+      background: "#FFF5F5",
+      color: "black",
+      padding: "4px 20px",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+      borderLeft: "5px solid red",
+    },
+  });
+};
+
+
+const handle_save = async()=>{
+  const details = {
+    module_id:selected_module.value.value,
+    role_id:selected_role.value.value,
+    module_perm_name:permission_type.value
+  }
+  const res = await create_permission(details)
+  if(res.statusCode == 200){
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -43,8 +141,9 @@ const handle_save = async () => {
         borderLeft: "5px solid green",
       },
     });
+    isDialogVisible.value = false;
     ReloadStore.set_permission_reload();
-  } else {
+  }else{
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -60,7 +159,9 @@ const handle_save = async () => {
       },
     });
   }
-};
+}
+// Fetch details when component is mounted
+onMounted(fetch_details);
 </script>
 
 <template>
@@ -159,8 +260,9 @@ const handle_save = async () => {
         <template #body-content>
           <div>
             <div class="p-2">
-                <span class="font-semibold text-xs text-gray-700">first name</span>
+                <span class="font-semibold text-xs text-gray-700">permission type</span>
                 <TextInput
+                    v-model="permission_type"
                     :type="'text'"
                     :ref_for="true"
                     size="sm"
@@ -171,74 +273,29 @@ const handle_save = async () => {
                 />
                 </div>
                 <div class="p-2">
-                <span class="font-semibold text-xs text-gray-700">last name</span>
-                <TextInput
-                    :type="'text'"
-                    :ref_for="true"
-                    size="sm"
-                    variant="subtle"
-                    placeholder="Placeholder"
-                    :disabled="false"
-                    modelValue=""
-                />
-                </div>
-                <div class="p-2">
-                <span class="font-semibold text-xs text-gray-700">email</span>
-                <TextInput
-                    :type="'text'"
-                    :ref_for="true"
-                    size="sm"
-                    variant="subtle"
-                    placeholder="Placeholder"
-                    :disabled="false"
-                    modelValue=""
-                />
-                </div>
+                    <span class="font-semibold text-xs text-gray-700">Module</span>
+                      <Autocomplete
+                        :options="module_list"
+                        v-model="selected_module"
+                        placeholder="Select person"
+                      />
+                    </div>
                 <div class="p-2">
                     <span class="font-semibold text-xs text-gray-700">Role</span>
-  <Autocomplete
-    :options="[
-      {
-        label: 'John Doe',
-        value: 'john-doe',
-        image: 'https://randomuser.me/api/portraits/men/59.jpg',
-      },
-      {
-        label: 'Jane Doe',
-        value: 'jane-doe',
-        image: 'https://randomuser.me/api/portraits/women/58.jpg',
-      },
-      {
-        label: 'John Smith',
-        value: 'john-smith',
-        image: 'https://randomuser.me/api/portraits/men/59.jpg',
-      },
-      {
-        label: 'Jane Smith',
-        value: 'jane-smith',
-        image: 'https://randomuser.me/api/portraits/women/59.jpg',
-      },
-      {
-        label: 'John Wayne',
-        value: 'john-wayne',
-        image: 'https://randomuser.me/api/portraits/men/57.jpg',
-      },
-      {
-        label: 'Jane Wayne',
-        value: 'jane-wayne',
-        image: 'https://randomuser.me/api/portraits/women/51.jpg',
-      },
-    ]"
-    v-model="single"
-    placeholder="Select person"
-  />
-</div>
+                      <Autocomplete
+                        :options="role_list"
+                        v-model="selected_role"
+                        placeholder="Select person"
+                      />
+                    </div>
+            
+                
           </div>
         </template>
         <template #actions>
             <div class="flex justify-between">
                 <Button class="ml-2" > Edit full Form </Button>
-                <Button variant="solid"> Save User</Button>
+                <Button @click="handle_save" variant="solid">Save Permission</Button>
             </div>
         
          
