@@ -4,14 +4,17 @@ const Users = db.users;
 const Role = db.role
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
+const emailValidator = require('email-validator');
+
+
 
 exports.create_user = async (req, res) => {
   try {
     const { email, password, role_id, first_name, last_name, enabled } =
       req.body;
+
     const validation = field_checker.checkNullValues({
       email: email,
-      password: password,
       role :role_id
     });
 
@@ -22,6 +25,10 @@ exports.create_user = async (req, res) => {
       });
     }
 
+
+    if (!emailValidator.validate(email)) {
+       return res.json({message:'invalid email ! please check the email',statusCode:400})
+    } 
     const find_user_exist = await Users.findOne({ where: { email: email } });
     if (find_user_exist) {
       return res.json({
@@ -29,14 +36,14 @@ exports.create_user = async (req, res) => {
         statusCode: 400,
       });
     }
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  // const hashedPassword = bcrypt.hashSync(password, 10);
 
     const create = await Users.create({
         first_name:first_name ?? '',
         last_name:last_name ?? '',
         email:email ?? '',
         role_id:role_id,
-        password:hashedPassword,
+        // password:hashedPassword,
         created_by:1,
         created_at:new Date()
 

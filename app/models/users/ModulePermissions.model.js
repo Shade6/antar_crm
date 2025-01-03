@@ -42,6 +42,12 @@ module.exports = (sequelize, Sequelize) => {
       amend: {
         type: Sequelize.BOOLEAN,
       },
+      import:{
+        type: Sequelize.BOOLEAN,
+      },
+      export:{
+        type: Sequelize.BOOLEAN,
+      },
       created_by: {
         type: Sequelize.INTEGER,
       },

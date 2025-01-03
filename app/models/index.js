@@ -42,6 +42,12 @@ db.salesOrders = require("./salesorder/SalesOrders.model.js")(sequelize, Sequeli
 db.tasksAndActivities = require("./taskactivity/TasksAndActivities.model.js")(sequelize, Sequelize);
 
 
+db.lead_assignee = require("./leads/LeadAssignee.js")(sequelize,Sequelize)
+db.user_group = require("./leads/UserGroup.js")(sequelize,Sequelize)
+db.user_group_details = require("./leads/UserGroupDetails.js")(sequelize,Sequelize)
+db.activity_log = require("./ActivityLog.js")(sequelize,Sequelize)
+db.industry = require("./leads/Industry.js")(sequelize,Sequelize)
+
 //-------------------------------------------------------------------------------------------
 db.module.hasMany(db.module_permission, { //---this is the reference 
   foreignKey: 'module_id',
