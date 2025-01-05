@@ -48,11 +48,10 @@ app.get('/',(req,res)=>{
 })
 require("./app/router/userAccess/User.routes")(app);
 require("./app/router/userAccess/Access.routes")(app);
-
 require("./app/router/userAccess/ModulePermisson_.routes")(app)
 require("./app/router/userAccess/Module_.routes")(app)
 require("./app/router/userAccess/Role_.routes")(app)
-
+require("./app/router/Industry.routes")(app)
 
 const PORT =  8088;
 app.listen(PORT, () => {
