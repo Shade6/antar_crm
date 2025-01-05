@@ -57,3 +57,11 @@ export const findAllRolePermission = async(data)=>{
 export const permission_giver = async(data)=>{
   return (await axiosInstance.put(`permission_giver?mdl=${switchStore.pageId}`,data)).data
 }
+
+export const create_industry = async(data)=>{
+  return (await axiosInstance.post(`create_industry?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const find_all_industry = async(data)=>{
+  return (await axiosInstance.get(`find_all_industry?mdl=${switchStore.pageId}&&role=${data}`)).data
+}

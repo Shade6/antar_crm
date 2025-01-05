@@ -87,6 +87,10 @@ const router = createRouter({
           path:'/antar_/user-settings',
           name:'user-settings',
           component:() => import('../views/antar_/user-management/UserSettings.vue'),
+        },{
+          path:'/antar_/settings',
+          name:'settings',
+          component:() => import('../views/antar_/settings.vue'), 
         }
       ]
     },

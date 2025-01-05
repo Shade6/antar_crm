@@ -35,6 +35,9 @@ const logout =()=>{
   localStorage.clear();
   router.push(`/login`);
 }
+const go_to_settings = ()=>{
+  router.push(`/antar_/settings`);
+}
 </script>
 
 <template>
@@ -73,6 +76,13 @@ const logout =()=>{
     {
       group: 'Action',
       items: [
+        {
+          label: 'settings',
+          icon: () => h(FeatherIcon, { name: 'settings' }),
+          onClick: () => {
+            go_to_settings();
+          }
+        },
         {
           label: 'Logout',
           icon: () => h(FeatherIcon, { name: 'power' }),

@@ -19,58 +19,60 @@
       </Button>
     </div>
 
-    <Dialog :options="{ size: '3xl' }"   v-model="dialog2">
+    <Dialog :options="{ size: '3xl' }" v-model="dialog2">
       <template #body-title>
         <h1 class="font-semibold text-2xl">Create Lead</h1>
       </template>
       <template #body-content>
         <div class="flex justify-between">
-     
           <div class="p-2 w-full">
-            <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
-          <Autocomplete
-
-            class="w-[90%]"
-            :options="[
-              {
-                label: 'John Doe',
-                value: 'john-doe',
-                image: 'https://randomuser.me/api/portraits/men/59.jpg',
-              },
-              {
-                label: 'Jane Doe',
-                value: 'jane-doe',
-                image: 'https://randomuser.me/api/portraits/women/58.jpg',
-              },
-              {
-                label: 'John Smith',
-                value: 'john-smith',
-                image: 'https://randomuser.me/api/portraits/men/59.jpg',
-              },
-              {
-                label: 'Jane Smith',
-                value: 'jane-smith',
-                image: 'https://randomuser.me/api/portraits/women/59.jpg',
-              },
-              {
-                label: 'John Wayne',
-                value: 'john-wayne',
-                image: 'https://randomuser.me/api/portraits/men/57.jpg',
-              },
-              {
-                label: 'Jane Wayne',
-                value: 'jane-wayne',
-                image: 'https://randomuser.me/api/portraits/women/51.jpg',
-              },
-            ]"
-            v-model="single"
-            placeholder="Select person"
-          />
-        </div>
-        <div class="p-2 w-full">
-            <span class="text-gray-500 font-medium text-sm my-1" >First Name</span>
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Salutation</span
+            >
+            <Autocomplete
+              class="w-[90%]"
+              :options="[
+                {
+                  label: 'John Doe',
+                  value: 'john-doe',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Doe',
+                  value: 'jane-doe',
+                  image: 'https://randomuser.me/api/portraits/women/58.jpg',
+                },
+                {
+                  label: 'John Smith',
+                  value: 'john-smith',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Smith',
+                  value: 'jane-smith',
+                  image: 'https://randomuser.me/api/portraits/women/59.jpg',
+                },
+                {
+                  label: 'John Wayne',
+                  value: 'john-wayne',
+                  image: 'https://randomuser.me/api/portraits/men/57.jpg',
+                },
+                {
+                  label: 'Jane Wayne',
+                  value: 'jane-wayne',
+                  image: 'https://randomuser.me/api/portraits/women/51.jpg',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >First Name</span
+            >
             <TextInput
-             class="text-gray-500 font-medium text-sm my-1"
+              class="text-gray-500 font-medium text-sm my-1"
               :type="'text'"
               :ref_for="true"
               size="sm"
@@ -81,9 +83,11 @@
             />
           </div>
           <div class="p-2 w-full">
-            <span class="text-gray-500 font-medium text-sm my-1">Last Name</span>
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Last Name</span
+            >
             <TextInput
-            class="text-gray-500 font-medium text-sm my-1"
+              class="text-gray-500 font-medium text-sm my-1"
               :type="'text'"
               :ref_for="true"
               size="sm"
@@ -94,295 +98,317 @@
             />
           </div>
         </div>
-
-
 
         <div class="flex justify-between">
-     
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Email</span>
-     <Autocomplete
-       :options="[
-         {
-           label: 'John Doe',
-           value: 'john-doe',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Doe',
-           value: 'jane-doe',
-           image: 'https://randomuser.me/api/portraits/women/58.jpg',
-         },
-         {
-           label: 'John Smith',
-           value: 'john-smith',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Smith',
-           value: 'jane-smith',
-           image: 'https://randomuser.me/api/portraits/women/59.jpg',
-         },
-         {
-           label: 'John Wayne',
-           value: 'john-wayne',
-           image: 'https://randomuser.me/api/portraits/men/57.jpg',
-         },
-         {
-           label: 'Jane Wayne',
-           value: 'jane-wayne',
-           image: 'https://randomuser.me/api/portraits/women/51.jpg',
-         },
-       ]"
-       v-model="single"
-       placeholder="Select person"
-     />
-   </div>
-   <div class="p-2 w-full">
-    <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-   </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1">Email</span>
+            <TextInput
+              class="text-gray-500 font-medium text-sm my-1"
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Mobile No</span
+            >
+            <TextInput
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
+            <Autocomplete
+              :options="[
+                {
+                  label: 'Female',
+                  value: 'Female',
+                },
+                {
+                  label: 'Genderqueer',
+                  value: 'Genderqueer',
+                },
+                {
+                  label: 'Male',
+                  value: 'Male',
+                },
+                {
+                  label: 'Non-Confoming',
+                  value: 'Non-Confoming',
+                },
+                {
+                  label: 'Other',
+                  value: 'Other',
+                },
+                {
+                  label: 'Prefer not to say',
+                  value: 'Transgender',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+        </div>
 
-   <hr class="my-3">
+        <hr class="my-3" />
 
-   <div class="flex justify-between">
-     
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Organization</span>
-     <Autocomplete
-       :options="[
-         {
-           label: 'John Doe',
-           value: 'john-doe',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Doe',
-           value: 'jane-doe',
-           image: 'https://randomuser.me/api/portraits/women/58.jpg',
-         },
-         {
-           label: 'John Smith',
-           value: 'john-smith',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Smith',
-           value: 'jane-smith',
-           image: 'https://randomuser.me/api/portraits/women/59.jpg',
-         },
-         {
-           label: 'John Wayne',
-           value: 'john-wayne',
-           image: 'https://randomuser.me/api/portraits/men/57.jpg',
-         },
-         {
-           label: 'Jane Wayne',
-           value: 'jane-wayne',
-           image: 'https://randomuser.me/api/portraits/women/51.jpg',
-         },
-       ]"
-       v-model="single"
-       placeholder="Select person"
-     />
-   </div>
-   <div class="p-2 w-full">
-    <span class="text-gray-500 font-medium text-sm my-1">Website</span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">No. of Employees  </span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-   </div>
-   <div class="flex justify-between">
-     
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
-     <Autocomplete
-       :options="[
-         {
-           label: 'John Doe',
-           value: 'john-doe',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Doe',
-           value: 'jane-doe',
-           image: 'https://randomuser.me/api/portraits/women/58.jpg',
-         },
-         {
-           label: 'John Smith',
-           value: 'john-smith',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Smith',
-           value: 'jane-smith',
-           image: 'https://randomuser.me/api/portraits/women/59.jpg',
-         },
-         {
-           label: 'John Wayne',
-           value: 'john-wayne',
-           image: 'https://randomuser.me/api/portraits/men/57.jpg',
-         },
-         {
-           label: 'Jane Wayne',
-           value: 'jane-wayne',
-           image: 'https://randomuser.me/api/portraits/women/51.jpg',
-         },
-       ]"
-       v-model="single"
-       placeholder="Select person"
-     />
-   </div>
-   <div class="p-2 w-full">
-    <span class="text-gray-500 font-medium text-sm my-1">Annual Revenue
-    </span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
-       <TextInput
-         :type="'text'"
-         :ref_for="true"
-         size="sm"
-         variant="subtle"
-         placeholder="Placeholder"
-         :disabled="false"
-         modelValue=""
-       />
-     </div>
-   </div>
-   <hr class="my-3">
-   <div class="flex justify-between">
-     
-     <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Status </span>
-     <Autocomplete
-       :options="[
-         {
-           label: 'John Doe',
-           value: 'john-doe',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Doe',
-           value: 'jane-doe',
-           image: 'https://randomuser.me/api/portraits/women/58.jpg',
-         },
-         {
-           label: 'John Smith',
-           value: 'john-smith',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Smith',
-           value: 'jane-smith',
-           image: 'https://randomuser.me/api/portraits/women/59.jpg',
-         },
-         {
-           label: 'John Wayne',
-           value: 'john-wayne',
-           image: 'https://randomuser.me/api/portraits/men/57.jpg',
-         },
-         {
-           label: 'Jane Wayne',
-           value: 'jane-wayne',
-           image: 'https://randomuser.me/api/portraits/women/51.jpg',
-         },
-       ]"
-       v-model="single"
-       placeholder="Select person"
-     />
-   </div>
-   <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Lead Owner </span>
-     <Autocomplete
-       :options="[
-         {
-           label: 'John Doe',
-           value: 'john-doe',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Doe',
-           value: 'jane-doe',
-           image: 'https://randomuser.me/api/portraits/women/58.jpg',
-         },
-         {
-           label: 'John Smith',
-           value: 'john-smith',
-           image: 'https://randomuser.me/api/portraits/men/59.jpg',
-         },
-         {
-           label: 'Jane Smith',
-           value: 'jane-smith',
-           image: 'https://randomuser.me/api/portraits/women/59.jpg',
-         },
-         {
-           label: 'John Wayne',
-           value: 'john-wayne',
-           image: 'https://randomuser.me/api/portraits/men/57.jpg',
-         },
-         {
-           label: 'Jane Wayne',
-           value: 'jane-wayne',
-           image: 'https://randomuser.me/api/portraits/women/51.jpg',
-         },
-       ]"
-       v-model="single"
-       placeholder="Select person"
-     />
-   </div>
+        <div class="flex justify-between">
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Organization</span
+            >
+            <TextInput
+              class="text-gray-500 font-medium text-sm my-1"
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1">Website</span>
+            <TextInput
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >No. of Employees
+            </span>
 
-   </div>
-        
+            <Autocomplete
+              :options="[
+                {
+                  label: '1-10',
+                  value: '1-10',
+                },
+                {
+                  label: '11-50',
+                  value: 'jane-doe',
+                },
+                {
+                  label: '51-200',
+                  value: '51-200',
+                },
+                {
+                  label: '201',
+                  value: '500',
+                },
+                {
+                  label: '501-1000',
+                  value: '501-1000',
+                },
+                {
+                  label: '1000+',
+                  value: '1000+',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+              :hideSearch="true"
+            />
+          </div>
+        </div>
+        <div class="flex justify-between">
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Territory</span
+            >
+            <Autocomplete
+              :options="[
+                {
+                  label: 'John Doe',
+                  value: 'john-doe',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Doe',
+                  value: 'jane-doe',
+                  image: 'https://randomuser.me/api/portraits/women/58.jpg',
+                },
+                {
+                  label: 'John Smith',
+                  value: 'john-smith',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Smith',
+                  value: 'jane-smith',
+                  image: 'https://randomuser.me/api/portraits/women/59.jpg',
+                },
+                {
+                  label: 'John Wayne',
+                  value: 'john-wayne',
+                  image: 'https://randomuser.me/api/portraits/men/57.jpg',
+                },
+                {
+                  label: 'Jane Wayne',
+                  value: 'jane-wayne',
+                  image: 'https://randomuser.me/api/portraits/women/51.jpg',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Annual Revenue
+            </span>
+            <TextInput
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
+            <Autocomplete
+              :options="[
+                {
+                  label: 'John Doe',
+                  value: 'john-doe',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Doe',
+                  value: 'jane-doe',
+                  image: 'https://randomuser.me/api/portraits/women/58.jpg',
+                },
+                {
+                  label: 'John Smith',
+                  value: 'john-smith',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Smith',
+                  value: 'jane-smith',
+                  image: 'https://randomuser.me/api/portraits/women/59.jpg',
+                },
+                {
+                  label: 'John Wayne',
+                  value: 'john-wayne',
+                  image: 'https://randomuser.me/api/portraits/men/57.jpg',
+                },
+                {
+                  label: 'Jane Wayne',
+                  value: 'jane-wayne',
+                  image: 'https://randomuser.me/api/portraits/women/51.jpg',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+        </div>
+        <hr class="my-3" />
+        <div class="flex justify-between">
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1">Status </span>
+            <Autocomplete
+              :options="[
+                {
+                  label: 'John Doe',
+                  value: 'john-doe',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Doe',
+                  value: 'jane-doe',
+                  image: 'https://randomuser.me/api/portraits/women/58.jpg',
+                },
+                {
+                  label: 'John Smith',
+                  value: 'john-smith',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Smith',
+                  value: 'jane-smith',
+                  image: 'https://randomuser.me/api/portraits/women/59.jpg',
+                },
+                {
+                  label: 'John Wayne',
+                  value: 'john-wayne',
+                  image: 'https://randomuser.me/api/portraits/men/57.jpg',
+                },
+                {
+                  label: 'Jane Wayne',
+                  value: 'jane-wayne',
+                  image: 'https://randomuser.me/api/portraits/women/51.jpg',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+          <div class="p-2 w-full">
+            <span class="text-gray-500 font-medium text-sm my-1"
+              >Lead Owner
+            </span>
+            <Autocomplete
+              :options="[
+                {
+                  label: 'John Doe',
+                  value: 'john-doe',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Doe',
+                  value: 'jane-doe',
+                  image: 'https://randomuser.me/api/portraits/women/58.jpg',
+                },
+                {
+                  label: 'John Smith',
+                  value: 'john-smith',
+                  image: 'https://randomuser.me/api/portraits/men/59.jpg',
+                },
+                {
+                  label: 'Jane Smith',
+                  value: 'jane-smith',
+                  image: 'https://randomuser.me/api/portraits/women/59.jpg',
+                },
+                {
+                  label: 'John Wayne',
+                  value: 'john-wayne',
+                  image: 'https://randomuser.me/api/portraits/men/57.jpg',
+                },
+                {
+                  label: 'Jane Wayne',
+                  value: 'jane-wayne',
+                  image: 'https://randomuser.me/api/portraits/women/51.jpg',
+                },
+              ]"
+              v-model="single"
+              placeholder="Select person"
+            />
+          </div>
+        </div>
       </template>
       <template class="flex justify-end" #actions>
         <div class="flex justify-end">
@@ -394,12 +420,27 @@
 </template>
 
 <script setup>
-import { h, ref , watch } from "vue";
+import { h, ref, watch } from "vue";
 import { Button, Dialog, Autocomplete, TextInput } from "frappe-ui";
 const dialog2 = ref(false);
 const single = ref("");
 
-
+const form_values = ref({
+  solution:null,
+  first_name:null,
+  last_name:null,
+  email:null,
+  mobile_no:null,
+  gender:null,
+  organization:null,
+  website:null,
+  no_of_employees:null,
+  territory:null,
+  annual_revenue:null,
+  industry:null,
+  status:null,
+  lead_owner:null
+})
 
 </script>
 
