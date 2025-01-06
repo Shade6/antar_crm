@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       user_id: {
         type: Sequelize.STRING,
       },
+      lead_id:{
+        type: Sequelize.STRING,
+      },
       assigned_by: {
         type: Sequelize.STRING,
       },

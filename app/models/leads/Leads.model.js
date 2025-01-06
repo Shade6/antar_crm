@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const { territory, industry } = require("..");
 module.exports = (sequelize, Sequelize) => {
     const Leads = sequelize.define("Leads", {
       lead_id: {
@@ -6,6 +7,9 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
+      },
+      salutation:{
+        type: Sequelize.STRING,
       },
       name: {
         type: Sequelize.STRING,
@@ -22,15 +26,21 @@ module.exports = (sequelize, Sequelize) => {
       email: {
         type: Sequelize.STRING,
       },
-      phone_number: {
+      gender:{
         type: Sequelize.STRING,
       },
       lead_source: {
         type: Sequelize.STRING,
       },
+      website:{
+        type: Sequelize.STRING,
+      },
       status: {
         type: Sequelize.ENUM,
-        values: ['Open', 'Won', 'Lost'],
+        values: ['New', 'Contacted', 'Nurture','Qualified','UnQualified','Junk'],
+      },
+      employees:{
+        type: Sequelize.STRING,
       },
       assigned_to: {
         type: Sequelize.STRING,
@@ -38,10 +48,22 @@ module.exports = (sequelize, Sequelize) => {
       created_by: {
         type: Sequelize.INTEGER,
       },
+      territory_id:{
+        type: Sequelize.STRING,
+      },
+      industry_id:{
+        type: Sequelize.STRING,
+      },
+      revenue:{
+        type: Sequelize.INTEGER,
+      },
       changed_by: {
         type: Sequelize.INTEGER,
       },
       created_at:{
+        type:Sequelize.DATE
+      },
+      updated_at:{
         type:Sequelize.DATE
       }
     });

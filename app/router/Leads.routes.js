@@ -1,14 +1,15 @@
 
 module.exports = app => {
-    const leads = require("../../app/controller/Contact.controller.js");
+    const controller = require("../../app/controller/Leads.controller");
   
     var router = require("express").Router();
   
-    router.post("/create_leads", leads);
-    router.put("/update_leads", leads);
-    router.get("/get_leads", leads);
-    router.get("/get_all_leads", leads);
-    router.delete("/delete_leads", leads);
+    router.post("/create_lead", controller.create_lead);
+    router.get("/get_leads",controller.getLeads)
+    // router.put("/update_leads", leads);
+    // router.get("/get_leads", leads);
+    // router.get("/get_all_leads", leads);
+    // router.delete("/delete_leads", leads);
   
   
   

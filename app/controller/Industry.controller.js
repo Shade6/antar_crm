@@ -28,7 +28,7 @@ exports.create_industry =async(req,res)=>{
 exports.find_all_industries = async(req,res)=>{
     try {
         const find_all = await Industry.findAll({})
-        console.log(find_all)
+  
         return res.json({message:'industry found',statusCode:200,data:find_all})
 
     } catch (error) {
