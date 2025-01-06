@@ -3,10 +3,13 @@ import { h, ref } from "vue";
 import ListIcon from "@/components/Icons/ListIcon.vue";
 import CreateLead from "@/components/modal/CreateLead.vue"
 import CommonNav from "./secondNav/CommonNav.vue";
-import { Dropdown, FeatherIcon } from "frappe-ui";
+import { Dropdown, FeatherIcon ,Button} from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 const switchStore = useSwitchStore();
 const dialog2 = ref(false);
+const handle_create = ()=>{
+  switchStore.changeCreateForm('create_lead')
+}
 </script>
 
 <template>
@@ -56,14 +59,26 @@ const dialog2 = ref(false);
         </Button>
       </Dropdown>
     </div>
-     <CreateLead/>
-    
-
-
+    <div class="p-1">
+      <Button
+        v-if="switchStore.create_form == null"
+        :variant="'solid'"
+        :ref_for="true"
+        theme="gray"
+        size="sm"
+        label="Button"
+        :loading="false"
+        :loadingText="null"
+        :disabled="false"
+        :link="null"
+        @click="handle_create"
+      >
+      <span class="text-bold">+</span>
+        Create
+      </Button>
+    </div>
   </div>
-  <CommonNav
-    v-if="switchStore.page != 'user' && switchStore.page != 'user-settings'"
-  />
+  
 </template>
 
 <style scoped></style>

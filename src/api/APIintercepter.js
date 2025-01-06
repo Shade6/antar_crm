@@ -31,7 +31,8 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response || error.response.status == 404) {
       localStorage.clear();
-      navigate('/login')
+      // navigate('/login')
+      window.location.reload(BASE_URL+'login')
     }
     return Promise.reject(error);
   }

@@ -33,36 +33,14 @@ import { ListView, FeatherIcon } from "frappe-ui";
       :rows="[
         {
           id: 1,
-          name: {
-            label: 'John Doe',
-            image: 'https://avatars.githubusercontent.com/u/499550',
-          },
+          name: 'John Doe',
           email: 'john@doe.com',
-          status: {
-            label: 'Active',
-            bg_color: 'bg-surface-green-3',
-          },
-          role: {
-            label: 'Developer',
-            color: 'green',
-          },
+          status: 'Active',
+        
+          role:'Developer',
+          
         },
-        {
-          id: 2,
-          name: {
-            label: 'Jane Doe',
-            image: 'https://avatars.githubusercontent.com/u/499120',
-          },
-          email: 'jane@doe.com',
-          status: {
-            label: 'Inactive',
-            bg_color: 'bg-surface-red-5',
-          },
-          role: {
-            label: 'HR',
-            color: 'red',
-          },
-        },
+  
       ]"
       :options="{
         onRowClick: (row) => console.log(row),

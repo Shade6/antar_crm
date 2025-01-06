@@ -53,7 +53,6 @@ export const findAllRolePermission = async(data)=>{
 }
 
 
-
 export const permission_giver = async(data)=>{
   return (await axiosInstance.put(`permission_giver?mdl=${switchStore.pageId}`,data)).data
 }
@@ -64,4 +63,29 @@ export const create_industry = async(data)=>{
 
 export const find_all_industry = async(data)=>{
   return (await axiosInstance.get(`find_all_industry?mdl=${switchStore.pageId}&&role=${data}`)).data
+}
+
+export const create_territory = async(data)=>{
+  return (await axiosInstance.post(`create_territory?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const find_all_territories = async(data)=>{
+  return (await axiosInstance.get(`find_all_territories?mdl=${switchStore.pageId}&&role=${data}`)).data
+}
+
+export const find_one_territory = async(data)=>{
+  return (await axiosInstance.get(`find_one_territory?mdl=${switchStore.pageId}&&territory_id=${data}`)).data
+}
+
+export const update_territory = async(data)=>{
+  return (await axiosInstance.put(`update_territory?mdl=${switchStore.pageId}`,data)).data
+}
+
+
+export const find_all_lead = async(data)=>{
+  return (await axiosInstance.get(`get_leads?mdl=${switchStore.pageId}&&role=${data}`)).data
+}
+
+export const create_lead = async(data)=>{
+  return (await axiosInstance.post(`create_lead?mdl=${switchStore.pageId}`,data)).data
 }

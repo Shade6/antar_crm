@@ -15,6 +15,7 @@ const page = ref(null)
 </script>
 
 <template>
+   
     <div v-if="page == null" class="p-10 flex gap-5">
          <div @click="handle_list_territory" class="p-5 rounded-sm shadow-lg w-64 flex justify-between">
              <span>Territory</span>

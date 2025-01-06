@@ -130,60 +130,7 @@ const go_to_settings = ()=>{
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">{{ menu.module.module_name }}</div>
       </li>
-      <!-- <li @click="switchStore.changePage('deals')" class="nav-item flex my-2">
-        <div class="nav-item__icon">
-          <DealsIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Deals</div>
-      </li>
-      <li
-        @click="switchStore.changePage('contacts')"
-        class="nav-item flex my-2"
-      >
-        <div class="nav-item__icon">
-          <ContactsIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Contacts</div>
-      </li>
-      <li
-        @click="switchStore.changePage('organizations')"
-        class="nav-item flex my-2"
-      >
-        <div class="nav-item__icon">
-          <OrganizationsIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Organizations</div>
-      </li>
-      <li @click="switchStore.changePage('notes')" class="nav-item flex my-2">
-        <div class="nav-item__icon">
-          <FileTextIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Notes</div>
-      </li>
-      <li @click="switchStore.changePage('task')" class="nav-item flex my-2">
-        <div class="nav-item__icon ml-0">
-          <TaskIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Tasks</div>
-      </li>
-      <li
-        @click="switchStore.changePage('call-logs')"
-        class="nav-item flex my-2"
-      >
-        <div class="nav-item__icon">
-          <PhoneIcon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Call Logs</div>
-      </li>
-      <li
-        @click="switchStore.changePage('email-template')"
-        class="nav-item flex my-2"
-      >
-        <div class="nav-item__icon">
-          <Email2Icon />
-        </div>
-        <div class="nav-item__text text-sm mx-2">Email Template</div>
-      </li> -->
+   
 
       <li class="nav-item flex my-3 absolute bottom-0">
         <button @click="handle_side_bar" class="p-0 m-0 flex">

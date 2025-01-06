@@ -8,7 +8,11 @@ export const useSwitchStore = defineStore("switch", () => {
   const profileView = ref(null);
   const menu = ref([])
   const pageId = ref(null)
+  const create_form = ref(null)
 
+  const changeCreateForm =(data)=>{
+    create_form.value = data
+  }
   // Actions
   const changeProfileView = (data) => {
     profileView.value = data;
@@ -42,7 +46,9 @@ export const useSwitchStore = defineStore("switch", () => {
     changeProfileView,
     AddMenu,
     menu,
-    clearPersist
+    clearPersist,
+    changeCreateForm,
+    create_form
   };
 }, {
   persist: {

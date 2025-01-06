@@ -2,7 +2,7 @@
 import { onMounted, watch } from "vue";
 import { useRouter } from "vue-router"; // Import useRoute to watch route changes
 import Header from "@/components/layouts/header.vue";
-import Navbar from "@/components/layouts/navbar.vue";
+
 import NotificationSideBar from "@/components/layouts/NotificationSideBar.vue";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -52,7 +52,7 @@ onMounted(onRouteChange);
         </div>
       </transition>
       <div :class="switchStore.notification ? 'w-[70%]' : 'w-[100%]'">
-        <Navbar />
+       
         <RouterView />
       </div>
     </div>
