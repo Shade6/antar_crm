@@ -15,13 +15,13 @@ const fetch = async () => {
   if (res.statusCode == 200) {
     lead_list.value = res.data.map((val, i) => ({
       id: val.lead_id,
-      name: val.name,
+      name: val?.first_name+ " "+val?.last_name,
       organization: "john@doe.com",
       status: val.status,
       email: val.email,
       mobile: val.contact,
       assigned: "not yet",
-      modified: "dd",
+      modified: "01/01/2024",
     }));
   } else {
     toast.success(res.message, {

@@ -89,3 +89,16 @@ export const find_all_lead = async(data)=>{
 export const create_lead = async(data)=>{
   return (await axiosInstance.post(`create_lead?mdl=${switchStore.pageId}`,data)).data
 }
+
+export const find_single_lead = async(data)=>{
+  return (await axiosInstance.get(`find_single_lead?mdl=${switchStore.pageId}&&id=${data}`)).data
+}
+
+export const find_assignees = async(data)=>{
+  return (await axiosInstance.get(`find_assignees?mdl=${switchStore.pageId}&&id=${data}`)).data
+}
+
+
+export const update_lead_assignee = async(data)=>{
+  return (await axiosInstance.put(`update_lead_assignee?mdl=${switchStore.pageId}`,data)).data
+}

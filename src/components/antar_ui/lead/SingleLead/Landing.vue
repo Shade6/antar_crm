@@ -5,20 +5,22 @@
       <Tabs class="w-full" v-model="state.index" :tabs="tabs">
         <template #tab-label="{ tab }">
           <div class="flex items-center gap-2">
-            <i class="feather" :class="`feather-${tab.icon}`"></i>
+            <!-- Render the icon -->
+            <component :is="tab.icon" />
+            <!-- Label -->
             <span>{{ tab.label }}</span>
           </div>
         </template>
 
         <template #default="{ tab }">
           <div class="p-5">
-            {{ tab.content }}
+            <component :is="tab.content"></component>
           </div>
         </template>
       </Tabs>
     </div>
 
-    <!-- Resizable Handle (placed between the two divs) -->
+    <!-- Resizable Handle -->
     <div
       class="cursor-col-resize bg-gray-400 w-1 h-full"
       @mousedown="startResizing"
@@ -27,7 +29,7 @@
     <!-- Resizable Sidebar -->
     <div class="h-screen" :style="{ width: sidebarWidth + '%' }">
       <div class="p-2 border w-full">
-        <span class="font-bold">CRM-LEAD-2024-00001</span>
+        <span class="font-bold">{{"CRM -" + details?.lead_id ?? "" }}</span>
       </div>
       <div class="p-2 border w-full flex">
         <img
@@ -36,36 +38,16 @@
           alt=""
         />
         <div>
-          <span class="my-auto text-3xl font-semibold">MR Vidhul prasad</span>
+          <span class="my-auto text-3xl font-semibold">{{ details?.salutation  + " "+ details?.name  }}</span>
           <div class="flex">
             <div class="p-1">
-              <Button
-                :variant="'subtle'"
-                :ref_for="true"
-                theme="gray"
-                size="sm"
-                label="Button"
-                :loading="false"
-                :loadingText="null"
-                :disabled="false"
-                :link="null"
-              >
-                <FeatherIcon name="phone" />
-            </Button>
+              <Button variant="subtle" theme="gray" size="sm" label="Phone">
+                <FeatherIcon class="w-4" name="phone" />
+              </Button>
             </div>
             <div class="p-1">
-              <Button
-                :variant="'subtle'"
-                :ref_for="true"
-                theme="gray"
-                size="sm"
-                label="Button"
-                :loading="false"
-                :loadingText="null"
-                :disabled="false"
-                :link="null"
-              >
-              <FeatherIcon name="mail" />
+              <Button variant="subtle" theme="gray" size="sm" label="Mail">
+                <FeatherIcon class="w-4" name="mail" />
               </Button>
             </div>
             <div class="p-1">
@@ -80,217 +62,374 @@
                 :disabled="false"
                 :link="null"
               >
-              <FeatherIcon name="link-2" />
+                <FeatherIcon class="w-4" name="link-2" />
               </Button>
             </div>
             <div class="p-1">
-              <Button
-                :variant="'subtle'"
-                :ref_for="true"
-                theme="gray"
-                size="sm"
-                label="Button"
-                :loading="false"
-                :loadingText="null"
-                :disabled="false"
-                :link="null"
-              >
-              <FeatherIcon name="paperclip" />
+              <Button variant="subtle" theme="gray" size="sm" label="Attach">
+                <FeatherIcon class="w-4" name="paperclip" />
               </Button>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Sidebar Menu -->
+       <div style="height: 70%;overflow-y: scroll;">
+        <div >
+           <div class="flex justify-between p-3 ">
+            <div @click="details_tab = !details_tab" class="flex">
+              <FeatherIcon v-if="details_tab" class="w-4 mx-3" name="chevron-down" />
+              <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
+              <span class="my-auto">details</span>
+            </div>
+             <div>
+              <div class="p-1">
+                <Button
+                  :variant="'subtle'"
+                  :ref_for="true"
+                  theme="gray"
+                  size="sm"
+                  label="Button"
+                  :loading="false"
+                  :loadingText="null"
+                  :disabled="false"
+                  :link="null"
+                >
+                <FeatherIcon class="w-4 mx-3" name="edit" />
+                </Button>
+              </div>
+             </div>
+            
+           </div>
+           <div v-if="details_tab" class="px-6">
+              <div class="flex my-3 justify-between">
+                 <span class="">Organization</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.company"
+                  />
+                </div>
+              </div>
 
-      <ul class="mt-12 flex flex-col">
-      
+              <div class="flex my-3 justify-between">
+                 <span class="">Website</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details?.website"
+                  />
+                </div>
+              </div>
 
-      <li class="relative transition">
-        <input class="peer hidden" type="checkbox" id="menu-2" />
-        <div class="relative m-2 flex items-center border   py-3 pl-5 text-sm text-gray-500">
-          <span class="mr-5 flex w-5 text-gray-500"
-            ><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg
-          ></span>
-          Analytics
-          <label for="menu-2" class="absolute inset-0 h-full w-full cursor-pointer"></label>
-        </div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="peer-checked:rotate-180 absolute right-0 top-6 mr-5 ml-auto h-4 text-gray-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-        <ul class="duration-400 peer-checked:max-h-96 m-2 flex max-h-0 flex-col overflow-hidden rounded-2xl  transition-all duration-300">
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm  hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg
-            ></span>
-            Carnival
-          </li>
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm text-gray-500 hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg
-            ></span>
-            Analytics
-          </li>
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm text-gray-500 hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg
-            ></span>
-            Revenue
-          </li>
-        </ul>
-      </li>
-      <li class="relative transition">
-        <input class="peer hidden" type="checkbox" id="menu-3" />
-        <div class="relative m-2 flex items-center border   py-3 pl-5 text-sm text-gray-500">
-          <span class="mr-5 flex w-5 text-gray-500"
-            ><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg
-          ></span>
-          Analytics
-          <label for="menu-3" class="absolute inset-0 h-full w-full cursor-pointer"></label>
-        </div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="peer-checked:rotate-180 absolute right-0 top-6 mr-5 ml-auto h-4 text-gray-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-        <ul class="duration-400 peer-checked:max-h-96 m-2 flex max-h-0 flex-col overflow-hidden rounded-2xl  transition-all duration-300">
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm  hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg
-            ></span>
-            Carnival
-          </li>
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm text-gray-500 hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg
-            ></span>
-            Analytics
-          </li>
-          <li class="m-2 flex cursor-pointer rounded-xl py-3 pl-5 text-sm text-gray-500 hover:bg-white">
-            <span class="mr-5"
-              ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg
-            ></span>
-            Revenue
-          </li>
-        </ul>
-      </li>
-    </ul>
+              <div class="flex my-3  justify-between">
+                 <span class="">Territory</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details?.territory?.territory_name"
+                  />
+                </div>
+              </div>
+
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Industry</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                      :modelValue="details?.industry?.industry_name"
+                  />
+                </div>
+              </div>
+
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Job Title</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    modelValue=""
+                  />
+                </div>
+              </div>
+
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Source</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    modelValue=""
+                  />
+                </div>
+              </div>
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Lead Owner</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.lead_name"
+                  />
+                </div>
+              </div>
+           </div>
+       </div>
+
+       <div>
+           <div class="flex justify-between p-3 ">
+            <div @click="person_tab=!person_tab" class="flex">
+              <FeatherIcon v-if="person_tab" class="w-4 mx-3" name="chevron-down" />
+              <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
+              <span class="my-auto">Person</span>
+            </div>
+            
+           </div>
+           <div v-if="person_tab" class="px-6">
+              <div class="flex my-3 justify-between">
+                 <span class="">Salutation</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.salutation"
+                  />
+                </div>
+              </div>
+
+              <div class="flex my-3 justify-between">
+                 <span class="">First Name</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                   :modelValue="details.first_name"
+                  />
+                </div>
+              </div>
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Last Name</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.last_name"
+                  />
+                </div>
+              </div>
+
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Email</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.email"
+                  />
+                </div>
+              </div>
+
+
+              <div class="flex my-3 justify-between">
+                 <span class="">Mobile No</span>
+                 <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="details.contact"
+                  />
+                </div>
+              </div>
+           </div>
+       </div>
+       </div>
+       
     </div>
-  </div>
-
-  <div class="mt-5">
-    <button @click="switchStore.changeCreateForm(null)">Close</button>
   </div>
 </template>
 
 <script setup>
 import { useSwitchStore } from "@/stores/switch";
-import { ref } from "vue";
-import { Tabs ,Button,FeatherIcon} from "frappe-ui";
-
+import { ref, h ,onMounted} from "vue";
+import { Tabs, Button, FeatherIcon,TextInput } from "frappe-ui";
+import Activity from "@/components/antar_ui/lead/SingleLead/Activity.vue";
+import Attachments from "@/components/antar_ui/lead/SingleLead/Attachments.vue";
+import Calls from "@/components/antar_ui/lead/SingleLead/Calls.vue";
+import Comments from "@/components/antar_ui/lead/SingleLead/Comments.vue";
+import Notes from "@/components/antar_ui/lead/SingleLead/Notes.vue";
+import Tasks from "@/components/antar_ui/lead/SingleLead/Tasks.vue";
+import Emails from "@/components/antar_ui/lead/SingleLead/Emails.vue";
+import {find_single_lead,find_assignees} from "@/api/userApi.js"
+import "@/assets/toast.css";
+import { useToast } from "vue-toast-notification";
+const toast = useToast();
 const switchStore = useSwitchStore();
-const state = ref({
-  index: null,
-});
-
-// Define tabs with icons and labels
+const tabsWidth = ref(70);
+const sidebarWidth = ref(30);
+const state = ref({ index: null });
+const details = ref({})
+const assignees = ref([])
+const person_tab = ref(true)
+const details_tab = ref(true)
 const tabs = [
   {
-    icon: "activity", // Icon for Activity tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Activity",
-    content:
-      "Github is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.",
+    content: Activity,
   },
   {
-    icon: "mail", // Icon for Emails tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Emails",
-    content:
-      "Twitter is an American microblogging and social networking service on which users post and interact with messages known as tweets.",
+    content: Emails,
   },
   {
-    icon: "message-circle", // Icon for Comments tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Comments",
-    content:
-      "LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps.",
+    content: Comments,
   },
   {
-    icon: "phone-call", // Icon for Calls tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Calls",
-    content:
-      "LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps.",
+    content: Calls,
   },
   {
-    icon: "check-square", // Icon for Tasks tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Tasks",
-    content:
-      "LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps.",
+    content: Tasks,
   },
   {
-    icon: "edit", // Icon for Notes tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Notes",
-    content:
-      "LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps.",
+    content: Notes,
   },
   {
-    icon: "paperclip", // Icon for Attachments tab
+    icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
     label: "Attachments",
-    content:
-      "LinkedIn is an American business and employment-oriented online service that operates via websites and mobile apps.",
+    content: Attachments,
   },
 ];
 
-const tabsWidth = ref(70); // initial width for tabs section
-const sidebarWidth = ref(30); // initial width for sidebar section
+const sidebarMenus = [
+  {
+    id: "menu-1",
+    label: "Analytics",
+    icon: "bar-chart-2",
+    items: ["Carnival", "Revenue"],
+  },
+  {
+    id: "menu-2",
+    label: "Reports",
+    icon: "file-text",
+    items: ["Monthly", "Weekly"],
+  },
+];
 
-// Function to start resizing
-function startResizing(event) {
-  // Record the initial position of the mouse
-  const initialX = event.clientX;
-  const initialTabsWidth = tabsWidth.value;
-  const initialSidebarWidth = sidebarWidth.value;
+const startResizing = () => {
+  document.addEventListener("mousemove", resize);
+  document.addEventListener("mouseup", stopResizing);
+};
 
-  // Set up the mousemove event to update the widths
-  const onMouseMove = (moveEvent) => {
-    const deltaX = moveEvent.clientX - initialX;
-    if (deltaX < 117) {
-      const newTabsWidth =
-        initialTabsWidth + (deltaX / window.innerWidth) * 100; // Percentage
-      const newSidebarWidth =
-        initialSidebarWidth - (deltaX / window.innerWidth) * 100;
-      console.log(newTabsWidth, "dddddddd", newSidebarWidth, "ddddd", deltaX);
-      // Set the new widths, ensuring they are within bounds
-      if (newTabsWidth >= 60 && newTabsWidth <= 100) {
-        tabsWidth.value = newTabsWidth;
-        sidebarWidth.value = newSidebarWidth;
-      }
-    }
-  };
+const resize = (e) => {
+  const percentage = (e.clientX / window.innerWidth) * 100;
+  console.log(percentage);
+  if (percentage > 60 && percentage < 80) {
+    tabsWidth.value = percentage;
+    sidebarWidth.value = 100 - percentage;
+  }
+};
 
-  // Stop resizing when mouseup occurs
-  const onMouseUp = () => {
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
-  };
+const stopResizing = () => {
+  document.removeEventListener("mousemove", resize);
+  document.removeEventListener("mouseup", stopResizing);
+};
 
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("mouseup", onMouseUp);
+
+const fetch = async()=>{
+  const res = await find_single_lead(switchStore.create_form)
+  if(res.statusCode ==200){
+   
+    details.value = res.data
+  }else{
+    toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+  }
 }
+onMounted(fetch)
 </script>
 
-<style scoped>
-.feather {
-  width: 16px;
-  height: 16px;
-}
-
-.cursor-col-resize {
-  cursor: col-resize;
-  background-color: #aaa;
+<style>
+body {
+  font-family: "Inter", sans-serif;
 }
 </style>

@@ -302,8 +302,8 @@ onMounted(fetch);
               value: '51-200',
             },
             {
-              label: '201',
-              value: '500',
+              label: '201-500',
+              value: '201-500',
             },
             {
               label: '501-1000',
