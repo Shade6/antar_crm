@@ -82,5 +82,59 @@ db.users.belongsTo(db.role, { //---this is the original table
   as: 'role'             
 });
 
+//-----------------------------------------------------------------------------------------
+
+db.industry.hasMany(db.leads, { //---this is the reference 
+  foreignKey: 'industry_id',
+  as: 'leads'      
+});
+db.leads.belongsTo(db.industry, { //---this is the original table
+  foreignKey: 'industry_id', 
+  targetKey: 'industry_id',         
+  as: 'industry'             
+});
+
+db.territory.hasMany(db.leads, { //---this is the reference 
+  foreignKey: 'territory_id',
+  as: 'leads'      
+});
+db.leads.belongsTo(db.territory, { //---this is the original table
+  foreignKey: 'territory_id', 
+  targetKey: 'territory_id',         
+  as: 'territory'             
+});
+
+//------------------------------------------------------------------
+
+db.users.hasMany(db.lead_assignee, {
+  foreignKey: 'user_id',
+  as: 'assignedLeads', // Changed alias to avoid duplication
+});
+db.lead_assignee.belongsTo(db.users, {
+  foreignKey: 'user_id',
+  as: 'user', // Changed alias
+});
+
+
+db.leads.hasMany(db.lead_assignee, {
+  foreignKey: 'lead_id',
+  as: 'assignedUsers', // Changed alias
+});
+db.lead_assignee.belongsTo(db.leads, {
+  foreignKey: 'lead_id',
+  as: 'lead', // Changed alias
+});
+
+
+db.users.hasMany(db.lead_assignee, {
+  foreignKey: 'assigned_by',
+  as: 'assignedByLeads', // Changed alias
+});
+db.lead_assignee.belongsTo(db.users, {
+  foreignKey: 'assigned_by',
+  as: 'assignedByUser', 
+});
+
+
 
 module.exports = db;

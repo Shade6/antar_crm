@@ -11,7 +11,10 @@ module.exports = (sequelize, Sequelize) => {
       salutation:{
         type: Sequelize.STRING,
       },
-      name: {
+      first_name: {
+        type: Sequelize.STRING,
+      },
+      last_name: {
         type: Sequelize.STRING,
       },
       lead_name: {
@@ -46,7 +49,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       created_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       territory_id:{
         type: Sequelize.STRING,
