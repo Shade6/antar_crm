@@ -71,3 +71,6 @@ const toast = useToast();
 https://crm.shade6.com/
 
 import {} from '@/api/userApi.js'
+
+import { useRouter } from "vue-router";
+const router = useRouter();

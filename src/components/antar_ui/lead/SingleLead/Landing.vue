@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-[675px]  ">
     <!-- Tabs Component -->
     <div class="flex-grow" :style="{ width: tabsWidth + '%' }">
       <Tabs class="w-full" v-model="state.index" :tabs="tabs">
@@ -13,7 +13,7 @@
         </template>
 
         <template #default="{ tab }">
-          <div class="p-5">
+          <div class="p-5 ">
             <component :is="tab.content"></component>
           </div>
         </template>
@@ -27,7 +27,7 @@
     ></div>
 
     <!-- Resizable Sidebar -->
-    <div class="h-screen" :style="{ width: sidebarWidth + '%' }">
+    <div class="" :style="{ width: sidebarWidth + '%' }">
       <div class="p-2 border w-full">
         <span class="font-bold">{{"CRM -" + details?.lead_id ?? "" }}</span>
       </div>

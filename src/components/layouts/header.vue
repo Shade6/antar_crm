@@ -15,10 +15,11 @@ import Email2Icon from "@/components/icons/Email2Icon.vue";
 import PinIcon from "@/components/icons/PinIcon.vue";
 
 import { useRouter } from "vue-router";
+const router = useRouter();
 import { useSwitchStore } from "@/stores/switch";
 
 const switchStore = useSwitchStore();
-const router = useRouter();
+
 
 const sidebarOpen = ref(true);
 const handle_side_bar = () => {

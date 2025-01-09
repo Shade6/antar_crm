@@ -102,3 +102,47 @@ export const find_assignees = async(data)=>{
 export const update_lead_assignee = async(data)=>{
   return (await axiosInstance.put(`update_lead_assignee?mdl=${switchStore.pageId}`,data)).data
 }
+
+
+export const create_email = async(data)=>{
+  return (await axiosInstance.post(`create_email?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const find_all_email = async()=>{
+  return (await axiosInstance.get(`find_all_email?mdl=${switchStore.pageId}`)).data
+}
+
+
+export const create_lead_attachment = async(data)=>{
+  return (await axiosInstance.post(`create_lead_attachment?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const get_attachment_by_lead_id = async(data)=>{
+  return (await axiosInstance.get(`get_attachment_by_lead_id?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
+}
+
+
+export const create_lead_comment = async(data)=>{
+  return (await axiosInstance.post(`create_lead_comment?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const get_lead_comment_by_lead_id = async(data)=>{
+  return (await axiosInstance.get(`get_lead_comment_by_lead_id?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
+}
+
+
+export const create_lead_note_attachment = async(data)=>{
+  return (await axiosInstance.post(`create_lead_note_attachment?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const get_lead_note_by_lead_id = async(data)=>{
+  return (await axiosInstance.get(`get_lead_note_by_lead_id?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
+}
+
+export const create_lead_task = async(data)=>{
+  return (await axiosInstance.post(`create_lead_task?mdl=${switchStore.pageId}`,data)).data
+}
+
+export const get_lead_task_by_lead_id = async(data)=>{
+  return (await axiosInstance.get(`get_lead_task_by_lead_id?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
+}

@@ -106,7 +106,7 @@ const handle_update = async () => {
 
 <template>
   <div class="w-full px-6 py-3 border-b flex justify-between">
-    <div class="w-1/2">
+    <div class="w-1/2 flex">
       <Breadcrumbs
         :items="[
           {
@@ -127,7 +127,7 @@ const handle_update = async () => {
           </span>
         </template>
       </Breadcrumbs>
-      <!-- <span class="text-gray-700 text-xl">{{ switchStore.page }} /</span>
+      
 
       <Dropdown
         :options="[
@@ -169,7 +169,7 @@ const handle_update = async () => {
             </div>
           </div>
         </Button>
-      </Dropdown> -->
+      </Dropdown> 
     </div>
 
     <div class="p-1 flex">
