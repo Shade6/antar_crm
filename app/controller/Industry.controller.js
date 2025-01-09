@@ -1,6 +1,8 @@
 
 const db = require("../models");
 const Industry  = db.industry
+const emailValidator = require('email-validator');
+const Email = db.emails
 exports.create_industry =async(req,res)=>{
     try {
       const {industry_name} = req.body;
@@ -34,4 +36,43 @@ exports.find_all_industries = async(req,res)=>{
     } catch (error) {
         return res.json({message:error.message,statusCode:500}) 
     }
+}
+
+exports.create_email = async(req,res)=>{
+  try {
+  console.log(req.body)
+  const {email} = req.body
+  
+      if (!emailValidator.validate(email)) {
+         return res.json({message:'invalid email ! please check the email',statusCode:400})
+      } 
+   const find_e = await Email.findOne({where:{email:email}})
+   if(find_e){
+    return res.json({message:'email already exist ', statusCode:400})
+   }
+
+   const create_ = await Email.create({
+    email:email,
+    created_by:req.user,
+    created_at:new Date()
+   })
+   if(!create_){
+    return res.json({message:'email creation failed',statusCode:400})
+   }
+
+   res.json({message:'email created successfully',statusCode:200,data:create_})
+  } catch (error) {
+      return res.json({message:error.message,statusCode:500}) 
+  }
+}
+
+exports.find_all_email = async(req,res)=>{
+  try {
+      const find_all = await Email.findAll({})
+
+      return res.json({message:'email found',statusCode:200,data:find_all})
+
+  } catch (error) {
+      return res.json({message:error.message,statusCode:500}) 
+  }
 }

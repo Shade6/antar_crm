@@ -1,5 +1,5 @@
-const field_checker = require("../utils/validate_body");
-const db = require("../models");
+const field_checker = require("../../utils/validate_body");
+const db = require("../../models");
 const Leads = db.leads;
 const Users = db.users;
 const LeadAssignee = db.lead_assignee;

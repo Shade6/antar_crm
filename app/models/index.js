@@ -48,6 +48,90 @@ db.user_group_details = require("./leads/UserGroupDetails.js")(sequelize,Sequeli
 db.activity_log = require("./ActivityLog.js")(sequelize,Sequelize)
 db.industry = require("./leads/Industry.js")(sequelize,Sequelize)
 db.territory = require("./leads/Territory.js")(sequelize,Sequelize)
+db.emails = require("./users/Email.model.js")(sequelize,Sequelize)
+
+db.lead_task = require("./leads/LeadTask.model.js")(sequelize,Sequelize)
+db.lead_note = require("./leads/LeadNote.model.js")(sequelize,Sequelize)
+db.lead_comment = require("./leads/LeadComment.model.js")(sequelize,Sequelize)
+db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Sequelize)
+
+
+//-------------------------------------------------------------------------------------------
+db.users.hasMany(db.lead_task, { //---this is the reference 
+  foreignKey: 'user_id',
+  as: 'task'      
+});
+db.lead_task.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'user_id', 
+  targetKey: 'user_id',         
+  as: 'user'             
+});
+db.leads.hasMany(db.lead_task, { //---this is the reference 
+  foreignKey: 'lead_id',
+  as: 'task'      
+});
+db.lead_task.belongsTo(db.leads, { //---this is the original table
+  foreignKey: 'lead_id', 
+  targetKey: 'lead_id',         
+  as: 'lead'             
+});
+//-------------------------------------------------------------------------------------------
+db.users.hasMany(db.lead_note, { //---this is the reference 
+  foreignKey: 'user_id',
+  as: 'note'      
+});
+db.lead_note.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'user_id', 
+  targetKey: 'user_id',         
+  as: 'user'             
+});
+db.leads.hasMany(db.lead_note, { //---this is the reference 
+  foreignKey: 'lead_id',
+  as: 'note'      
+});
+db.lead_note.belongsTo(db.leads, { //---this is the original table
+  foreignKey: 'lead_id', 
+  targetKey: 'lead_id',         
+  as: 'lead'             
+});
+//-------------------------------------------------------------------------------------------
+db.users.hasMany(db.lead_comment, { //---this is the reference 
+  foreignKey: 'user_id',
+  as: 'comment'      
+});
+db.lead_comment.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'user_id', 
+  targetKey: 'user_id',         
+  as: 'user'             
+});
+db.leads.hasMany(db.lead_comment, { //---this is the reference 
+  foreignKey: 'lead_id',
+  as: 'comment'      
+});
+db.lead_comment.belongsTo(db.leads, { //---this is the original table
+  foreignKey: 'lead_id', 
+  targetKey: 'lead_id',         
+  as: 'lead'             
+});
+//-------------------------------------------------------------------------------------------
+db.users.hasMany(db.lead_attachment, { //---this is the reference 
+  foreignKey: 'user_id',
+  as: 'attachment'      
+});
+db.lead_attachment.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'user_id', 
+  targetKey: 'user_id',         
+  as: 'user'             
+});
+db.leads.hasMany(db.lead_attachment, { //---this is the reference 
+  foreignKey: 'lead_id',
+  as: 'attachment'      
+});
+db.lead_attachment.belongsTo(db.leads, { //---this is the original table
+  foreignKey: 'lead_id', 
+  targetKey: 'lead_id',         
+  as: 'lead'             
+});
 
 //-------------------------------------------------------------------------------------------
 db.module.hasMany(db.module_permission, { //---this is the reference 
@@ -104,7 +188,7 @@ db.leads.belongsTo(db.territory, { //---this is the original table
   as: 'territory'             
 });
 
-//------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 db.users.hasMany(db.lead_assignee, {
   foreignKey: 'user_id',
