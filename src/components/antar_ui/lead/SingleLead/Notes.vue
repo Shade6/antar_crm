@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { Button, FeatherIcon ,Textarea,TextInput} from "frappe-ui";
+import { Button, FeatherIcon, Textarea, TextInput, Dialog ,Dropdown} from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
   create_lead_note_attachment,
@@ -12,6 +12,7 @@ import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
 const array_list = ref([]);
+const dialog2 = ref(false);
 
 const Cred_status = ref(null);
 const title_name = ref("");
@@ -41,10 +42,10 @@ const fetch = async () => {
 
 const save_ = async () => {
   const data = {
-    lead_id:switchStore.create_form,
-    title:title_name.value,
-    content:content.value,
-    status:false
+    lead_id: switchStore.create_form,
+    title: title_name.value,
+    content: content.value,
+    status: false,
   };
   const res = await create_lead_note_attachment(data);
   if (res.statusCode == 200) {
@@ -63,9 +64,9 @@ const save_ = async () => {
       },
     });
     fetch();
-    Cred_status.value = null;
+    dialog2.value = false;
     title_name.value = "";
-    content.value = ""
+    content.value = "";
   } else {
     toast.success(res.message, {
       position: "top-right",
@@ -121,23 +122,43 @@ function getTimeDifference(dateString) {
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Notes </span>
     <div class="p-1">
-      <Button
-        v-if="Cred_status == null"
-        style="width: 150px"
-        :variant="'solid'"
-        :ref_for="true"
-        theme="gray"
-        label="Button"
-        :loading="false"
-        :loadingText="null"
-        :disabled="false"
-        :link="null"
-        @click="Cred_status = 'create'"
-      >
-        <div class="flex justify-start">
-          <FeatherIcon class="w-4" name="plus" /> <span>New Notes</span>
-        </div>
-      </Button>
+      <Button @click="dialog2 = true"> New Notes </Button>
+      <Dialog v-model="dialog2">
+        <template #body-title>
+          <h3>Create Notes</h3>
+        </template>
+        <template #body-content>
+          <div class="p-2">
+            <span class="text-sm text-gray-500">Title</span>
+            <TextInput
+              :type="'text'"
+              :ref_for="true"
+              size="sm"
+              variant="subtle"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+              v-model="title_name"
+            />
+          </div>
+          <div class="p-1">
+            <Textarea
+              :variant="'outline'"
+              :ref_for="true"
+              size="sm"
+              placeholder="Placeholder"
+              :disabled="false"
+              modelValue=""
+              label="Content"
+              v-model="content"
+            />
+          </div>
+        </template>
+        <template #actions>
+          <Button @click="save_" variant="solid"> Confirm </Button>
+          <Button class="ml-2" @click="dialog2 = false"> Close </Button>
+        </template>
+      </Dialog>
     </div>
   </div>
   <div v-if="Cred_status == null">
@@ -154,80 +175,32 @@ function getTimeDifference(dateString) {
       >
         <div class="flex justify-between my-2">
           <span class="truncate text-2xl">{{ notes.title }}</span>
-          <FeatherIcon class="w-4" name="more-horizontal" />
+          <Dropdown
+              :button="{
+                icon: 'more-horizontal',
+              }"
+              :options="[
+                {
+                  label: 'Edit',
+                  onClick: () => {},
+                },
+                {
+                  label: 'Delete',
+                  onClick: () => {},
+                },
+              ]"
+            />
         </div>
         <div class="h-[70%] overflow-auto">
-          <p class="text-gray-600 ">{{ notes.content }}</p>
+          <p class="text-gray-600">{{ notes.content }}</p>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-600 text-sm">{{ notes.user.first_name + " " + notes.user.last_name }}</span>
-          <span class="text-gray-600 text-sm">{{ getTimeDifference(notes.created_at) }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="w-full" v-else>
-    <div style="width: 600px; height: 300px" class="border mx-auto rounded-sm p-4">
-      <div class="flex justify-center my-4">
-         <span class="text-2xl ">Create Note</span>
-      </div>
-      <div class="p-2">
-        <span class="text-sm text-gray-500">Title</span>
-        <TextInput
-          :type="'text'"
-          :ref_for="true"
-          size="sm"
-          variant="subtle"
-          placeholder="Placeholder"
-          :disabled="false"
-          modelValue=""
-          v-model="title_name"
-        />
-      </div>
-      <div class="p-1">
-        <Textarea
-          :variant="'outline'"
-          :ref_for="true"
-          size="sm"
-          placeholder="Placeholder"
-          :disabled="false"
-          modelValue=""
-          label="Content"
-          v-model="content"
-        />
-      </div>
-      <div class="flex justify-center my-5">
-        <div class="p-1">
-          <Button
-            :variant="'solid'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="save_"
-          >
-            Create Note
-          </Button>
-        </div>
-        <div class="p-1">
-          <Button
-            :variant="'subtle'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="Cred_status = null"
-          >
-            Close
-          </Button>
+          <span class="text-gray-600 text-sm">{{
+            notes.user.first_name + " " + notes.user.last_name
+          }}</span>
+          <span class="text-gray-600 text-sm">{{
+            getTimeDifference(notes.created_at)
+          }}</span>
         </div>
       </div>
     </div>

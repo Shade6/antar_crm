@@ -1,5 +1,5 @@
 <script setup>
-import { ref ,onMounted,watch} from "vue";
+import { ref ,onMounted,watch,computed} from "vue";
 import {
   ListView,
   ListSelectBanner,
@@ -12,7 +12,9 @@ import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useReloadStore } from "@/stores/reload.js";
 const ReloadStore = useReloadStore();
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const toast = useToast();
 const single = ref();
 const users = ref([])
@@ -21,7 +23,7 @@ const fetch_users=async()=>{
   
   if(res.statusCode == 200){
     users.value = res.data.map((val, i) => ({
-        id: i + 1,
+        id:val.user_id,
         name: `${val.first_name} ${val.last_name}`,
         email: val.email,
         status: val.enabled ? "Active" : "Inactive",
@@ -51,10 +53,17 @@ onMounted(()=>{
 watch(()=>ReloadStore.reload_user,()=>{
   fetch_users()
 })
+const handleRowClick = (row) => {
+  router.push({
+    name: 'user-settings-detail', // Add the route name
+    params: { id: row.id }
+})
+};
+
 </script>
 
 <template>
-  <div class="p-1">
+  <div  class="p-1">
     <div class="p-7">
       <ListView
         class="h-2/3"
@@ -63,7 +72,7 @@ watch(()=>ReloadStore.reload_user,()=>{
             label: 'Name',
             key: 'name',
             
-            getLabel: ({ row }) => row.name,
+            getLabel: ({ row }) => row.user_id,
             prefix: ({ row }) => {
               return h(Avatar, {
                 shape: 'circle',
@@ -86,29 +95,30 @@ watch(()=>ReloadStore.reload_user,()=>{
             key: 'status',
           },
         ]"
-        :rows="users"
-        :options="{
-          selectable: true,
-          showTooltip: true,
-          resizeColumn: true,
-          emptyState: {
-            title: 'No records found',
-            description: 'Create a new record to get started',
-            button: {
-              label: 'New Record',
-              variant: 'solid',
-              onClick: () => console.log('New Record'),
-            },
+     :rows="users"
+      :options="{
+        selectable: true,
+        showTooltip: true,
+        resizeColumn: true,
+        onRowClick: (row) => handleRowClick(row),
+        emptyState: {
+          title: 'No records found',
+          description: 'Create a new record to get started',
+          button: {
+            label: 'New Record',
+            variant: 'solid',
+            onClick: () => console.log('New Record'),
           },
-        }"
-        row-key="id"
-      >
-        <template #cell="{ item, row, column }">
-          <span class="font-medium text-ink-gray-7">
-            {{ item }}
-          </span>
-        </template>
-      </ListView>
+        },
+      }"
+  row-key="id"
+>
+  <template #cell="{ item, row, column }">
+    <span class="font-medium text-ink-gray-7 cursor-pointer">
+      {{ item }}
+    </span>
+  </template>
+</ListView>
     </div>
   </div>
 </template>

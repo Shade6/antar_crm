@@ -84,10 +84,18 @@ const router = createRouter({
           component:() => import('../views/antar_/user-management/User.vue'),
         },
         {
-          path:'/antar_/user-settings',
-          name:'user-settings',
-          component:() => import('../views/antar_/user-management/UserSettings.vue'),
-        },{
+          path: '/antar_/user-settings/',
+          name: 'user-settings',
+          component: () => import('../views/antar_/user-management/UserSettings.vue'),
+          children: [
+            {
+              path: ':id',
+              name: 'user-settings-detail', // Give it a unique name
+              component: () => import('../views/antar_/user-management/SingleUser.vue'),
+            }
+          ]
+        },
+        {
           path:'/antar_/settings',
           name:'settings',
           component:() => import('../views/antar_/settings.vue'), 

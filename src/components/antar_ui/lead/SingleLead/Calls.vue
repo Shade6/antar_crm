@@ -1,6 +1,7 @@
 <script setup >
+import {ref} from "vue"
 import { Button, FeatherIcon } from "frappe-ui";
-
+const array_list = ref([])
 </script>
 
 <template>
@@ -23,6 +24,12 @@ import { Button, FeatherIcon } from "frappe-ui";
         </div>
       </Button>
     </div>
+  </div>
+
+  <div>
+      <div v-if="array_list.length == 0">
+          <span> call details is on maintanance</span>
+      </div>
   </div>
 </template>
 

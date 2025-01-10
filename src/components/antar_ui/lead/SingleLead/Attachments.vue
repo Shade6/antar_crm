@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { Button, FeatherIcon, FileUploader ,TextInput} from "frappe-ui";
+import {
+  Button,
+  FeatherIcon,
+  FileUploader,
+  TextInput,
+  Dialog,
+} from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
   create_lead_attachment,
@@ -12,11 +18,11 @@ import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
 const array_list = ref([]);
-
+const dialog2 = ref(false);
 const Cred_status = ref(null);
-const link_open = ref(true)
+const link_open = ref(true);
 
-const file = ref(null)
+const file = ref(null);
 const fetch = async () => {
   const res = await get_attachment_by_lead_id(switchStore.create_form);
   if (res.statusCode == 200) {
@@ -41,8 +47,8 @@ const fetch = async () => {
 
 const save_ = async () => {
   const data = {
-    lead_id:switchStore.create_form,
-    title:file.value
+    lead_id: switchStore.create_form,
+    title: file.value,
   };
   const res = await create_lead_attachment(data);
   if (res.statusCode == 200) {
@@ -63,7 +69,7 @@ const save_ = async () => {
     fetch();
     file.value = null;
     link_open.value = true;
-    Cred_status.value = null
+    dialog2.value = false;
   } else {
     toast.success(res.message, {
       position: "top-right",
@@ -115,23 +121,80 @@ function getTimeDifference(dateString) {
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Attachments </span>
     <div class="p-1">
-      <Button
-        v-if="Cred_status == null"
-        style="width: 200px"
-        :variant="'solid'"
-        :ref_for="true"
-        theme="gray"
-        label="Button"
-        :loading="false"
-        :loadingText="null"
-        :disabled="false"
-        :link="null"
-        @click="Cred_status = 'create'"
+      <Button @click="dialog2 = true"> Upload Attachment </Button>
+      <Dialog v-model="dialog2">
+        <template #body-title>
+          <h3>Custom Title</h3>
+        </template>
+        <template #body-content>
+          <div
+        v-if="link_open"
+        class="w-full h-2/3 flex justify-center items-center"
       >
-        <div class="flex justify-start">
-          <FeatherIcon class="w-4" name="plus" /> <span>Upload Attachment</span>
+        <FileUploader
+          :fileTypes="['image/*']"
+          :validateFile="(fileObject) => {}"
+          @success="(file) => {}"
+        >
+          <template
+            #default="{
+              file,
+              uploading,
+              progress,
+              uploaded,
+              message,
+              error,
+              total,
+              success,
+              openFileSelector,
+            }"
+          >
+            <Button
+              @click="openFileSelector.toString()"
+              :loading="uploading.toString()"
+            >
+              Uploading {{ progress }}%
+            </Button>
+          </template>
+        </FileUploader>
+        <Button
+          class="mx-3"
+          :variant="'subtle'"
+          :ref_for="true"
+          theme="gray"
+          size="sm"
+          label="Button"
+          :loading="false"
+          :loadingText="null"
+          :disabled="false"
+          :link="null"
+          @click="link_open = false"
+        >
+          Link
+        </Button>
+      </div>
+      <div class="my-6" v-else>
+        <div class="p-2">
+          <span>Enter link</span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="Enter the link"
+            :disabled="false"
+            modelValue=""
+            v-model="file"
+          />
         </div>
-      </Button>
+      </div>
+        </template>
+        <template #actions>
+          <Button @click="save_" variant="solid"> Confirm </Button>
+          <Button    v-if="link_open" class="ml-2" @click="dialog2 = false"> Close </Button>
+          <Button    v-else class="ml-2" @click="link_open = true"> back </Button>
+        </template>
+      </Dialog>
     </div>
   </div>
 
@@ -186,122 +249,7 @@ function getTimeDifference(dateString) {
     </div>
   </div>
 
-  <div class="w-full" v-else>
-    <div class="w-[500px] h-[300px] border rounded-lg mx-auto p-5">
-      <div>
-        <span>Create Attachments</span>
-      </div>
-
-      <div v-if="link_open" class="w-full h-2/3 flex justify-center items-center">
-        <FileUploader
-          :fileTypes="['image/*']"
-          :validateFile="(fileObject) => {}"
-          @success="(file) => {}"
-        >
-          <template
-            #default="{
-              file,
-              uploading,
-              progress,
-              uploaded,
-              message,
-              error,
-              total,
-              success,
-              openFileSelector,
-            }"
-          >
-            <Button
-              @click="openFileSelector.toString()"
-              :loading="uploading.toString()"
-            >
-              Uploading {{ progress }}%
-            </Button>
-          </template>
-        </FileUploader>
-        <Button
-            class="mx-3"
-            :variant="'subtle'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="link_open = false"
-          >
-            Link
-          </Button>
-      </div>
-      <div class="my-6" v-else>
-        <div class="p-2">
-          <span>Enter link</span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="Enter the link"
-            :disabled="false"
-            modelValue=""
-            v-model="file"
-          />
-        </div>
-      </div>
-      <div class="flex justify-center my-5">
-        <div class="p-1">
-          <Button
-            :variant="'solid'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="save_"
-          >
-            Attachment And Create
-          </Button>
-        </div>
-        <div class="p-1">
-          <Button
-            v-if="link_open"
-            :variant="'subtle'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="Cred_status = null"
-          >
-            Close
-          </Button>
-          <Button
-            v-else
-            :variant="'subtle'"
-            :ref_for="true"
-            theme="gray"
-            size="sm"
-            label="Button"
-            :loading="false"
-            :loadingText="null"
-            :disabled="false"
-            :link="null"
-            @click="link_open = true"
-          >
-            Back
-          </Button>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 </template>
 
 <style scoped></style>
