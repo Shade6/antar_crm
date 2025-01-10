@@ -63,9 +63,11 @@ exports.create_lead = async (req, res) => {
       status: status.value ?? null,
       employees: employees.value ?? null,
       territory_id: territory_id.value ?? null,
+      assigned_to:req.user,
       industry_id: industry_id.value ?? null,
       revenue: revenue,
       created_by: find_owner.user_id,
+      changed_by:req.user,
       created_at: new Date(),
       updated_at: new Date(),
     });

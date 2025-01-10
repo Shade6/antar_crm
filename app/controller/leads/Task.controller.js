@@ -4,7 +4,7 @@ const Users = db.users;
 const Leads = db.leads;
 exports.create = async (req, res) => {
   try {
-    const { lead_id, user_id, title, description, type,big_status, task_data} = req.body;
+    const { lead_id, user_id, title, description, type,big_status, task_data,task_status} = req.body;
     console.log(req.body)
     const user = req.user;
     if (!user) {
@@ -29,6 +29,9 @@ exports.create = async (req, res) => {
     if(!big_status){
         return res.json({ message: "choose low medium hard  ", statusCode: 400 });
     }
+    if(!task_status){
+      return res.json({ message: "task status is not selected", statusCode: 400 });
+    }
 
 
     const creat_ = await LeadTask.create({
@@ -41,6 +44,7 @@ exports.create = async (req, res) => {
       task_date:task_data,
       created_by: user,
       created_at: new Date(),
+      task_status:task_status
     });
 
     if (creat_) {

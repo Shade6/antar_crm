@@ -11,10 +11,12 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       lead_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       user_id: { // user_id
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       }, 
       created_at: {
         type: Sequelize.DATE,

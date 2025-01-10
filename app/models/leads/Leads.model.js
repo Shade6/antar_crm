@@ -46,22 +46,27 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       assigned_to: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+         allowNull: false,
       },
       created_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       territory_id:{
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       industry_id:{
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       revenue:{
         type: Sequelize.INTEGER,
       },
       changed_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       created_at:{
         type:Sequelize.DATE

@@ -1,0 +1,54 @@
+const { v4: uuidv4 } = require("uuid");
+module.exports = (sequelize, Sequelize) => {
+    const Organization = sequelize.define("organization", {
+     org_id: {
+        type: Sequelize.UUID,
+        primaryKey: true,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+      },
+      organization_name: {
+        type: Sequelize.STRING,
+      },
+      no_of_employees: {
+        type: Sequelize.STRING,
+      },
+      currency: {
+        type: Sequelize.STRING,
+      },
+      annual_revenue: {
+        type: Sequelize.STRING,
+      },
+      organization_logo: {
+        type: Sequelize.STRING,
+      },
+      website: {
+        type: Sequelize.STRING,
+      },
+      territory: {
+        type: Sequelize.STRING,
+      },
+      industry: {
+        type: Sequelize.STRING,
+      },
+      address: {
+        type: Sequelize.STRING,
+      },
+      createdBy: {
+        type: Sequelize.UUID,
+      },
+      createdOn: {
+        type: Sequelize.DATE,
+      },
+      updatedBy: {
+        type: Sequelize.INTEGER,
+      },
+      UpdatedOn: {
+        type: Sequelize.DATE,
+      },
+    });
+    Organization.beforeCreate((data, options) => {
+      data.org_id = uuidv4();
+    });
+    return Organization;
+  };

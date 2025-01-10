@@ -8,10 +8,12 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
       },
       lead_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+         allowNull: false,
       },
       user_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       title: { // user_id
         type: Sequelize.STRING,
@@ -27,8 +29,13 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ['Low', 'Medium', 'High'],
       }, 
+      task_status:{
+        type: Sequelize.ENUM,
+        values: ['Calling', 'Meeting', 'Event'],
+      },
       created_by:{
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       task_date:{
         type: Sequelize.DATE,

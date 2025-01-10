@@ -8,13 +8,16 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
       },
       user_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       lead_id:{
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       assigned_by: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
       },
       assigned_at: {
         type: Sequelize.DATE,
