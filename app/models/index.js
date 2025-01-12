@@ -56,6 +56,9 @@ db.lead_comment = require("./leads/LeadComment.model.js")(sequelize,Sequelize)
 db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Sequelize)
 
 
+db.user_email = require("./users/UserEmail.model.js")(sequelize,Sequelize)
+
+
 //-------------------------------------------------------------------------------------------
 db.users.hasMany(db.lead_task, { //---this is the reference 
   foreignKey: 'user_id',
@@ -220,5 +223,15 @@ db.lead_assignee.belongsTo(db.users, {
 });
 
 
+//----------------------------------------------------
+
+db.emails.hasMany(db.user_email, {
+  foreignKey: 'email_id',
+    as: 'user_email', // Changed alias
+});
+db.user_email.belongsTo(db.emails, {
+  foreignKey: 'email_id',
+  as: 'email', 
+});
 
 module.exports = db;
