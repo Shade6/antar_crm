@@ -1,9 +1,36 @@
 <script setup>
-import { ref } from "vue";
-import { Button, FeatherIcon } from "frappe-ui";
-
+import { ref, onMounted } from "vue";
+import { Button, FeatherIcon,Dialog } from "frappe-ui";
+import { useToast } from "vue-toast-notification";
+import { find_all_email } from '@/api/userApi.js'
+const toast = useToast();
 const email_state = ref(null);
 const email_lists = ref([]);
+const selected_email = ref([]);
+const dialog2 = ref(false);
+const fetch_email = async () => {
+  const res = await find_all_email();
+  if (res.statusCode == 200) {
+    email_lists.value = res.data;
+  } else {
+    toast.error(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+    });
+  }
+};
+onMounted(() => {
+  fetch_email();
+  });
+
+const remove_email = (email) => {
+  selected_email.value = selected_email.value.filter((val) => val.email_id !== email.email_id);
+};
+const handle_email = (email) => {
+  selected_email.value.push(email);
+  dialog2.value = false;
+};
 </script>
 
 <template>
@@ -87,15 +114,43 @@ const email_lists = ref([]);
         </Button>
       </div>
       <div class="flex justify-between my-4">
-        <div class="my-3">
-          <div class="flex my-2">
+        <div class="my-3 ">
+          <div class="flex my-2 ">
             <span class="text-gray-500 mx-2">TO:</span>
-            <span class="bg-gray-200 px-2 rounded-sm">vidhul@gmail.com</span>
+            <div v-for="email in selected_email" class="flex mx-2 flex-wrap rounded-sm bg-gray-200">
+              <span  class=" px-2  ">{{ email?.email_address }}</span>
+              <Button class="mx-2" variant="" size="sm">X</Button>
+            </div>
+            <div class="p-1">
+  
+            <Button @click="dialog2 = true">
+              +
+          </Button>
+          <Dialog v-model="dialog2">
+            <template #body-title>
+              <h3>Select Email</h3>
+            </template>
+            <template #body-content>
+               <span @click="handle_email(email)" v-for="email in email_lists" class="flex flex-wrap bg-gray-200 p-1 rounded-sm w-fit m-1">{{ email?.email_address }}</span>
+            </template>
+            <template #actions>
+              <Button
+                class="ml-2"
+                @click="dialog2 = false"
+              >
+                Close
+              </Button>
+            </template>
+          </Dialog>
+          </div>
+
+         
           </div>
           <div class="flex">
             <span class="text-gray-500 mx-2">SUBJECT:</span>
             <span>MR vidhul prasad </span>
           </div>
+      
         </div>
         <div class="flex">
           <div class="p-1">

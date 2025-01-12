@@ -104,7 +104,7 @@ export const update_lead_assignee = async(data)=>{
 }
 
 
-export const create_email = async(data)=>{
+export const create_email_account = async(data)=>{
   return (await axiosInstance.post(`create_email?mdl=${switchStore.pageId}`,data)).data
 }
 
@@ -146,3 +146,22 @@ export const create_lead_task = async(data)=>{
 export const get_lead_task_by_lead_id = async(data)=>{
   return (await axiosInstance.get(`get_lead_task_by_lead_id?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
 }
+
+
+
+export const findUserById = async(data)=>{
+  return (await axiosInstance.get(`findUserById?mdl=${switchStore.pageId}&&u_id=${data}`)).data
+}
+
+export const find_user_created_email = async(data)=>{
+  return (await axiosInstance.get(`find_user_created_email?mdl=${switchStore.pageId}&&u_id=${data}`)).data
+}
+
+export const find_selected_user_email = async(data)=>{
+  return (await axiosInstance.get(`find_selected_user_email?mdl=${switchStore.pageId}&&user_id=${data}`)).data
+}
+
+export const create_email_user_email = async(data)=>{
+  return (await axiosInstance.post(`create_email_user_email?mdl=${switchStore.pageId}`,data)).data
+}
+

@@ -1,9 +1,65 @@
 <script setup>
 import { Checkbox, TextInput } from "frappe-ui";
-import { ref } from "vue";
+import { ref, defineExpose, watch ,defineProps, onMounted} from "vue";
 const state = ref({
   value: null,
 });
+const props = defineProps({
+  data:{
+    type:Object,
+    required:true
+  }
+})
+const emit = defineEmits(['update:incomingData']);
+
+const incoming_details = ref({
+  default_incoming: null,
+  attachment_limit: null,
+  imap: null,
+  ssl: null,
+  incoming_server: null, // Fixed property name from outgoing_server
+  port: null,
+  append_to: null,
+  contact_from_incoming_email: null, // Fixed property name
+  enable_automatic_linking: null,
+  notify_if_un_replied: null,
+})
+
+// Watch for changes in incoming_details and emit updated data
+watch(incoming_details, (newValue) => {
+  emit('update:incomingData', {
+    default_incoming: newValue.default_incoming,
+    attachment_limit: newValue.attachment_limit,
+    imap: newValue.imap,
+    ssl: newValue.ssl,
+    incoming_server: newValue.incoming_server,
+    port: newValue.port,
+    append_to: newValue.append_to,
+    contact_from_incoming_email: newValue.contact_from_incoming_email,
+    enable_automatic_linking: newValue.enable_automatic_linking,
+    notify_if_un_replied: newValue.notify_if_un_replied
+  });
+}, { deep: true });
+
+defineExpose({
+  getData: () => {
+    return {
+      default_incoming: incoming_details.value.default_incoming,
+      attachment_limit: incoming_details.value.attachment_limit,
+      imap: incoming_details.value.imap,
+      ssl: incoming_details.value.ssl,
+      incoming_server: incoming_details.value.incoming_server,
+      port: incoming_details.value.port,
+      append_to: incoming_details.value.append_to,
+      contact_from_incoming_email: incoming_details.value.contact_from_incoming_email,
+      enable_automatic_linking: incoming_details.value.enable_automatic_linking,
+      notify_if_un_replied: incoming_details.value.notify_if_un_replied
+    }
+  }
+})
+onMounted(()=>{
+  incoming_details.value = props.data
+})
 </script>
 
 <template>
@@ -14,7 +70,7 @@ const state = ref({
           <Checkbox
             size="sm"
             :value="false"
-            v-model="state.value"
+            v-model="incoming_details.default_incoming"
             label="Default Incoming"
           />
           <br />
@@ -32,9 +88,10 @@ const state = ref({
             :ref_for="true"
             size="sm"
             variant="subtle"
-            placeholder="Placeholder"
+            placeholder="10"
             :disabled="false"
-            modelValue=""
+            :modelValue="incoming_details.attachment_limit"
+            v-model="incoming_details.attachment_limit"
           />
         </div>
         <br />
@@ -49,14 +106,14 @@ const state = ref({
         <Checkbox
           size="sm"
           :value="false"
-          v-model="state.value"
+          v-model="incoming_details.imap"
           label="Use IMAP"
         />
         <br />
         <Checkbox
           size="sm"
           :value="false"
-          v-model="state.value"
+          v-model="incoming_details.ssl"
           label="Use SSL"
         />
         <br />
@@ -68,9 +125,10 @@ const state = ref({
               :ref_for="true"
               size="sm"
               variant="subtle"
-              placeholder="Placeholder"
+              placeholder="pop.gmail.com"
               :disabled="false"
-              modelValue=""
+              :modelValue="incoming_details.incoming_server"
+              v-model="incoming_details.incoming_server"
             />
 
             <span class="text-gray-500"
@@ -87,9 +145,10 @@ const state = ref({
               :ref_for="true"
               size="sm"
               variant="subtle"
-              placeholder="Placeholder"
+              placeholder="995"
               :disabled="false"
-              modelValue=""
+              :modelValue="incoming_details.port"
+              v-model="incoming_details.port"
             />
 
             <span class="text-gray-500 ">
@@ -114,9 +173,10 @@ const state = ref({
             :ref_for="true"
             size="sm"
             variant="subtle"
-            placeholder="Placeholder"
+            placeholder="Communication"
             :disabled="false"
-            modelValue=""
+            :modelValue="incoming_details.append_to"
+            v-model="incoming_details.append_to"
           />
 
           <span class="text-gray-500">
@@ -130,7 +190,7 @@ const state = ref({
         <Checkbox
           size="sm"
           :value="false"
-          v-model="state.value"
+          v-model="incoming_details.notify_if_un_replied"
           label="Notify if unreplied"
         />
       </div>
@@ -138,14 +198,14 @@ const state = ref({
       <Checkbox
         size="sm"
         :value="false"
-        v-model="state.value"
+        v-model="incoming_details.contact_from_incoming_email"
         label="Create Contacts from Incoming Emails"
       />
       <br />
       <Checkbox
         size="sm"
         :value="false"
-        v-model="state.value"
+        v-model="incoming_details.enable_automatic_linking"
         label="Enable Automatic Linking in Documents"
       />
     </div>

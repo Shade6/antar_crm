@@ -3,7 +3,7 @@ import { defineEmits, onMounted, ref ,h} from "vue";
 import { Button, FeatherIcon, ListView, TextInput } from "frappe-ui";
 import { useRouter } from "vue-router";
 const router = useRouter();
-import {create_email,find_all_email} from '@/api/userApi.js'
+import {find_all_email} from '@/api/userApi.js'
 import EmailHandler from  "@/components/antar_ui/settings/email/EmailHandler.vue"
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -100,7 +100,7 @@ const fetch=async()=>{
     if(res.statusCode == 200){
         table_data.value = res.data.map((val,i)=>({
           id:i+1,
-          email:val.email,
+          email:val.email_address,
       
         }))
         console.log(table_data.value,'-----')
@@ -214,7 +214,7 @@ onMounted(fetch)
     </div>
   </div>
   <div  v-else>
-     <EmailHandler />
+     <EmailHandler @update:email="fetch" />
   </div>
 </template>
 
