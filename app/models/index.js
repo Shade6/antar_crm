@@ -57,6 +57,15 @@ db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Seque
 
 
 db.user_email = require("./users/UserEmail.model.js")(sequelize,Sequelize)
+db.contact_email = require("./deals/ContactEmail.js")(sequelize,Sequelize)
+db.deal_status = require("./deals/DealStatus.js")(sequelize,Sequelize)
+db.organization = require("./deals/Organization.js")(sequelize,Sequelize)
+db.currency = require("./deals/Currency.js")(sequelize,Sequelize) 
+db.deal = require("./deals/Deal.js")(sequelize,Sequelize)
+db.contact_phone = require("./deals/ContactPhone.js")(sequelize,Sequelize)
+db.country = require("./deals/Country.js")(sequelize,Sequelize)
+
+
 
 
 //-------------------------------------------------------------------------------------------

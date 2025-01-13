@@ -1,47 +1,63 @@
 const { v4: uuidv4 } = require("uuid");
-
 module.exports = (sequelize, Sequelize) => {
-    const Contacts = sequelize.define("Contacts", {
-      contact_id: {
+    const Contact = sequelize.define("contact", {
+     contact_id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
       },
-      name: {
+      first_name: {
         type: Sequelize.STRING,
       },
-      customer: {
+      middle_name: {
+        type: Sequelize.STRING,
+      },
+      last_name: {
         type: Sequelize.STRING,
       },
       full_name: {
         type: Sequelize.STRING,
       },
-      email: {
+      email_id: {
+        type: Sequelize.UUID,
+      },
+      user_id: {
+        type: Sequelize.UUID,
+      },
+      address: {
         type: Sequelize.STRING,
       },
-      phone_number: {
+      status: {
+        type: Sequelize.STRING,
+      },
+      salutation: {
         type: Sequelize.STRING,
       },
       designation: {
         type: Sequelize.STRING,
       },
-      status: {
-        type: Sequelize.ENUM,
-        values: ["Active", "Inactive"],
+      gender: {
+        type: Sequelize.STRING,
       },
-      created_by: {
+      phone: {
         type: Sequelize.INTEGER,
       },
-      changed_by: {
+      mobile_no: {
         type: Sequelize.INTEGER,
       },
-      created_at:{
-        type:Sequelize.DATE
-      }
+      company_name: {
+        type: Sequelize.STRING,
+      },
+      image: {
+        type: Sequelize.STRING,
+      },
+      department: {
+        type: Sequelize.STRING,
+      },
     });
-    Contacts.beforeCreate((data, options) => {
+    Contact.beforeCreate((data, options) => {
       data.contact_id = uuidv4();
     });
-    return Contacts;
+    return Contact;
   };
