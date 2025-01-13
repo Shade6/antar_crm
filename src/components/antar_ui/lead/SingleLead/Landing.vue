@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[675px]  ">
+  <div class="flex h-[675px]">
     <!-- Tabs Component -->
     <div class="flex-grow" :style="{ width: tabsWidth + '%' }">
       <Tabs class="w-full" v-model="state.index" :tabs="tabs">
@@ -13,7 +13,7 @@
         </template>
 
         <template #default="{ tab }">
-          <div class="p-5 ">
+          <div class="p-5">
             <component :is="tab.content"></component>
           </div>
         </template>
@@ -29,7 +29,7 @@
     <!-- Resizable Sidebar -->
     <div class="" :style="{ width: sidebarWidth + '%' }">
       <div class="p-2 border w-full">
-        <span class="font-bold">{{"CRM -" + details?.lead_id ?? "" }}</span>
+        <span class="font-bold">{{ "CRM -" + details?.lead_id ?? "" }}</span>
       </div>
       <div class="p-2 border w-full flex">
         <img
@@ -38,15 +38,33 @@
           alt=""
         />
         <div>
-          <span class="my-auto text-3xl font-semibold">{{ details?.salutation  + " "+ details?.name  }}</span>
+          <span class="my-auto text-3xl font-semibold">{{
+            details?.salutation +
+            " " +
+            details?.first_name +
+            " " +
+            details?.last_name
+          }}</span>
           <div class="flex">
             <div class="p-1">
-              <Button variant="subtle" theme="gray" size="sm" label="Phone">
+              <Button
+                variant="subtle"
+                theme="gray"
+                size="sm"
+                label="Phone"
+                title="Call contact"
+              >
                 <FeatherIcon class="w-4" name="phone" />
               </Button>
             </div>
             <div class="p-1">
-              <Button variant="subtle" theme="gray" size="sm" label="Mail">
+              <Button
+                variant="subtle"
+                theme="gray"
+                size="sm"
+                label="Mail"
+                title="Send email"
+              >
                 <FeatherIcon class="w-4" name="mail" />
               </Button>
             </div>
@@ -61,51 +79,63 @@
                 :loadingText="null"
                 :disabled="false"
                 :link="null"
+                title="Copy contact link"
               >
                 <FeatherIcon class="w-4" name="link-2" />
               </Button>
             </div>
             <div class="p-1">
-              <Button variant="subtle" theme="gray" size="sm" label="Attach">
+              <Button
+                variant="subtle"
+                theme="gray"
+                size="sm"
+                label="Attach"
+                title="Attach files"
+              >
                 <FeatherIcon class="w-4" name="paperclip" />
               </Button>
             </div>
+        
           </div>
         </div>
       </div>
 
       <!-- Sidebar Menu -->
-       <div style="height: 70%;overflow-y: scroll;">
+      <div style="height: 80%; overflow-y: scroll">
         <div >
-           <div class="flex justify-between p-3 ">
-            <div @click="details_tab = !details_tab" class="flex">
-              <FeatherIcon v-if="details_tab" class="w-4 mx-3" name="chevron-down" />
-              <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
-              <span class="my-auto">details</span>
-            </div>
-             <div>
-              <div class="p-1">
-                <Button
-                  :variant="'subtle'"
-                  :ref_for="true"
-                  theme="gray"
-                  size="sm"
-                  label="Button"
-                  :loading="false"
-                  :loadingText="null"
-                  :disabled="false"
-                  :link="null"
-                >
-                <FeatherIcon class="w-4 mx-3" name="edit" />
-                </Button>
+          <div>
+            <div class="flex justify-between p-3">
+              <div @click="details_tab = !details_tab" class="flex">
+                <FeatherIcon
+                  v-if="details_tab"
+                  class="w-4 mx-3"
+                  name="chevron-down"
+                />
+                <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
+                <span class="my-auto">details</span>
               </div>
-             </div>
-            
-           </div>
-           <div v-if="details_tab" class="px-6">
+              <div>
+                <div class="p-1">
+                  <Button
+                    :variant="'subtle'"
+                    :ref_for="true"
+                    theme="gray"
+                    size="sm"
+                    label="Button"
+                    :loading="false"
+                    :loadingText="null"
+                    :disabled="false"
+                    :link="null"
+                  >
+                    <FeatherIcon class="w-4 mx-3" name="edit" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div v-if="details_tab" class="px-6">
               <div class="flex my-3 justify-between">
-                 <span class="">Organization</span>
-                 <div class="p-2">
+                <span class="">Organization</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -119,8 +149,8 @@
               </div>
 
               <div class="flex my-3 justify-between">
-                 <span class="">Website</span>
-                 <div class="p-2">
+                <span class="">Website</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -133,9 +163,9 @@
                 </div>
               </div>
 
-              <div class="flex my-3  justify-between">
-                 <span class="">Territory</span>
-                 <div class="p-2">
+              <div class="flex my-3 justify-between">
+                <span class="">Territory</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -148,10 +178,9 @@
                 </div>
               </div>
 
-
               <div class="flex my-3 justify-between">
-                 <span class="">Industry</span>
-                 <div class="p-2">
+                <span class="">Industry</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -159,31 +188,14 @@
                     variant="subtle"
                     placeholder="Placeholder"
                     :disabled="false"
-                      :modelValue="details?.industry?.industry_name"
+                    :modelValue="details?.industry?.industry_name"
                   />
                 </div>
               </div>
 
-
               <div class="flex my-3 justify-between">
-                 <span class="">Job Title</span>
-                 <div class="p-2">
-                  <TextInput
-                    :type="'text'"
-                    :ref_for="true"
-                    size="sm"
-                    variant="subtle"
-                    placeholder="Placeholder"
-                    :disabled="false"
-                    modelValue=""
-                  />
-                </div>
-              </div>
-
-
-              <div class="flex my-3 justify-between">
-                 <span class="">Source</span>
-                 <div class="p-2">
+                <span class="">Job Title</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -197,8 +209,23 @@
               </div>
 
               <div class="flex my-3 justify-between">
-                 <span class="">Lead Owner</span>
-                 <div class="p-2">
+                <span class="">Source</span>
+                <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    modelValue=""
+                  />
+                </div>
+              </div>
+
+              <div class="flex my-3 justify-between">
+                <span class="">Lead Owner</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -210,22 +237,25 @@
                   />
                 </div>
               </div>
-           </div>
-       </div>
-
-       <div>
-           <div class="flex justify-between p-3 ">
-            <div @click="person_tab=!person_tab" class="flex">
-              <FeatherIcon v-if="person_tab" class="w-4 mx-3" name="chevron-down" />
-              <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
-              <span class="my-auto">Person</span>
             </div>
-            
-           </div>
-           <div v-if="person_tab" class="px-6">
+          </div>
+
+          <div>
+            <div class="flex justify-between p-3">
+              <div @click="person_tab = !person_tab" class="flex">
+                <FeatherIcon
+                  v-if="person_tab"
+                  class="w-4 mx-3"
+                  name="chevron-down"
+                />
+                <FeatherIcon v-else class="w-4 mx-3" name="chevron-right" />
+                <span class="my-auto">Person</span>
+              </div>
+            </div>
+            <div v-if="person_tab" class="px-6">
               <div class="flex my-3 justify-between">
-                 <span class="">Salutation</span>
-                 <div class="p-2">
+                <span class="">Salutation</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -239,8 +269,8 @@
               </div>
 
               <div class="flex my-3 justify-between">
-                 <span class="">First Name</span>
-                 <div class="p-2">
+                <span class="">First Name</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -248,14 +278,14 @@
                     variant="subtle"
                     placeholder="Placeholder"
                     :disabled="false"
-                   :modelValue="details.first_name"
+                    :modelValue="details.first_name"
                   />
                 </div>
               </div>
 
               <div class="flex my-3 justify-between">
-                 <span class="">Last Name</span>
-                 <div class="p-2">
+                <span class="">Last Name</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -268,10 +298,9 @@
                 </div>
               </div>
 
-
               <div class="flex my-3 justify-between">
-                 <span class="">Email</span>
-                 <div class="p-2">
+                <span class="">Email</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -284,10 +313,9 @@
                 </div>
               </div>
 
-
               <div class="flex my-3 justify-between">
-                 <span class="">Mobile No</span>
-                 <div class="p-2">
+                <span class="">Mobile No</span>
+                <div class="p-2">
                   <TextInput
                     :type="'text'"
                     :ref_for="true"
@@ -299,18 +327,19 @@
                   />
                 </div>
               </div>
-           </div>
-       </div>
-       </div>
+            </div>
+          </div>
+        </div>
        
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { useSwitchStore } from "@/stores/switch";
-import { ref, h ,onMounted} from "vue";
-import { Tabs, Button, FeatherIcon,TextInput } from "frappe-ui";
+import { ref, h, onMounted } from "vue";
+import { Tabs, Button, FeatherIcon, TextInput } from "frappe-ui";
 import Activity from "@/components/antar_ui/lead/SingleLead/Activity.vue";
 import Attachments from "@/components/antar_ui/lead/SingleLead/Attachments.vue";
 import Calls from "@/components/antar_ui/lead/SingleLead/Calls.vue";
@@ -318,7 +347,7 @@ import Comments from "@/components/antar_ui/lead/SingleLead/Comments.vue";
 import Notes from "@/components/antar_ui/lead/SingleLead/Notes.vue";
 import Tasks from "@/components/antar_ui/lead/SingleLead/Tasks.vue";
 import Emails from "@/components/antar_ui/lead/SingleLead/Emails.vue";
-import {find_single_lead,find_assignees} from "@/api/userApi.js"
+import { find_single_lead, find_assignees } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -326,10 +355,11 @@ const switchStore = useSwitchStore();
 const tabsWidth = ref(70);
 const sidebarWidth = ref(30);
 const state = ref({ index: null });
-const details = ref({})
-const assignees = ref([])
-const person_tab = ref(true)
-const details_tab = ref(true)
+const details = ref({});
+const assignees = ref([]);
+const person_tab = ref(true);
+const details_tab = ref(true);
+const lead_scoring_active = ref(false);
 const tabs = [
   {
     icon: h("v-icon", { name: "github", class: "w-4 h-4" }),
@@ -402,30 +432,28 @@ const stopResizing = () => {
   document.removeEventListener("mouseup", stopResizing);
 };
 
-
-const fetch = async()=>{
-  const res = await find_single_lead(switchStore.create_form)
-  if(res.statusCode ==200){
-   
-    details.value = res.data
-  }else{
+const fetch = async () => {
+  const res = await find_single_lead(switchStore.create_form);
+  if (res.statusCode == 200) {
+    details.value = res.data;
+  } else {
     toast.success(res.message, {
-        position: "top-right",
-        duration: 3000,
-        dismissible: true,
-        style: {
-          background: "#FFF5F5",
-          color: "black",
-          padding: "4px 20px",
-          borderRadius: "8px",
-          fontSize: "16px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-          borderLeft: "5px solid red",
-        },
-      });
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
   }
-}
-onMounted(fetch)
+};
+onMounted(fetch);
 </script>
 
 <style>

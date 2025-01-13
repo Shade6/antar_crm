@@ -61,7 +61,7 @@ onMounted(fetch);
         { label: 'Organization', key: 'organization', width: '180px' },
         { label: 'Status', key: 'status', width: '150px' },
         { label: 'Email', key: 'email', width: '180px' },
-        { label: 'Mobile No', key: 'mobile', width: '150px' },
+        { label: 'lead score', key: 'mobile', width: '150px' },
         { label: 'Assigned To', key: 'assigned', width: '150px' },
         { label: 'Last Modified', key: 'modified', width: '150px' },
       ]"

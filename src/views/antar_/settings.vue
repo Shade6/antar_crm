@@ -5,6 +5,7 @@ import IndustryList from "@/components/antar_ui/settings/IndustryList.vue";
 import Settings from "@/components/antar_ui/settings/Settings.vue";
 import Subscription from "@/components/antar_ui/settings/Subscription.vue";
 import Email from "@/components/antar_ui/settings/email/Email.vue";
+import ScoringRules from "@/components/antar_ui/settings/ScoringRules.vue";
 
 const page = ref(null);
 
@@ -25,7 +26,7 @@ const handle_back = () => {
       <div
         @click="page = 'territory_list'"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
-        style="cursor: pointer;"
+        style="cursor: pointer"
       >
         <span>Territory</span>
         <div>
@@ -49,7 +50,7 @@ const handle_back = () => {
       <div
         @click="page = 'industry_list'"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
-         style="cursor: pointer;"
+        style="cursor: pointer"
       >
         <span>Industry</span>
         <div>
@@ -71,10 +72,11 @@ const handle_back = () => {
         </div>
       </div>
       <div
-     style="cursor: pointer;"
+        @click="page = 'scoring_rules'"
+        style="cursor: pointer"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
       >
-        <span>Scrolling Rules</span>
+        <span>Scoring Rules</span>
         <div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -95,14 +97,14 @@ const handle_back = () => {
       </div>
     </div>
 
-    <div class="mb-2 mt-10 ">
+    <div class="mb-2 mt-10">
       <span class="text-2xl">Settings</span>
     </div>
     <div class="flex gap-5">
       <div
-        style="cursor: pointer;"
+        style="cursor: pointer"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
-            @click="page = 'settings'"
+        @click="page = 'settings'"
       >
         <span>Account Settings</span>
         <div>
@@ -124,8 +126,8 @@ const handle_back = () => {
         </div>
       </div>
       <div
-         @click="page = 'subscription'"
-        style="cursor: pointer;"
+        @click="page = 'subscription'"
+        style="cursor: pointer"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
       >
         <span>Subscription</span>
@@ -148,8 +150,8 @@ const handle_back = () => {
         </div>
       </div>
       <div
-          @click="page = 'email'"
-         style="cursor: pointer;"
+        @click="page = 'email'"
+        style="cursor: pointer"
         class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
       >
         <span>Email</span>
@@ -188,6 +190,9 @@ const handle_back = () => {
   </div>
   <div v-else-if="page == 'email'">
     <Email @go_back="handle_back" />
+  </div>
+  <div v-else-if="page == 'scoring_rules'">
+    <ScoringRules @go_back="handle_back" />
   </div>
 </template>
 
