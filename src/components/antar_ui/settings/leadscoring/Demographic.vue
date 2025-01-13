@@ -1,43 +1,31 @@
 <script setup>
-const emit = defineEmits(["go_back"]);
+const emit = defineEmits(["go_back","selected_demographic", "value_selected_demographic"]);
 import { TextInput, Button, Select, Autocomplete } from "frappe-ui";
 import { find_all_industry, find_all_territories } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-import { onMounted, ref } from "vue";
-const selected_number_value = ref({
-  territory: null,
-  industry: null,
-  job_title: null,
-  annual_revenue: null,
-  budget: null,
-  website_visits: null,
-  email_interaction: null,
-  content_engagement: null,
-  lead_source: null,
-});
+import { onMounted, ref, watch } from "vue";
+
+
+const value_selected_lead = ref({
+  value_of_number_of_employees: null,
+  value_of_selected_industry: null,
+  value_of_selected_job_title: null,
+  value_of_selected_territory: null,
+})
 const selected_lead = ref({
   number_of_employees: null,
-  telephone_conversation: null,
-  response_rate: null,
-  is_there_a_need_currently: null,
-  use_case_alignment: null,
-  is_lead_unhappy_with_current_solution: null,
-  did_they_signup_for_trial: null,
-  feedback_provided: null,
-  qualified_or_unqualified_lead: null,
+  selected_industry: null,
+  selected_job_title: null,
+  selected_territory: null,
 });
 
-const selected_industry = ref(null);
-const selected_job_title = ref(null);
-const selected_number_of_employees = ref(null);
-const selected_territory = ref(null);
+
 
 const territory_list = ref([]);
 const industry_list = ref([]);
-const job_title_list = ref([]);
-const number_of_employees_list = ref([]);
+
 
 const get_territory_list = async () => {
   const res = await find_all_territories();
@@ -92,6 +80,14 @@ const get_industry_list = async () => {
   }
 };
 
+watch(() => selected_lead.value, (newVal) => {
+  emit("selected_demographic", newVal);
+}, { deep: true });
+
+watch(() => value_selected_lead.value, (newVal) => {
+  emit("value_selected_demographic", newVal); 
+}, { deep: true });
+
 onMounted(() => {
   get_territory_list();
   get_industry_list();
@@ -135,9 +131,10 @@ onMounted(() => {
               <div class="w-full">
                 <Autocomplete
                   :options="industry_list"
-                  v-model="selected_industry"
+                  v-model="selected_lead.selected_industry"
                   placeholder="Select industry"
                   :multiple="true"
+                  :unique="true"
                 />
               </div>
             </td>
@@ -146,14 +143,14 @@ onMounted(() => {
             >
               <div class="bg-white">
                 <TextInput
-                  :type="'text'"
+                  :type="'number'"
                   :ref_for="true"
                   size="sm"
                   variant="subtle"
                   placeholder="Enter website visits score"
                   :disabled="false"
-                  :modelValue="selected_lead.website_visits"
-                  v-model="selected_lead.website_visits"
+                  :modelValue="value_selected_lead.value_of_selected_industry"
+                  v-model="value_selected_lead.value_of_selected_industry"
                 />
               </div>
             </td>
@@ -167,35 +164,43 @@ onMounted(() => {
             <td
               class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
             >
-              <Select
+              <Autocomplete
                 class="bg-white"
                 :options="[
                   {
                     label: '1-10',
                     value: '1-10',
+                    id: 1
                   },
                   {
-                    label: '11-50',
+                    label: '11-50', 
                     value: '11-50',
+                    id: 2
                   },
                   {
                     label: '51-200',
                     value: '51-200',
+                    id: 3
                   },
                   {
                     label: '201-500',
                     value: '201-500',
+                    id: 4
                   },
                   {
                     label: '501-1000',
                     value: '501-1000',
+                    id: 5
                   },
                   {
                     label: '1000+',
                     value: '1000+',
+                    id: 6
                   },
                 ]"
-                v-model="selected_lead.telephone_conversation"
+                :multiple="true"
+                :unique="true"
+                v-model="selected_lead.number_of_employees"
               />
             </td>
             <td
@@ -203,14 +208,14 @@ onMounted(() => {
             >
               <div class="">
                 <TextInput
-                  :type="'text'"
+                  :type="'number'"
                   :ref_for="true"
                   size="sm"
                   variant="subtle"
                   placeholder="Enter website visits score"
                   :disabled="false"
-                  :modelValue="selected_lead.website_visits"
-                  v-model="selected_lead.website_visits"
+                  :modelValue="value_selected_lead.value_of_number_of_employees"
+                  v-model="value_selected_lead.value_of_number_of_employees"
                 />
               </div>
             </td>
@@ -224,8 +229,10 @@ onMounted(() => {
             <td
               class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
             >
-              <Select
+              <Autocomplete
                 class="bg-white"
+                :multiple="true"
+                :unique="true"
                 :options="[
                   {
                     label: 'Technology and Software',
@@ -272,7 +279,7 @@ onMounted(() => {
                     value: 'Legal and Compliance',
                   },
                 ]"
-                v-model="selected_lead.telephone_conversation"
+                v-model="selected_lead.selected_job_title"
               />
             </td>
             <td
@@ -280,14 +287,14 @@ onMounted(() => {
             >
               <div class="">
                 <TextInput
-                  :type="'text'"
+                  :type="'number'"
                   :ref_for="true"
                   size="sm"
                   variant="subtle"
                   placeholder="Enter website visits score"
                   :disabled="false"
-                  :modelValue="selected_lead.website_visits"
-                  v-model="selected_lead.website_visits"
+                  :modelValue="value_selected_lead.value_of_selected_job_title"
+                  v-model="value_selected_lead.value_of_selected_job_title"
                 />
               </div>
             </td>
@@ -303,9 +310,10 @@ onMounted(() => {
             >
               <Autocomplete
                 :options="territory_list"
-                v-model="selected_territory"
+                v-model="selected_lead.selected_territory"
                 placeholder="Select territory"
                 :multiple="true"
+                :unique="true"
               />
             </td>
             <td
@@ -313,14 +321,14 @@ onMounted(() => {
             >
               <div class="">
                 <TextInput
-                  :type="'text'"
+                  :type="'number'"
                   :ref_for="true"
                   size="sm"
                   variant="subtle"
                   placeholder="Enter website visits score"
                   :disabled="false"
-                  :modelValue="selected_lead.website_visits"
-                  v-model="selected_lead.website_visits"
+                  :modelValue="value_selected_lead.value_of_selected_territory"
+                  v-model="value_selected_lead.value_of_selected_territory"
                 />
               </div>
             </td>

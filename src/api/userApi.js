@@ -165,3 +165,12 @@ export const create_email_user_email = async(data)=>{
   return (await axiosInstance.post(`create_email_user_email?mdl=${switchStore.pageId}`,data)).data
 }
 
+
+export const get_lead_scoring_rules = async(data)=>{
+  return (await axiosInstance.get(`get_lead_scoring_rules?mdl=${switchStore.pageId}&&lead_id=${data}`)).data
+}
+
+export const create_lead_scoring_rules = async(data)=>{
+  return (await axiosInstance.post(`create_lead_scoring_rules?mdl=${switchStore.pageId}`,data)).data
+}
+

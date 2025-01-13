@@ -1,29 +1,24 @@
 <script setup>
-const emit = defineEmits(["go_back"]);
-import { TextInput, Button, Select } from "frappe-ui";
-import { ref } from "vue";
-const selected_number_value = ref({
-  territory: null,
-  industry: null,
-  job_title: null,
-  annual_revenue: null,
-  budget: null,
-  website_visits: null,
-  email_interaction: null,
-  content_engagement: null,
-  lead_source: null,
-});
+const emit = defineEmits(["go_back", "selected_lead_life", "value_selected_lead_life"]);
+import { TextInput, Button, Autocomplete } from "frappe-ui";
+import { ref, watch } from "vue";
+
+const value_selected_lead = ref({
+  value_of_qualified_or_unqualified_lead: null
+})
+
 const selected_lead = ref({
-  number_of_employees: null,
-  telephone_conversation: null,
-  response_rate: null,
-  is_there_a_need_currently: null,
-  use_case_alignment: null,
-  is_lead_unhappy_with_current_solution: null,
-  did_they_signup_for_trial: null,
-  feedback_provided: null,
-  qualified_or_unqualified_lead: null,
+  qualified_or_unqualified_lead: null
 });
+
+watch(() => selected_lead.value, (newVal) => {
+  emit("selected_lead_life", newVal);
+}, { deep: true });
+
+watch(() => value_selected_lead.value, (newVal) => {
+  emit("value_selected_lead_life", newVal);
+}, { deep: true });
+
 </script>
 <template>
     <div
@@ -62,7 +57,7 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
                       :options="[
                         {
@@ -70,7 +65,7 @@ const selected_lead = ref({
                           value: '1-10',
                         },
                         {
-                          label: 'low',
+                          label: 'low', 
                           value: '11-50',
                         },
                         {
@@ -90,7 +85,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.qualified_or_unqualified_lead"
                     />
                   </td>
                   <td
@@ -98,15 +93,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter qualified/unqualified lead value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_qualified_or_unqualified_lead"
+                        v-model="value_selected_lead.value_of_qualified_or_unqualified_lead"
                       />
                     </div>
                   </td>
@@ -117,6 +111,5 @@ const selected_lead = ref({
         </div>
 </template>
 
-<style  scoped>
-
+<style scoped>
 </style>

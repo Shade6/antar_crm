@@ -1,29 +1,32 @@
 <script setup>
-const emit = defineEmits(["go_back"]);
-import { TextInput, Button, Select } from "frappe-ui";
-import { ref } from "vue";
-const selected_number_value = ref({
-  territory: null,
-  industry: null,
-  job_title: null,
-  annual_revenue: null,
-  budget: null,
-  website_visits: null,
-  email_interaction: null,
-  content_engagement: null,
-  lead_source: null,
-});
+const emit = defineEmits(["go_back", "selected_fitwith", "value_selected_fitwith"]);
+import { TextInput, Button, Select, Autocomplete } from "frappe-ui";
+import { ref, watch } from "vue";
+
+const value_selected_lead = ref({
+  value_of_is_there_need: null,
+  value_of_use_case_alignment: null,
+  value_of_unhappy_with_current: null,
+  value_of_signup_trial: null,
+  value_of_feedback: null
+})
+
 const selected_lead = ref({
-  number_of_employees: null,
-  telephone_conversation: null,
-  response_rate: null,
-  is_there_a_need_currently: null,
-  use_case_alignment: null,
-  is_lead_unhappy_with_current_solution: null,
-  did_they_signup_for_trial: null,
-  feedback_provided: null,
-  qualified_or_unqualified_lead: null,
+  is_there_need: null,
+  use_case_alignment: null, 
+  unhappy_with_current: null,
+  signup_trial: null,
+  feedback: null
 });
+
+watch(() => selected_lead.value, (newVal) => {
+  emit("selected_fitwith", newVal);
+}, { deep: true });
+
+watch(() => value_selected_lead.value, (newVal) => {
+  emit("value_selected_fitwith", newVal);
+}, { deep: true });
+
 </script>
 <template>
  <div
@@ -62,8 +65,10 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
+                       :multiple="true"
+                       :unique="true"
                       :options="[
                         {
                           label: 'empty',
@@ -90,7 +95,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.is_there_need"
                     />
                   </td>
                   <td
@@ -98,15 +103,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_is_there_need"
+                        v-model="value_selected_lead.value_of_is_there_need"
                       />
                     </div>
                   </td>
@@ -120,8 +124,10 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
+                       :multiple="true"
+                       :unique="true"
                       :options="[
                         {
                           label: 'empty',
@@ -148,7 +154,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.use_case_alignment"
                     />
                   </td>
                   <td
@@ -156,15 +162,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_use_case_alignment"
+                        v-model="value_selected_lead.value_of_use_case_alignment"
                       />
                     </div>
                   </td>
@@ -179,8 +184,10 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
+                       :multiple="true"
+                       :unique="true"
                       :options="[
                         {
                           label: 'empty',
@@ -207,7 +214,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.unhappy_with_current"
                     />
                   </td>
                   <td
@@ -215,15 +222,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_unhappy_with_current"
+                        v-model="value_selected_lead.value_of_unhappy_with_current"
                       />
                     </div>
                   </td>
@@ -237,8 +243,10 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
+                       :multiple="true"
+                       :unique="true"
                       :options="[
                         {
                           label: 'empty',
@@ -265,7 +273,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.signup_trial"
                     />
                   </td>
                   <td
@@ -273,15 +281,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_signup_trial"
+                        v-model="value_selected_lead.value_of_signup_trial"
                       />
                     </div>
                   </td>
@@ -295,8 +302,10 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
+                       :multiple="true"
+                       :unique="true"
                       :options="[
                         {
                           label: 'empty',
@@ -323,7 +332,7 @@ const selected_lead = ref({
                           value: 'excellent',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.feedback"
                     />
                   </td>
                   <td
@@ -331,15 +340,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_feedback"
+                        v-model="value_selected_lead.value_of_feedback"
                       />
                     </div>
                   </td>
@@ -350,6 +358,5 @@ const selected_lead = ref({
         </div>
 </template>
 
-<style  scoped>
-
+<style scoped>
 </style>

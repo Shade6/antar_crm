@@ -1,29 +1,31 @@
 <script setup>
-const emit = defineEmits(["go_back"]);
-import { TextInput, Button, Select } from "frappe-ui";
-import { ref } from "vue";
-const selected_number_value = ref({
-  territory: null,
-  industry: null,
-  job_title: null,
-  annual_revenue: null,
-  budget: null,
-  website_visits: null,
-  email_interaction: null,
-  content_engagement: null,
-  lead_source: null,
+const emit = defineEmits(["go_back", "selected_source", "value_selected_source"]);
+import { TextInput, Button, Autocomplete } from "frappe-ui";
+import { ref, watch } from "vue";
+
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => []
+  }
 });
+
+const value_selected_lead = ref({
+  value_of_lead_source: null
+})
+
 const selected_lead = ref({
-  number_of_employees: null,
-  telephone_conversation: null,
-  response_rate: null,
-  is_there_a_need_currently: null,
-  use_case_alignment: null,
-  is_lead_unhappy_with_current_solution: null,
-  did_they_signup_for_trial: null,
-  feedback_provided: null,
-  qualified_or_unqualified_lead: null,
+  lead_source: null
 });
+
+watch(() => selected_lead.value, (newVal) => {
+  emit("selected_source", newVal);
+}, { deep: true });
+
+watch(() => value_selected_lead.value, (newVal) => {
+  emit("value_selected_source", newVal);
+}, { deep: true });
+
 </script>
 <template>
 <div
@@ -62,35 +64,36 @@ const selected_lead = ref({
                   <td
                     class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-2"
                   >
-                    <Select
+                    <Autocomplete
                        class="bg-white"
                       :options="[
                         {
-                          label: 'empty',
-                          value: '1-10',
+                          label: 'Website',
+                          value: 'website',
                         },
                         {
-                          label: 'low',
-                          value: '11-50',
+                          label: 'Social Media',
+                          value: 'social_media',
                         },
                         {
-                          label: 'medium',
-                          value: '51-200',
+                          label: 'Email Campaign',
+                          value: 'email_campaign',
                         },
                         {
-                          label: 'high',
-                          value: '201-500',
+                          label: 'Referral',
+                          value: 'referral',
                         },
                         {
-                          label: 'very high',
-                          value: '501-1000',
+                          label: 'Trade Show',
+                          value: 'trade_show',
                         },
                         {
-                          label: 'excellent',
-                          value: 'excellent',
+                          label: 'Cold Call',
+                          value: 'cold_call',
                         },
                       ]"
-                      v-model="selected_lead.telephone_conversation"
+                      v-model="selected_lead.lead_source"
+                      :multiple="true"
                     />
                   </td>
                   <td
@@ -98,15 +101,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                     
-                      :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
-                        placeholder="Enter website visits score"
+                        placeholder="Enter lead source value"
                         :disabled="false"
-                        :modelValue="selected_lead.website_visits"
-                        v-model="selected_lead.website_visits"
+                        :modelValue="value_selected_lead.value_of_lead_source"
+                        v-model="value_selected_lead.value_of_lead_source"
                       />
                     </div>
                   </td>

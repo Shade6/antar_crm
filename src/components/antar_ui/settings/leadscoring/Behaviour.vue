@@ -1,32 +1,28 @@
 <script setup>
-const emit = defineEmits(["go_back"]);
+const emit = defineEmits(["go_back", "selected_behaviour", "value_selected_behaviour"]);
 import { TextInput, Button, Select } from "frappe-ui";
-import { ref } from "vue";
-const selected_number_value = ref({
-  territory: null,
-  industry: null,
-  job_title: null,
-  annual_revenue: null,
-  budget: null,
-  website_visits: null,
-  email_interaction: null,
-  content_engagement: null,
-  lead_source: null,
-});
+import { ref, watch } from "vue";
+
+const value_selected_lead = ref({
+  value_of_website_visits: null,
+  value_of_email_interaction: null, 
+  value_of_content_engagement: null
+})
+
 const selected_lead = ref({
-  number_of_employees: null,
-  telephone_conversation: null,
-  response_rate: null,
-  is_there_a_need_currently: null,
-  use_case_alignment: null,
-  is_lead_unhappy_with_current_solution: null,
-  did_they_signup_for_trial: null,
-  feedback_provided: null,
-  qualified_or_unqualified_lead: null,
   website_visits: null,
   email_interaction: null,
   content_engagement: null
 });
+
+watch(() => selected_lead.value, (newVal) => {
+  emit("selected_behaviour", newVal);
+}, { deep: true });
+
+watch(() => value_selected_lead.value, (newVal) => {
+  emit("value_selected_behaviour", newVal);
+}, { deep: true });
+
 </script>
 <template>
 <div
@@ -36,25 +32,25 @@ const selected_lead = ref({
             <table
               class="items-center w-full border-collapse text-blueGray-700"
             >
-              <thead class="thead-bold ">
-                <tr>
-                  <th
-                    class="px-6 w-80 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3  uppercase border-l-0 border-r-0 whitespace-nowrap  text-left"
-                  >
-                    Behaviour
-                  </th>
-                  <th
-                    class="px-6 w-96 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3  uppercase border-l-0 border-r-0 whitespace-nowrap  text-left"
-                  >
-                    Selection
-                  </th>
-                  <th
-                    class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3  uppercase border-l-0 border-r-0 whitespace-nowrap  text-left"
-                  >
-                    Value
-                  </th>
-                </tr>
-              </thead>
+            <thead class="thead-light">
+          <tr>
+            <th
+              class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+            >
+              Behaviour
+            </th>
+            <th
+              class="px-6 w-96 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+            >
+              selection
+            </th>
+            <th
+              class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+            >
+              Value
+            </th>
+          </tr>
+        </thead>
               <tbody class="font-light">
                 <tr>
                   <th
@@ -101,14 +97,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                        :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
                         placeholder="Enter website visits value"
                         :disabled="false"
-                        :modelValue="selected_number_value.website_visits"
-                        v-model="selected_number_value.website_visits"
+                        :modelValue="value_selected_lead.value_of_website_visits"
+                        v-model="value_selected_lead.value_of_website_visits"
                       />
                     </div>
                   </td>
@@ -158,14 +154,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                        :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
                         placeholder="Enter email interaction value"
                         :disabled="false"
-                        :modelValue="selected_number_value.email_interaction"
-                        v-model="selected_number_value.email_interaction"
+                        :modelValue="value_selected_lead.value_of_email_interaction"
+                        v-model="value_selected_lead.value_of_email_interaction"
                       />
                     </div>
                   </td>
@@ -215,14 +211,14 @@ const selected_lead = ref({
                   >
                     <div class="">
                       <TextInput
-                        :type="'text'"
+                        :type="'number'"
                         :ref_for="true"
                         size="sm"
                         variant="subtle"
                         placeholder="Enter content engagement value"
                         :disabled="false"
-                        :modelValue="selected_number_value.content_engagement"
-                        v-model="selected_number_value.content_engagement"
+                        :modelValue="value_selected_lead.value_of_content_engagement"
+                        v-model="value_selected_lead.value_of_content_engagement"
                       />
                     </div>
                   </td>
@@ -233,6 +229,5 @@ const selected_lead = ref({
         </div>
 </template>
 
-<style  scoped>
-
+<style scoped>
 </style>
