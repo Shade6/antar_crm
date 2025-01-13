@@ -31,6 +31,10 @@ module.exports = app => {
    router.post("/create_lead_task",Authenticator.user,AccessChecker.access_create,task_controller.create)
    router.get("/get_lead_task_by_lead_id",Authenticator.user,AccessChecker.access_read,task_controller.get_by_lead_id)
   
-    app.use('/api/v1/', router);
+
+   router.post("/create_lead_scoring_rules",Authenticator.user,AccessChecker.access_create,controller.create_lead_scoring_rules)
+   router.get("/get_lead_scoring_rules",Authenticator.user,AccessChecker.access_read,controller.get_lead_scoring_rules)
+   
+   app.use('/api/v1/', router);
   };
   

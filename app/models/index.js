@@ -65,7 +65,7 @@ db.deal = require("./deals/Deal.js")(sequelize,Sequelize)
 db.contact_phone = require("./deals/ContactPhone.js")(sequelize,Sequelize)
 db.country = require("./deals/Country.js")(sequelize,Sequelize)
 
-
+db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
 
 //-------------------------------------------------------------------------------------------
