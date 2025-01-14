@@ -174,3 +174,8 @@ export const create_lead_scoring_rules = async(data)=>{
   return (await axiosInstance.post(`create_lead_scoring_rules?mdl=${switchStore.pageId}`,data)).data
 }
 
+export const delete_lead = async(data)=>{
+  return (await axiosInstance.delete(`delete_lead?mdl=${switchStore.pageId}&&id=${data}`)).data
+}
+
+

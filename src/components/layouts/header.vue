@@ -5,7 +5,7 @@ import CRMLogo from "@/components/icons/CRMLogo.vue";
 import CollapseSidebar from "@/components/icons/CollapseSidebar.vue";
 import OrganizationsIcon from "@/components/icons/OrganizationsIcon.vue";
 import FileTextIcon from "@/components/icons/FileTextIcon.vue";
-import { FeatherIcon, Dropdown,Button } from "frappe-ui";
+import { FeatherIcon, Dropdown, Button } from "frappe-ui";
 import LeadsIcon from "@/components/icons/LeadsIcon.vue";
 import DealsIcon from "@/components/icons/DealsIcon.vue";
 import ContactsIcon from "@/components/icons/ContactsIcon.vue";
@@ -20,7 +20,6 @@ import { useSwitchStore } from "@/stores/switch";
 
 const switchStore = useSwitchStore();
 
-
 const sidebarOpen = ref(true);
 const handle_side_bar = () => {
   sidebarOpen.value = !sidebarOpen.value;
@@ -28,17 +27,17 @@ const handle_side_bar = () => {
 watch(
   () => switchStore.page,
   (new_) => {
-      router.push(`/antar_/${new_}`);
+    router.push(`/antar_/${new_}`);
   }
 );
-const logout =()=>{
+const logout = () => {
   switchStore.clearPersist();
   localStorage.clear();
   router.push(`/login`);
-}
-const go_to_settings = ()=>{
+};
+const go_to_settings = () => {
   router.push(`/antar_/settings`);
-}
+};
 </script>
 
 <template>
@@ -52,86 +51,102 @@ const go_to_settings = ()=>{
       class="nav w-full text-lg h-[100%] ease-out transition-all duration-100 sticky p-3 bg-gray-50"
     >
       <div class="nav-item flex cursor-pointer">
-        
-        <Dropdown class="w-full" 
-  :options="[
-    {
-      group: 'User Manage',
-      items: [
-        switchStore.menu.some((val)=>val.module.module_name == 'user') && {
-          label: 'Users',
-          icon: () => h(FeatherIcon, { name: 'user' }),
-          onClick: () => {
-            switchStore.changePage({module_name:'user',module_id:'87c9139e-1586-40c8-8a96-436ca33ad952'});
-          }
-        },
-        switchStore.menu.find((val)=>val.module.module_name == 'user-settings') && {
-          label: 'User Settings',
-          icon: () => h(FeatherIcon, { name: 'users' }),
-          onClick: () => {
-            switchStore.changePage({module_name:'user-settings',module_id:'ff5e2c3b-dd8a-45da-bcf4-0f8900902a92'});
-          }
-        }
-      ].filter(Boolean) // Filter out null values if conditions fail
-    },
-    {
-      group: 'Action',
-      items: [
-        {
-          label: 'settings',
-          icon: () => h(FeatherIcon, { name: 'settings' }),
-          onClick: () => {
-            go_to_settings();
-          }
-        },
-        {
-          label: 'Logout',
-          icon: () => h(FeatherIcon, { name: 'power' }),
-          onClick: () => {
-            logout();
-          }
-        }
-      ]
-    }
-  ]"
->
-  <Button class="w-full">
-    <template #icon class="w-full">
-      <div class="flex w-full">
-        <CRMLogo class="w-[30px] h-[30px]" />
-        <div class="nav-item__text m-0 text-xl mx-2 text-black">Antar CRM</div>
-      </div>
-    </template>
-  </Button>
-</Dropdown>
+        <Dropdown
+          class="w-full"
+          :options="[
+            {
+              group: 'User Manage',
+              items: [
+                switchStore.menu.some(
+                  (val) => val.module.module_name == 'user'
+                ) && {
+                  label: 'Users',
+                  icon: () => h(FeatherIcon, { name: 'user' }),
+                  onClick: () => {
+                    switchStore.changePage({
+                      module_name: 'user',
+                      module_id: '87c9139e-1586-40c8-8a96-436ca33ad952',
+                    });
+                  },
+                },
+                switchStore.menu.find(
+                  (val) => val.module.module_name == 'user-settings'
+                ) && {
+                  label: 'User Settings',
+                  icon: () => h(FeatherIcon, { name: 'users' }),
+                  onClick: () => {
+                    switchStore.changePage({
+                      module_name: 'user-settings',
+                      module_id: 'ff5e2c3b-dd8a-45da-bcf4-0f8900902a92',
+                    });
+                  },
+                },
+              ].filter(Boolean), // Filter out null values if conditions fail
+            },
+            {
+              group: 'Action',
+              items: [
+                {
+                  label: 'settings',
+                  icon: () => h(FeatherIcon, { name: 'settings' }),
+                  onClick: () => {
+                    go_to_settings();
+                  },
+                },
+                {
+                  label: 'Logout',
+                  icon: () => h(FeatherIcon, { name: 'power' }),
+                  onClick: () => {
+                    logout();
+                  },
+                },
+              ],
+            },
+          ]"
+        >
+          <Button class="w-full">
+            <template #icon class="w-full">
+              <div class="flex w-full">
+                <CRMLogo class="w-[30px] h-[30px]" />
+                <div class="nav-item__text m-0 text-xl mx-2 text-black">
+                  Antar CRM
+                </div>
+              </div>
+            </template>
+          </Button>
+        </Dropdown>
       </div>
 
-      <li  @click="switchStore.changeNotification()" class="nav-item flex my-4">
+      <li @click="switchStore.changeNotification()" class="nav-item flex my-4">
         <div class="nav-item__icon">
           <PinIcon />
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">Notification</div>
       </li>
 
-
-      <li v-for="menu in switchStore.menu.filter((val)=>val.module.docs_type == 'crm')" @click="switchStore.changePage(menu.module)" class="nav-item flex my-2">
+      <li
+        v-for="menu in switchStore.menu.filter(
+          (val) => val.module.docs_type == 'crm'
+        )"
+        @click="switchStore.changePage(menu.module)"
+        class="nav-item flex my-2"
+      >
         <div class="nav-item__icon">
-          <LeadsIcon v-if="menu.module.module_name == 'leads'"/>
-          <DealsIcon v-else-if="menu.module.module_name == 'deals'"/>
-          <PhoneIcon v-else-if="menu.module.module_name == 'call-logs'"/>
-          <ContactsIcon v-else-if="menu.module.module_name == 'contacts'"/>
-          <TaskIcon v-else-if="menu.module.module_name == 'task'"/>
-          <FileTextIcon v-else-if="menu.module.module_name == 'notes'"/>
-          <OrganizationsIcon v-else-if="menu.module.module_name == 'organizations'"/>
-          <Email2Icon v-else-if="menu.module.module_name == 'email-template'"/>
-      
-
-       
-
+          <LeadsIcon v-if="menu.module.module_name == 'leads'" />
+          <DealsIcon v-else-if="menu.module.module_name == 'deals'" />
+          <PhoneIcon v-else-if="menu.module.module_name == 'call-logs'" />
+          <ContactsIcon v-else-if="menu.module.module_name == 'contacts'" />
+          <TaskIcon v-else-if="menu.module.module_name == 'task'" />
+          <FileTextIcon v-else-if="menu.module.module_name == 'notes'" />
+          <OrganizationsIcon
+            v-else-if="menu.module.module_name == 'organizations'"
+          />
+          <Email2Icon v-else-if="menu.module.module_name == 'email-template'" />
         </div>
-        <div class="nav-item__text m-0 text-sm mx-2">{{ menu.module.module_name }}</div>
+        <div class="nav-item__text m-0 text-sm mx-2">
+          {{ menu.module.module_name }}
+        </div>
       </li>
-   
 
       <li class="nav-item flex my-3 absolute bottom-0">
         <button @click="handle_side_bar" class="p-0 m-0 flex">
@@ -139,7 +154,7 @@ const go_to_settings = ()=>{
             class="h-4.5 w-4.5 nav-item__icon duration-300 ease-in-out my-auto"
             :class="{ '[transform:rotateY(180deg)]': sidebarOpen }"
           />
-          <div class="nav-item__text text-xs">Collapse</div>
+          <div class="nav-item__text my-auto text-xs">Collapse</div>
         </button>
       </li>
     </ul>

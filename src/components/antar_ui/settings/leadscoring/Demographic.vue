@@ -1,5 +1,9 @@
 <script setup>
-const emit = defineEmits(["go_back","selected_demographic", "value_selected_demographic"]);
+const emit = defineEmits([
+  "go_back",
+  "selected_demographic",
+  "value_selected_demographic",
+]);
 import { TextInput, Button, Select, Autocomplete } from "frappe-ui";
 import { find_all_industry, find_all_territories } from "@/api/userApi.js";
 import "@/assets/toast.css";
@@ -7,13 +11,19 @@ import { useToast } from "vue-toast-notification";
 const toast = useToast();
 import { onMounted, ref, watch } from "vue";
 
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 const value_selected_lead = ref({
   value_of_number_of_employees: null,
   value_of_selected_industry: null,
   value_of_selected_job_title: null,
   value_of_selected_territory: null,
-})
+});
 const selected_lead = ref({
   number_of_employees: null,
   selected_industry: null,
@@ -21,11 +31,8 @@ const selected_lead = ref({
   selected_territory: null,
 });
 
-
-
 const territory_list = ref([]);
 const industry_list = ref([]);
-
 
 const get_territory_list = async () => {
   const res = await find_all_territories();
@@ -80,18 +87,51 @@ const get_industry_list = async () => {
   }
 };
 
-watch(() => selected_lead.value, (newVal) => {
-  emit("selected_demographic", newVal);
-}, { deep: true });
+watch(
+  () => selected_lead.value,
+  (newVal) => {
+    emit("selected_demographic", newVal);
+  },
+  { deep: true }
+);
 
-watch(() => value_selected_lead.value, (newVal) => {
-  emit("value_selected_demographic", newVal); 
-}, { deep: true });
+watch(
+  () => value_selected_lead.value,
+  (newVal) => {
+    emit("value_selected_demographic", newVal);
+  },
+  { deep: true }
+);
 
 onMounted(() => {
   get_territory_list();
   get_industry_list();
 });
+watch(
+  () => props.data,
+  (newData) => {
+    if (Object.keys(newData).length > 0) {
+      selected_lead.value = {
+        number_of_employees: newData.selected?.number_of_employees || null,
+        selected_industry: newData.selected?.selected_industry || null,
+        selected_job_title: newData.selected?.selected_job_title || null,
+        selected_territory: newData.selected?.selected_territory || null,
+      };
+
+      value_selected_lead.value = {
+        value_of_number_of_employees:
+          newData.values?.value_of_number_of_employees || null,
+        value_of_selected_industry:
+          newData.values?.value_of_selected_industry || null,
+        value_of_selected_job_title:
+          newData.values?.value_of_selected_job_title || null,
+        value_of_selected_territory:
+          newData.values?.value_of_selected_territory || null,
+      };
+    }
+  },
+  { immediate: true, deep: true }
+);
 </script>
 <template>
   <div
@@ -166,36 +206,37 @@ onMounted(() => {
             >
               <Autocomplete
                 class="bg-white"
+                 placeholder="Select number of employees"
                 :options="[
                   {
                     label: '1-10',
                     value: '1-10',
-                    id: 1
+                    id: 1,
                   },
                   {
-                    label: '11-50', 
+                    label: '11-50',
                     value: '11-50',
-                    id: 2
+                    id: 2,
                   },
                   {
                     label: '51-200',
                     value: '51-200',
-                    id: 3
+                    id: 3,
                   },
                   {
                     label: '201-500',
                     value: '201-500',
-                    id: 4
+                    id: 4,
                   },
                   {
                     label: '501-1000',
                     value: '501-1000',
-                    id: 5
+                    id: 5,
                   },
                   {
                     label: '1000+',
                     value: '1000+',
-                    id: 6
+                    id: 6,
                   },
                 ]"
                 :multiple="true"
@@ -233,6 +274,7 @@ onMounted(() => {
                 class="bg-white"
                 :multiple="true"
                 :unique="true"
+                placeholder="Select job title"
                 :options="[
                   {
                     label: 'Technology and Software',
