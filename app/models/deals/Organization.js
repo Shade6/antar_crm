@@ -34,16 +34,16 @@ module.exports = (sequelize, Sequelize) => {
       address: {
         type: Sequelize.STRING,
       },
-      createdBy: {
+      created_by: {
         type: Sequelize.UUID,
       },
-      createdOn: {
+      created_on: {
         type: Sequelize.DATE,
       },
-      updatedBy: {
+      changed_by: {
         type: Sequelize.INTEGER,
       },
-      UpdatedOn: {
+      changed_on: {
         type: Sequelize.DATE,
       },
     });

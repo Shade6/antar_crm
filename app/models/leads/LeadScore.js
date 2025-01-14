@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       territory_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       industry: {
@@ -20,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       industry_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       job_title: {
@@ -28,23 +28,23 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       job_title_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       annual_revenue: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       annual_revenue_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       budget: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       budget_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       website_visits: {
@@ -52,7 +52,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       website_visits_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       email_interaction: {
@@ -60,7 +60,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       email_interaction_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       content_engagement: {
@@ -68,7 +68,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       content_engagement_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       lead_source: {
@@ -76,7 +76,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       lead_source_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       number_of_employees: {
@@ -84,7 +84,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       number_of_employees_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       telephone_conversation: {
@@ -92,7 +92,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       telephone_conversation_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       response_rate: {
@@ -100,7 +100,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       response_rate_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       is_there_a_need_currently: {
@@ -108,7 +108,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       is_there_a_need_currently_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       use_case_alignment: {
@@ -116,7 +116,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       use_case_alignment_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       is_lead_unhappy_with_current_solution: {
@@ -124,7 +124,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       is_lead_unhappy_with_current_solution_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       did_they_signup_for_trial: {
@@ -132,7 +132,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       did_they_signup_for_trial_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       feedback_provided: {
@@ -140,7 +140,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       feedback_provided_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       qualified_or_unqualified_lead: {
@@ -148,7 +148,31 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true
       },
       qualified_or_unqualified_lead_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      hot_lead_is_greater_than: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      hot_lead_is_lesser_than: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      warm_lead_is_greater_than: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      warm_lead_is_lesser_than: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      cold_lead_is_greater_than: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      cold_lead_is_lesser_than: {
+        type: Sequelize.INTEGER,
         allowNull: true
       }
     });

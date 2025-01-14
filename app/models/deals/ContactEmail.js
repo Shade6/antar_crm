@@ -24,16 +24,16 @@ module.exports = (sequelize, Sequelize) => {
       },
 
 
-      createdBy: {
+      created_by: {
         type: Sequelize.UUID,
       },
-      createdOn: {
+      created_on: {
         type: Sequelize.DATE,
       },
-      updatedBy: {
-        type: Sequelize.UUID,
+      changed_by: {
+        type: Sequelize.INTEGER,
       },
-      UpdatedOn: {
+      changed_on: {
         type: Sequelize.DATE,
       },
     });

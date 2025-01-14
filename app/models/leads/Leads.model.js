@@ -1,5 +1,4 @@
 const { v4: uuidv4 } = require("uuid");
-const { territory, industry } = require("..");
 module.exports = (sequelize, Sequelize) => {
     const Leads = sequelize.define("Leads", {
       lead_id: {
@@ -35,6 +34,12 @@ module.exports = (sequelize, Sequelize) => {
       lead_source: {
         type: Sequelize.STRING,
       },
+      lead_score: {
+        type: Sequelize.STRING,
+      },
+      lead_value: {
+        type: Sequelize.STRING,
+      },
       website:{
         type: Sequelize.STRING,
       },
@@ -48,10 +53,6 @@ module.exports = (sequelize, Sequelize) => {
       assigned_to: {
         type: Sequelize.UUID, // Match the data type in `Leads`
          allowNull: false,
-      },
-      created_by: {
-        type: Sequelize.UUID, // Match the data type in `Leads`
-        allowNull: false,
       },
       territory_id:{
         type: Sequelize.UUID, // Match the data type in `Leads`
@@ -73,7 +74,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       updated_at:{
         type:Sequelize.DATE
-      }
+      },
+      created_by: {
+        type: Sequelize.UUID, // Match the data type in `Leads`
+        allowNull: false,
+      },
     });
     Leads.beforeCreate((data, options) => {
       data.lead_id = uuidv4();

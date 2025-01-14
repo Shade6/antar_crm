@@ -205,59 +205,80 @@ exports.update_lead_assignee=async(req,res)=>{
 exports.create_lead_scoring_rules = async(req,res)=>{
   try {
     console.log(req.body)
-    const find_lead_score = await LeadScore.findAll()
-    if(find_lead_score.length !== 0){
-      return res.json({message:'lead score already exists',statusCode:400})
-    }
-
+    const find_lead_score = await LeadScore.findOne()
+    
     const data = {
       territory: JSON.stringify(req.body.demographic_data.selected.selected_territory) ?? '',
-      territory_value: req.body.demographic_data.values.value_of_selected_territory ?? '',
+      territory_value: req.body.demographic_data.values.value_of_selected_territory ?? 0,
       industry: JSON.stringify(req.body.demographic_data.selected.selected_industry) ?? '',
-      industry_value: req.body.demographic_data.values.value_of_selected_industry ?? '',
+      industry_value: req.body.demographic_data.values.value_of_selected_industry ?? 0,
       job_title: JSON.stringify(req.body.demographic_data.selected.selected_job_title) ?? '',
-      job_title_value: req.body.demographic_data.values.value_of_selected_job_title ?? '',
+      job_title_value: req.body.demographic_data.values.value_of_selected_job_title ?? 0,
       number_of_employees: JSON.stringify(req.body.demographic_data.selected.number_of_employees) ?? '',
-      number_of_employees_value: req.body.demographic_data.values.value_of_number_of_employees ?? '',
+      number_of_employees_value: req.body.demographic_data.values.value_of_number_of_employees ?? 0,
 
-      annual_revenue: JSON.stringify(req.body.FirmData_data.selected.annual_revenue) ?? '',
-      annual_revenue_value: req.body.FirmData_data.values.value_of_annual_revenue ?? '',
-      budget: JSON.stringify(req.body.FirmData_data.selected.budget) ?? '',
-      budget_value: req.body.FirmData_data.values.value_of_budget ?? '',
+      annual_revenue: parseInt(req.body.FirmData_data.selected.annual_revenue?? 0),
+      annual_revenue_value: parseInt(req.body.FirmData_data.values.annual_revenue_value ?? 0),
+      budget: parseInt(req.body.FirmData_data.selected.budget?? 0),
+      budget_value: parseInt(req.body.FirmData_data.values.budget_value ?? 0),
 
       website_visits: JSON.stringify(req.body.Behaviour_data.selected.website_visits) ?? '',
-      website_visits_value: req.body.Behaviour_data.values.value_of_website_visits ?? '',
+      website_visits_value: req.body.Behaviour_data.values.value_of_website_visits ?? 0,
       email_interaction: JSON.stringify(req.body.Behaviour_data.selected.email_interaction) ?? '',
-      email_interaction_value: req.body.Behaviour_data.values.value_of_email_interaction ?? '',
+      email_interaction_value: req.body.Behaviour_data.values.value_of_email_interaction ?? 0,
       content_engagement: JSON.stringify(req.body.Behaviour_data.selected.content_engagement) ?? '',
-      content_engagement_value: req.body.Behaviour_data.values.value_of_content_engagement ?? '',
+      content_engagement_value: req.body.Behaviour_data.values.value_of_content_engagement ?? 0,
 
       telephone_conversation: JSON.stringify(req.body.Engagment_data.selected.telephone_conversation) ?? '',
-      telephone_conversation_value: req.body.Engagment_data.values.value_of_telephone_conversation ?? '',
+      telephone_conversation_value: req.body.Engagment_data.values.value_of_telephone_conversation ?? 0,
       response_rate: JSON.stringify(req.body.Engagment_data.selected.response_rate) ?? '',
-      response_rate_value: req.body.Engagment_data.values.value_of_response_rate ?? '',
+      response_rate_value: req.body.Engagment_data.values.value_of_response_rate ?? 0,
 
       is_there_a_need_currently: JSON.stringify(req.body.Fitwith_data.selected.is_there_need) ?? '',
-      is_there_a_need_currently_value: req.body.Fitwith_data.values.value_of_is_there_need ?? '',
+      is_there_a_need_currently_value: req.body.Fitwith_data.values.value_of_is_there_need ?? 0,
       use_case_alignment: JSON.stringify(req.body.Fitwith_data.selected.use_case_alignment) ?? '',
-      use_case_alignment_value: req.body.Fitwith_data.values.value_of_use_case_alignment ?? '',
+      use_case_alignment_value: req.body.Fitwith_data.values.value_of_use_case_alignment ?? 0,
       is_lead_unhappy_with_current_solution: JSON.stringify(req.body.Fitwith_data.selected.unhappy_with_current) ?? '',
-      is_lead_unhappy_with_current_solution_value: req.body.Fitwith_data.values.value_of_unhappy_with_current ?? '',
+      is_lead_unhappy_with_current_solution_value: req.body.Fitwith_data.values.value_of_unhappy_with_current ?? 0,
       did_they_signup_for_trial: JSON.stringify(req.body.Fitwith_data.selected.signup_trial) ?? '',
-      did_they_signup_for_trial_value: req.body.Fitwith_data.values.value_of_signup_trial ?? '',
+      did_they_signup_for_trial_value: req.body.Fitwith_data.values.value_of_signup_trial ?? 0,
       feedback_provided: JSON.stringify(req.body.Fitwith_data.selected.feedback) ?? '',
-      feedback_provided_value: req.body.Fitwith_data.values.value_of_feedback ?? '',
+      feedback_provided_value: req.body.Fitwith_data.values.value_of_feedback ?? 0,
 
       qualified_or_unqualified_lead: JSON.stringify(req.body.LeadLife_data.selected.qualified_or_unqualified_lead) ?? '',
-      qualified_or_unqualified_lead_value: req.body.LeadLife_data.values.value_of_qualified_or_unqualified_lead ?? '',
+      qualified_or_unqualified_lead_value: req.body.LeadLife_data.values.value_of_qualified_or_unqualified_lead ?? 0,
 
       lead_source: JSON.stringify(req.body.SourceOfLead_data.selected.lead_source) ?? '',
-      lead_source_value: req.body.SourceOfLead_data.values.value_of_lead_source ?? ''
+      lead_source_value: req.body.SourceOfLead_data.values.value_of_lead_source ?? '',
+
+      hot_lead_is_greater_than: req.body.LeadScore_data.hot_lead_is_greater_than ?? 0 ,
+      hot_lead_is_lesser_than: req.body.LeadScore_data.hot_lead_is_lesser_than ?? 0,
+      warm_lead_is_greater_than: req.body.LeadScore_data.warm_lead_is_greater_than ?? 0,
+      warm_lead_is_lesser_than: req.body.LeadScore_data.warm_lead_is_lesser_than ?? 0,
+      cold_lead_is_greater_than: req.body.LeadScore_data.cold_lead_is_greater_than ?? 0,
+      cold_lead_is_lesser_than: req.body.LeadScore_data.cold_lead_is_lesser_than ?? 0
     }
     console.log(data)
 
-    const create_lead_score = await LeadScore.create(data);
-    return res.json({message:'lead score created successfully',statusCode:200,data:create_lead_score})
+    let result;
+    if(find_lead_score) {
+      // Update only changed fields
+      const changedFields = {};
+      for(const [key, value] of Object.entries(data)) {
+        if(find_lead_score[key] !== value) {
+          changedFields[key] = value;
+        }
+      }
+      result = await LeadScore.update(changedFields, {
+        where: {
+          lead_score_id: find_lead_score.lead_score_id
+        }
+      });
+      return res.json({message:'lead score updated successfully',statusCode:200,data:result})
+    } else {
+      result = await LeadScore.create(data);
+      return res.json({message:'lead score created successfully',statusCode:200,data:result})
+    }
   } catch (error) {
     return res.json({message:error.message,statusCode:500})
   }
@@ -272,3 +293,15 @@ exports.get_lead_scoring_rules = async(req,res)=>{
     
   }
 }
+
+exports.delete_lead_scoring_rules = async(req,res)=>{
+  try {
+    const lead_score_id = req.query.id
+    console.log(lead_score_id)
+    const find_lead_score = await LeadScore.findOne({where:{lead_score_id:lead_score_id}})
+
+  } catch (error) {
+    return res.json({message:error.message,statusCode:500})
+  }
+}
+

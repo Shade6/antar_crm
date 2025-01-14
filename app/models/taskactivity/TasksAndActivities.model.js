@@ -35,14 +35,17 @@ module.exports = (sequelize, Sequelize) => {
        type:Sequelize.STRING
       },
       created_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+      },
+      created_on: {
+        type: Sequelize.DATE,
       },
       changed_by: {
         type: Sequelize.INTEGER,
       },
-      created_at:{
-        type:Sequelize.DATE
-      }
+      changed_on: {
+        type: Sequelize.DATE,
+      },
     });
     TasksAndActivities.beforeCreate((data, options) => {
       data.task_activity_id = uuidv4();

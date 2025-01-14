@@ -35,6 +35,8 @@ module.exports = app => {
    router.post("/create_lead_scoring_rules",Authenticator.user,AccessChecker.access_create,controller.create_lead_scoring_rules)
    router.get("/get_lead_scoring_rules",Authenticator.user,AccessChecker.access_read,controller.get_lead_scoring_rules)
    
+   router.delete("/delete_lead",Authenticator.user,AccessChecker.access_delete,controller.delete_lead_scoring_rules)
+
    app.use('/api/v1/', router);
   };
   
