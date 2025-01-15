@@ -296,10 +296,23 @@ exports.get_lead_scoring_rules = async(req,res)=>{
 
 exports.delete_lead_scoring_rules = async(req,res)=>{
   try {
-    const lead_score_id = req.query.id
-    console.log(lead_score_id)
-    const find_lead_score = await LeadScore.findOne({where:{lead_score_id:lead_score_id}})
+    const lead_ids = req.query.id
 
+    const ids = lead_ids.split(',')
+    console.log(ids)
+    if(ids.length == 0){
+      return res.json({message:'lead  id is required',statusCode:400})
+    }
+    let count = 0;
+    for(let id of ids){
+      const find_lead_score = await Leads.findOne({where:{lead_id:id}})
+      if(find_lead_score){
+        await Leads.destroy({where:{lead_id:id}})
+        count++;
+      }
+    }
+    return res.json({message:`${count} lead deleted successfully`,statusCode:200})
+ 
   } catch (error) {
     return res.json({message:error.message,statusCode:500})
   }

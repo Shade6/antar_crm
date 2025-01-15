@@ -1,5 +1,22 @@
 
 module.exports = app => {
+    const multer = require('multer')
+    const path = require('path');
+
+    const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          console.log(file,'file destination')
+          cb(null, path.join(__dirname, '../public'));
+        },
+        filename: function (req, file, cb) {
+          console.log(file,'file filename')
+          const name = Date.now() + '-' + file.originalname;
+          cb(null, name);
+        },
+      });
+      
+      const upload = multer({ storage: storage });
+
     const controller = require("../controller/leads/Leads.controller.js");
     const attachment_controller = require("../controller/leads/Attachment.controller.js")
     const comment_controller =  require("../controller/leads/Comment.controller.js")
@@ -19,7 +36,7 @@ module.exports = app => {
     router.put("/update_lead_assignee",Authenticator.user,AccessChecker.access_amend,controller.update_lead_assignee)
     
   
-   router.post("/create_lead_attachment",Authenticator.user,AccessChecker.access_create,attachment_controller.create)
+   router.post("/create_lead_attachment",Authenticator.user,AccessChecker.access_create,upload.single('file'),attachment_controller.create)
    router.get("/get_attachment_by_lead_id",Authenticator.user,AccessChecker.access_read,attachment_controller.get_by_lead_id)
 
    router.post("/create_lead_comment",Authenticator.user,AccessChecker.access_create,comment_controller.create)
@@ -36,6 +53,19 @@ module.exports = app => {
    router.get("/get_lead_scoring_rules",Authenticator.user,AccessChecker.access_read,controller.get_lead_scoring_rules)
    
    router.delete("/delete_lead",Authenticator.user,AccessChecker.access_delete,controller.delete_lead_scoring_rules)
+
+
+   router.delete("/delete_lead_comment",Authenticator.user,AccessChecker.access_delete,comment_controller.delete_lead_comment)
+   router.put("/update_lead_comment",Authenticator.user,AccessChecker.access_amend,comment_controller.update_lead_comment)
+
+   router.delete("/delete_lead_task",Authenticator.user,AccessChecker.access_delete,task_controller.delete_lead_task)
+   router.put("/update_lead_task",Authenticator.user,AccessChecker.access_amend,task_controller.update_lead_task)
+
+
+   router.delete("/delete_lead_note",Authenticator.user,AccessChecker.access_delete,note_controller.delete_lead_note  )
+   router.put("/update_lead_note",Authenticator.user,AccessChecker.access_amend,note_controller.update_lead_note)
+
+   router.delete("/delete_lead_attachment",Authenticator.user,AccessChecker.access_delete,attachment_controller.delete_lead_attachment)
 
    app.use('/api/v1/', router);
   };

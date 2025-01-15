@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require('path')
 require("dotenv").config();
 
 app.use(express.json());
@@ -26,7 +27,8 @@ app.use(
   });
 
   app.use(express.urlencoded({ extended: true }));
-
+  const publicFolderPath = path.join(__dirname, 'public');
+  app.use('/public', express.static(publicFolderPath));
 
   const db = require("./app/models");
   db.sequelize

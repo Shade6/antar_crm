@@ -81,3 +81,34 @@ exports.get_by_lead_id = async (req, res) => {
     res.json({ message: error.message, statusCode: 500 });
   }
 };
+
+
+exports.delete_lead_comment = async(req,res)=>{
+  try {
+    const lead_ids = req.query.id
+    console.log(lead_ids)
+    const find_lead_comment = await LeadComment.findOne({where:{lead_comment_id:lead_ids}})
+    if(!find_lead_comment){
+      return res.json({message:'lead comment not found',statusCode:400})
+    }
+    await LeadComment.destroy({where:{lead_comment_id:lead_ids}})
+    return res.json({message:'lead comment deleted successfully',statusCode:200})
+  } catch (error) {
+    res.json({message:error.message,statusCode:500})
+  }
+}
+
+
+exports.update_lead_comment = async(req,res)=>{
+  try {
+    const {comment_id,comment} = req.body
+    const find_lead_comment = await LeadComment.findOne({where:{lead_comment_id:comment_id}})
+    if(!find_lead_comment){
+      return res.json({message:'lead comment not found',statusCode:400})
+    }
+    await LeadComment.update({comment:comment},{where:{lead_comment_id:comment_id}})
+    return res.json({message:'lead comment updated successfully',statusCode:200})
+  } catch (error) {
+    res.json({message:error.message,statusCode:500})
+  }
+}

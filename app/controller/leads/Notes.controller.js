@@ -89,3 +89,30 @@ exports.get_by_lead_id = async (req, res) => {
     }
   };
   
+  exports.delete_lead_note = async(req,res)=>{
+    try {
+        const lead_note_id = req.query.id
+        const find_lead_note = await LeadNote.findOne({where:{lead_note_id:lead_note_id}})
+        if(!find_lead_note){
+            return res.json({message:'lead note not found',statusCode:400})
+        }
+        await LeadNote.destroy({where:{lead_note_id:lead_note_id}})
+        return res.json({message:'lead note deleted successfully',statusCode:200})
+    } catch (error) {
+        res.json({message:error.message,statusCode:500})
+    }
+  }
+
+  exports.update_lead_note = async(req,res)=>{
+    try {
+        const {lead_note_id,title,content,status} = req.body
+        const find_lead_note = await LeadNote.findOne({where:{lead_note_id:lead_note_id}})
+        if(!find_lead_note){
+            return res.json({message:'lead note not found',statusCode:400})
+        }
+        await LeadNote.update({title:title,content:content,status:status??false},{where:{lead_note_id:lead_note_id}})
+        return res.json({message:'lead note updated successfully',statusCode:200})
+    } catch (error) {
+        res.json({message:error.message,statusCode:500})
+    }
+  }
