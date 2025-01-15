@@ -11,7 +11,7 @@ import {
   ListSelectBanner,
   Button,
 } from "frappe-ui";
-import { find_all_lead,delete_lead } from "@/api/userApi.js";
+import { find_all_lead, delete_lead } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useSwitchStore } from "@/stores/switch";
@@ -26,12 +26,12 @@ const fetch = async () => {
   if (res.statusCode === 200) {
     lead_list.value = res.data.map((val) => ({
       id: val.lead_id,
-      name: `${val.first_name || ''} ${val.last_name || ''}`.trim(),
-      organization: val.company || 'no company',
+      name: `${val.first_name || ""} ${val.last_name || ""}`.trim(),
+      organization: val.company || "no company",
       status: val.status,
       email: val.email,
       mobile: val.contact,
-      assigned: val.assigned || 'Not Assigned',
+      assigned: val.assigned || "Not Assigned",
       modified: val.modified || new Date().toLocaleDateString(),
     }));
   } else {
@@ -75,12 +75,12 @@ const handleSelectionChange = (rows) => {
     });
   }
 };
-const handleDelete = async(data) => {
-   console.log(data)
- const res = await delete_lead(data)
- if(res.statusCode == 200){
-  fetch()
-  toast.success(res.message, {
+const handleDelete = async (data) => {
+  console.log(data);
+  const res = await delete_lead(data);
+  if (res.statusCode == 200) {
+    fetch();
+    toast.success(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -94,8 +94,8 @@ const handleDelete = async(data) => {
         borderLeft: "5px solid green",
       },
     });
-}else{
-  toast.error(res.message, {
+  } else {
+    toast.error(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -110,7 +110,7 @@ const handleDelete = async(data) => {
       },
     });
   }
-}
+};
 onMounted(fetch);
 </script>
 
@@ -151,20 +151,13 @@ onMounted(fetch);
         :item="column"
       >
         <template #prefix="{ item }">
-          <FeatherIcon
-            :name="item.icon"
-            class="h-4 w-4"
-          />
+          <FeatherIcon :name="item.icon" class="h-4 w-4" />
         </template>
       </ListHeaderItem>
     </ListHeader>
 
     <ListRows>
-      <ListRow
-        v-for="row in lead_list"
-        :key="row.id"
-        :row="row"
-      >
+      <ListRow v-for="row in lead_list" :key="row.id" :row="row">
         <template #default="{ column, item }">
           <ListRowItem
             :item="item"
@@ -184,14 +177,13 @@ onMounted(fetch);
     </ListRows>
 
     <ListSelectBanner>
-      <template #actions="{selections, unselectAll }">
+      <template #actions="{ selections, unselectAll }">
         <div class="flex gap-2">
           <Button
             variant="ghost"
             label="Delete"
             @click="handleDelete(selections)"
           />
-      
         </div>
       </template>
     </ListSelectBanner>

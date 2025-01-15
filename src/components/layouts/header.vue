@@ -125,6 +125,7 @@ const go_to_settings = () => {
       </li>
 
       <li
+        :style="switchStore.page == menu.module.module_name ? 'background-color:#F5F5F5; color: black;box-shadow: rgba(0, 0, 0, 0.17) 0px 0px 5px 1px;' : ''"
         v-for="menu in switchStore.menu.filter(
           (val) => val.module.docs_type == 'crm'
         )"
@@ -175,7 +176,6 @@ li:hover {
 .nav-item {
   display: flex;
   align-items: start; /* Vertically center items */
-
   border-radius: 4px;
 }
 </style>

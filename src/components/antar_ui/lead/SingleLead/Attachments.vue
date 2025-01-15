@@ -11,9 +11,10 @@ import { useSwitchStore } from "@/stores/switch";
 import {
   create_lead_attachment,
   get_attachment_by_lead_id,
+  delete_lead_attachment
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
-
+const file_data = ref(null);
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -46,6 +47,8 @@ const fetch = async () => {
 };
 
 const save_ = async () => {
+  if(file_data.value==null){
+
   const data = {
     lead_id: switchStore.create_form,
     title: file.value,
@@ -86,6 +89,30 @@ const save_ = async () => {
       },
     });
   }
+
+    }else{
+    const formData = new FormData();
+    formData.append("file", file_data.value);
+
+    const res = await create_lead_attachment(formData,switchStore.create_form);
+    if (res.statusCode == 200) {
+      fetch();
+      file_data.value = null;
+      link_open.value = true;
+      dialog2.value = false;
+      toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+      });
+    }else{
+      toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+      });
+    } 
+  }
 };
 
 onMounted(fetch);
@@ -115,84 +142,99 @@ function getTimeDifference(dateString) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
 }
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  file_data.value = file;
+};
+const delete_attachment = async(id)=>{
+  const res = await delete_lead_attachment(id);
+  if(res.statusCode==200){
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+    }); 
+    fetch();
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+    });
+  }
+}
 </script>
 
 <template>
+  <img width="100" height="100" src="http://localhost:8088/public/1736967679777-bike4.jpeg" alt="dfa">
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Attachments </span>
     <div class="p-1">
       <Button @click="dialog2 = true"> Upload Attachment </Button>
       <Dialog v-model="dialog2">
         <template #body-title>
-          <h3>Custom Title</h3>
+          <h3>Upload Attachment</h3>
         </template>
         <template #body-content>
-          <div
-        v-if="link_open"
-        class="w-full h-2/3 flex justify-center items-center"
-      >
-        <FileUploader
-          :fileTypes="['image/*']"
-          :validateFile="(fileObject) => {}"
-          @success="(file) => {}"
-        >
-          <template
-            #default="{
-              file,
-              uploading,
-              progress,
-              uploaded,
-              message,
-              error,
-              total,
-              success,
-              openFileSelector,
-            }"
-          >
-            <Button
-              @click="openFileSelector.toString()"
-              :loading="uploading.toString()"
+          <div v-if="file_data==null">
+            <div
+              v-if="link_open"
+              class="w-full h-2/3 flex justify-center items-center"
             >
-              Uploading {{ progress }}%
-            </Button>
-          </template>
-        </FileUploader>
-        <Button
-          class="mx-3"
-          :variant="'subtle'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-          @click="link_open = false"
-        >
-          Link
-        </Button>
-      </div>
-      <div class="my-6" v-else>
-        <div class="p-2">
-          <span>Enter link</span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="Enter the link"
-            :disabled="false"
-            modelValue=""
-            v-model="file"
-          />
-        </div>
-      </div>
+              <input
+                @change="handleFileChange"
+                type="file"
+                class="custom-file-input"
+              />
+              <Button
+                class="mx-3"
+                :variant="'subtle'"
+                :ref_for="true"
+                theme="gray"
+                size="sm"
+                label="Button"
+                :loading="false"
+                :loadingText="null"
+                :disabled="false"
+                :link="null"
+                @click="link_open = false"
+              >
+                Link
+              </Button>
+            </div>
+            <div class="my-6" v-else>
+              <div class="p-2">
+                <span>Enter link</span>
+                <TextInput
+                  :type="'text'"
+                  :ref_for="true"
+                  size="sm"
+                  variant="subtle"
+                  placeholder="Enter the link"
+                  :disabled="false"
+                  modelValue=""
+                  v-model="file"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center" v-else>
+            <div class="flex flex-col justify-center items-center">
+              <div>
+              <span>File Name</span>
+              <span>{{ file_data?.name }}</span>
+            </div>
+            <Button @click="file_data = null">Remove file</Button>
+            </div>
+          
+          </div>
         </template>
         <template #actions>
           <Button @click="save_" variant="solid"> Confirm </Button>
-          <Button    v-if="link_open" class="ml-2" @click="dialog2 = false"> Close </Button>
-          <Button    v-else class="ml-2" @click="link_open = true"> back </Button>
+          <Button v-if="link_open" class="ml-2" @click="dialog2 = false">
+            Close
+          </Button>
+          <Button v-else class="ml-2" @click="link_open = true"> back </Button>
         </template>
       </Dialog>
     </div>
@@ -215,6 +257,7 @@ function getTimeDifference(dateString) {
           <div class="flex gap-3">
             <div class="p-1">
               <Button
+                @click="delete_attachment(image.lead_attachment_id)"
                 :variant="'subtle'"
                 :ref_for="true"
                 theme="gray"
@@ -228,28 +271,45 @@ function getTimeDifference(dateString) {
                 delete
               </Button>
             </div>
-            <div class="p-1">
-              <Button
-                :variant="'subtle'"
-                :ref_for="true"
-                theme="gray"
-                size="sm"
-                label="Button"
-                :loading="false"
-                :loadingText="null"
-                :disabled="false"
-                :link="null"
-              >
-                edit
-              </Button>
-            </div>
+           
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  
 </template>
 
-<style scoped></style>
+<style scoped>
+.custom-file-input {
+  width: 90px;
+  color: transparent;
+}
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.custom-file-input::before {
+  content: "Select  files";
+  color: black;
+  display: inline-block;
+  background: -webkit-linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+}
+.custom-file-input:hover::before {
+  border-color: black;
+}
+.custom-file-input:active {
+  outline: 0;
+}
+.custom-file-input:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+}
+</style>

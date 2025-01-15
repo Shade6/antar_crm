@@ -2,7 +2,8 @@ import axios from "axios";
 // const baseUrl = "http://localhost:8088/api/";
 // const image_upload_url = "http://localhost:8088/"
 // export const Image_url = "http://localhost:8088/uploads/"
-const BASE_URL = "http://localhost:8088/api/v1/";
+import { USER_API } from "./EndPoint";
+const BASE_URL = USER_API;
 
 
 // Function to get headers

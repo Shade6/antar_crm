@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { Button, FeatherIcon } from "frappe-ui";
+import { ref, onMounted, h } from "vue";
+import { Button, FeatherIcon, Dropdown } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
   get_lead_comment_by_lead_id,
   create_lead_comment,
+  delete_lead_comment,
+  update_lead_comment,
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -13,8 +15,8 @@ import { useToast } from "vue-toast-notification";
 const toast = useToast();
 const array_list = ref([]);
 const Cred_status = ref(null);
-const comment = ref("")
-
+const comment = ref("");
+const comment_id = ref(null);
 const fetch = async () => {
   const res = await get_lead_comment_by_lead_id(switchStore.create_form);
   if (res.statusCode == 200) {
@@ -39,8 +41,8 @@ const fetch = async () => {
 
 const save_ = async () => {
   const data = {
-    comment:comment.value,
-    lead_id:switchStore.create_form
+    comment: comment.value,
+    lead_id: switchStore.create_form,
   };
   const res = await create_lead_comment(data);
   if (res.statusCode == 200) {
@@ -58,7 +60,7 @@ const save_ = async () => {
         borderLeft: "5px solid green",
       },
     });
-    comment.value = ""
+    comment.value = "";
     fetch();
   } else {
     toast.success(res.message, {
@@ -105,10 +107,94 @@ function getTimeDifference(dateString) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
 }
+const edit_comment = async (comment) => {
+
+    comment.value = comment.comment;
+  comment_id.value = comment.lead_comment_id;
+
+  Cred_status.value = "create";
+};
+const delete_comment = async (id) => {
+  const res = await delete_lead_comment(id);
+  if (res.statusCode == 200) {
+    fetch()
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
+const update_comment = async () => {
+  const data = {
+    comment: comment.value,
+    comment_id: comment_id.value,
+  };
+  const res = await update_lead_comment(data);
+  if (res.statusCode == 200) {
+    comment_id.value = null
+    Cred_status.value = null
+    comment.value = ""
+    fetch()
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
 </script>
 
 <template>
-
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Comments </span>
     <div class="p-1">
@@ -123,7 +209,7 @@ function getTimeDifference(dateString) {
         :loadingText="null"
         :disabled="false"
         :link="null"
-        @click="Cred_status = 'create'"
+        @click="()=>{Cred_status = 'create';comment_id.value=null}"
       >
         <div class="flex justify-start">
           <FeatherIcon class="w-4" name="plus" /> <span>New Comment</span>
@@ -133,7 +219,7 @@ function getTimeDifference(dateString) {
   </div>
   <div
     v-if="array_list.length == 0"
-    class="p-3 flex justify-center items-center "
+    class="p-3 flex justify-center items-center"
   >
     <div class="flex flex-col items-center">
       <FeatherIcon class="w-14" name="mail" />
@@ -157,27 +243,66 @@ function getTimeDifference(dateString) {
     </div>
   </div>
   <div v-else>
-      <div class=" my-3 " v-for="comment in array_list">
-        <div class="flex justify-between">
-          <div>
-            <span class="bg-gray-100 rounded-full px-3 py-2 mr-3 ">{{ comment.user.first_name[0] }}</span>
-            <span class="text-gray-500">{{ comment.user.first_name + " " + comment.user.last_name + " added a comment"  }}</span>
-          </div>
-          <div>
-              <span class="text-gray-500">{{ getTimeDifference(comment.created_at) }}</span>
-          </div>
-         
+    <div class="my-3" v-for="comment in array_list" :key="comment.comment_id">
+      <div class="flex justify-between">
+        <div>
+          <span class="bg-gray-100 rounded-full px-3 py-2 mr-3">{{
+            comment.user.first_name[0]
+          }}</span>
+          <span class="text-gray-500">{{
+            comment.user.first_name +
+            " " +
+            comment.user.last_name +
+            " added a comment"
+          }}</span>
         </div>
-        
-        <div class="bg-gray-50 p-3 ml-6 mt-4 rounded-sm shadow-sm">
-          {{ comment.comment }}
+        <div>
+          <span class="text-gray-500">{{
+            getTimeDifference(comment.created_at)
+          }}</span>
         </div>
-        
       </div>
+
+      <div
+        class="bg-gray-50 p-3 ml-6 mt-4 flex justify-between rounded-sm shadow-sm"
+      >
+        <p class="text-gray-700">{{ comment.comment }}</p>
+        <Dropdown
+          :options="[
+            {
+              group: 'Manage',
+              items: [
+                {
+                  label: 'Edit comment',
+                  icon: () => h(FeatherIcon, { name: 'edit' }),
+                  onClick: () => {
+                 
+                    edit_comment(comment);
+                  },
+                },
+                {
+                  label: 'Delete comment',
+                  icon: () => h(FeatherIcon, { name: 'trash' }),
+                  onClick: () => {
+                    delete_comment(comment.lead_comment_id);
+                  },
+                },
+              ],
+            },
+          ]"
+        >
+          <Button>
+            <template #icon>
+              <FeatherIcon name="more-horizontal" class="h-4 w-4" />
+            </template>
+          </Button>
+        </Dropdown>
+      </div>
+    </div>
   </div>
 
   <div
-    class=" w-full"
+    class="w-full"
     style="border-bottom: solid 1px #e5e4e2; border-top: solid 1px #e5e4e2"
     v-if="Cred_status == 'create'"
   >
@@ -206,6 +331,7 @@ function getTimeDifference(dateString) {
         id="body"
         class="w-full h-64 text-gray-700 border-none focus:outline-none focus:ring-0 focus:border-transparent"
         placeholder="Message..."
+        :modelValue="comment"
         v-model="comment"
       ></textarea>
     </div>
@@ -228,6 +354,7 @@ function getTimeDifference(dateString) {
       </div>
       <div class="p-1">
         <Button
+          v-if="comment_id == null"
           :variant="'subtle'"
           :ref_for="true"
           theme="gray"
@@ -240,6 +367,21 @@ function getTimeDifference(dateString) {
           @click="save_"
         >
           Comment
+        </Button>
+        <Button
+          v-else
+          :variant="'subtle'"
+          :ref_for="true"
+          theme="gray"
+          size="sm"
+          label="Button"
+          :loading="false"
+          :loadingText="null"
+          :disabled="false"
+          :link="null"
+          @click="update_comment"
+        >
+          Update
         </Button>
       </div>
     </div>

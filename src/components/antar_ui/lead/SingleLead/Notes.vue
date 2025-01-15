@@ -5,6 +5,8 @@ import { useSwitchStore } from "@/stores/switch";
 import {
   create_lead_note_attachment,
   get_lead_note_by_lead_id,
+  update_lead_note,
+  delete_lead_note,
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -13,6 +15,7 @@ import { useToast } from "vue-toast-notification";
 const toast = useToast();
 const array_list = ref([]);
 const dialog2 = ref(false);
+const note_id = ref(null);
 
 const Cred_status = ref(null);
 const title_name = ref("");
@@ -116,16 +119,102 @@ function getTimeDifference(dateString) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
 }
+const edit_note = async(data)=>{
+  note_id.value = data.lead_note_id
+  title_name.value = data.title
+  content.value = data.content
+  dialog2.value = true
+}
+const update_note = async()=>{
+  const data = {
+    lead_note_id: note_id.value,
+    title: title_name.value,
+    content: content.value,
+  }
+  const res = await update_lead_note(data)
+  if(res.statusCode == 200){
+    fetch()
+    dialog2.value = false
+    title_name.value = ""
+    content.value = ""
+    note_id.value = null
+    fetch()
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+}
+const delete_note = async(data)=>{
+  const res = await delete_lead_note(data.lead_note_id)
+  if(res.statusCode == 200){
+    fetch()
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+}
 </script>
 
 <template>
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Notes </span>
     <div class="p-1">
-      <Button @click="dialog2 = true"> New Notes </Button>
+      <Button @click="()=>{dialog2 = true; note_id = null; title_name = ''; content = '';}"> New Notes </Button>
       <Dialog v-model="dialog2">
         <template #body-title>
-          <h3>Create Notes</h3>
+          <h3>{{note_id ? 'Edit Notes' : 'Create Notes'}}</h3>
         </template>
         <template #body-content>
           <div class="p-2">
@@ -137,8 +226,9 @@ function getTimeDifference(dateString) {
               variant="subtle"
               placeholder="Placeholder"
               :disabled="false"
-              modelValue=""
+             
               v-model="title_name"
+              :modelValue="title_name"
             />
           </div>
           <div class="p-1">
@@ -148,14 +238,14 @@ function getTimeDifference(dateString) {
               size="sm"
               placeholder="Placeholder"
               :disabled="false"
-              modelValue=""
               label="Content"
-              v-model="content"
+              v-model="content" 
+              :modelValue="content"
             />
           </div>
         </template>
         <template #actions>
-          <Button @click="save_" variant="solid"> Confirm </Button>
+          <Button @click="note_id ? update_note() : save_()" variant="solid"> {{note_id ? 'Update' : 'Confirm'}} </Button>
           <Button class="ml-2" @click="dialog2 = false"> Close </Button>
         </template>
       </Dialog>
@@ -182,11 +272,15 @@ function getTimeDifference(dateString) {
               :options="[
                 {
                   label: 'Edit',
-                  onClick: () => {},
+                  onClick: () => {
+                    edit_note(notes)
+                  },
                 },
                 {
                   label: 'Delete',
-                  onClick: () => {},
+                  onClick: () => {
+                    delete_note(notes)
+                  },
                 },
               ]"
             />

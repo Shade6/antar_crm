@@ -15,6 +15,8 @@ import {
   create_lead_task,
   get_lead_task_by_lead_id,
   findAllUsers,
+  delete_lead_task,
+  update_lead_task,
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -33,6 +35,7 @@ const big_status = ref("Low");
 const dateTimeValue = ref(null);
 const member = ref(null);
 const member_list = ref([]);
+const task_id = ref(null);
 
 const fetch = async () => {
   const user_res = await findAllUsers();
@@ -79,6 +82,20 @@ const fetch = async () => {
 };
 
 const save_ = async () => {
+  toast.success("create lead task", {
+    position: "top-right",
+    duration: 3000,
+    dismissible: true,
+    style: {
+      background: "#FFF5F5",
+      color: "black",
+      padding: "4px 20px",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+      borderLeft: "5px solid red",
+    },
+  });
   const data = {
     lead_id: switchStore.create_form,
     title: title_name.value,
@@ -125,6 +142,106 @@ const save_ = async () => {
   }
 };
 
+const edit_task = async (task) => {
+  console.log(task)
+  title_name.value = task.title;
+  Description.value = task.description;
+  status.value = task.type;
+  big_status.value = task.big_status;
+  member.value = {
+    label: task.user.first_name + " " + task.user.last_name,
+    val: task.user_id,
+  };
+  dateTimeValue.value = task.task_date;
+  type_status.value = task.task_status;
+  task_id.value = task.lead_task_id;
+  dialog2.value = true;
+};
+
+const update_task = async () => {
+  const data = {
+    task_id: task_id.value,
+    lead_id: switchStore.create_form,
+    title: title_name.value,
+    description: Description.value,
+    type: status.value,
+    big_status: big_status.value,
+    user_id: member.value,
+    task_data: dateTimeValue.value,
+    task_status: type_status.value,
+  };
+  const res = await update_lead_task(data);
+  if (res.statusCode == 200) {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    fetch();
+    dialog2.value = false;
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
+
+const delete_task = async (id) => {
+  const res = await delete_lead_task(id);
+  if (res.statusCode == 200) {
+    fetch();
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
+
 onMounted(fetch);
 function formatCustomDate(dateString) {
   const date = new Date(dateString);
@@ -150,7 +267,7 @@ function formatCustomDate(dateString) {
       <Button @click="dialog2 = true"> Create Task </Button>
       <Dialog v-model="dialog2">
         <template #body-title>
-          <h3>Create Task</h3>
+          <h3>{{ task_id ? "Edit Task" : "Create Task" }}</h3>
         </template>
         <template #body-content>
           <div class="my-2">
@@ -164,7 +281,6 @@ function formatCustomDate(dateString) {
                 variant="subtle"
                 placeholder="Placeholder"
                 :disabled="false"
-                modelValue=""
                 v-model="title_name"
               />
             </div>
@@ -179,7 +295,6 @@ function formatCustomDate(dateString) {
                 size="sm"
                 placeholder="Placeholder"
                 :disabled="false"
-                modelValue=""
                 v-model="Description"
               />
             </div>
@@ -187,27 +302,27 @@ function formatCustomDate(dateString) {
           <div class="flex flex-wrap">
             <div class="flex">
               <FeatherIcon
-                v-if="status == 'Backlog'"
+                v-if="status === 'Backlog'"
                 class="w-4 my-auto"
                 name="circle"
               />
               <FeatherIcon
-                v-if="status == 'Todo'"
+                v-if="status === 'Todo'"
                 class="w-4 my-auto"
                 name="target"
               />
               <FeatherIcon
-                v-if="status == 'In Progress'"
+                v-if="status === 'In Progress'"
                 class="w-4 my-auto"
                 name="leader"
               />
               <FeatherIcon
-                v-if="status == 'Done'"
+                v-if="status === 'Done'"
                 class="w-4 my-auto"
                 name="check-circle"
               />
               <FeatherIcon
-                v-if="status == 'Canceled'"
+                v-if="status === 'Canceled'"
                 class="w-4 my-auto"
                 name="x-circle"
               />
@@ -215,8 +330,9 @@ function formatCustomDate(dateString) {
               <Dropdown
                 class="my-auto"
                 :button="{
-                  label: status,
+                  label: status || 'Select Status',
                 }"
+                v-model="status"
                 :options="[
                   {
                     label: 'Backlog',
@@ -260,7 +376,8 @@ function formatCustomDate(dateString) {
             <div class="p-2">
               <Autocomplete
                 :options="member_list"
-                v-model="member"
+                 v-model="member"
+                :modelValue="member"
                 placeholder="Select person"
               />
             </div>
@@ -269,15 +386,16 @@ function formatCustomDate(dateString) {
               <DateTimePicker
                 v-model="dateTimeValue"
                 variant="subtle"
-                placeholder="Placeholder"
+                placeholder="Select Date and Time"
                 :disabled="false"
               />
             </div>
             <div>
               <Dropdown
                 :button="{
-                  label: big_status,
+                  label: big_status || 'Select Priority',
                 }"
+                v-model="big_status"
                 :options="[
                   {
                     label: 'Low',
@@ -306,8 +424,9 @@ function formatCustomDate(dateString) {
             <div class="mx-3">
               <Dropdown
                 :button="{
-                  label: type_status,
+                  label: type_status || 'Select Type',
                 }"
+                v-model="type_status"
                 :options="[
                   {
                     label: 'Calling',
@@ -336,7 +455,9 @@ function formatCustomDate(dateString) {
           </div>
         </template>
         <template #actions>
-          <Button @click="save_" variant="solid"> Confirm </Button>
+          <Button @click="task_id ? update_task() : save_()" variant="solid">
+            Confirm
+          </Button>
           <Button class="ml-2" @click="dialog2 = false"> Close </Button>
         </template>
       </Dialog>
@@ -387,11 +508,11 @@ function formatCustomDate(dateString) {
               :options="[
                 {
                   label: 'Edit',
-                  onClick: () => {},
+                  onClick: () => edit_task(task),
                 },
                 {
                   label: 'Delete',
-                  onClick: () => {},
+                  onClick: () => delete_task(task.lead_task_id),
                 },
               ]"
             />

@@ -3,7 +3,8 @@
 
 // const image_upload_url = "https://api.letslegislate.in/"
 // export const Image_url = "https://api.letslegislate.in/uploads/"
-
+import { USER_API } from "./EndPoint";
+import axios from "axios";
 import axiosInstance from "./APIintercepter";
 import { useSwitchStore } from '@/stores/switch';
 const switchStore = useSwitchStore();
@@ -108,13 +109,20 @@ export const create_email_account = async(data)=>{
   return (await axiosInstance.post(`create_email?mdl=${switchStore.pageId}`,data)).data
 }
 
+
 export const find_all_email = async()=>{
   return (await axiosInstance.get(`find_all_email?mdl=${switchStore.pageId}`)).data
 }
 
 
-export const create_lead_attachment = async(data)=>{
-  return (await axiosInstance.post(`create_lead_attachment?mdl=${switchStore.pageId}`,data)).data
+export const create_lead_attachment = async(data,lead_id)=>{
+
+  return (await axios.post(`${USER_API}create_lead_attachment?mdl=${switchStore.pageId}&&lead_id=${lead_id}`,data,{
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `${localStorage.getItem("token")}`,
+    },  
+  })).data
 }
 
 export const get_attachment_by_lead_id = async(data)=>{
@@ -175,7 +183,36 @@ export const create_lead_scoring_rules = async(data)=>{
 }
 
 export const delete_lead = async(data)=>{
-  return (await axiosInstance.delete(`delete_lead?mdl=${switchStore.pageId}&&id=${data}`)).data
+  const formattedData = Array.from(data).join(',');
+  return (await axiosInstance.delete(`delete_lead?mdl=${switchStore.pageId}&&id=${formattedData}`)).data;
 }
 
+export const delete_lead_comment = async(data)=>{
+  return (await axiosInstance.delete(`delete_lead_comment?mdl=${switchStore.pageId}&&id=${data}`)).data;
+}
+
+export const update_lead_comment = async(data)=>{
+  return (await axiosInstance.put(`update_lead_comment?mdl=${switchStore.pageId}`,data)).data;
+}
+
+
+export const delete_lead_task = async(data)=>{
+  return (await axiosInstance.delete(`delete_lead_task?mdl=${switchStore.pageId}&&id=${data}`)).data;
+}
+ 
+export const update_lead_task = async(data)=>{
+  return (await axiosInstance.put(`update_lead_task?mdl=${switchStore.pageId}`,data)).data;
+}
+
+export const update_lead_note = async(data)=>{
+  return (await axiosInstance.put(`update_lead_note?mdl=${switchStore.pageId}`,data)).data;
+}
+
+export const delete_lead_note = async(data)=>{
+  return (await axiosInstance.delete(`delete_lead_note?mdl=${switchStore.pageId}&&id=${data}`)).data;
+}
+
+export const delete_lead_attachment = async(data)=>{
+  return (await axiosInstance.delete(`delete_lead_attachment?mdl=${switchStore.pageId}&&id=${data}`)).data;
+}
 

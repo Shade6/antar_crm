@@ -57,7 +57,7 @@ onMounted(() => {
   // Removed auto-open on page load since we want it closed initially
 });
 
-function addUserMessage(message) {
+function addUserMessage(message,data) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("mb-2", "text-right");
   messageElement.innerHTML = `<p class="bg-black text-white rounded-lg py-2 px-4 inline-block">${message}</p>`;
@@ -65,26 +65,50 @@ function addUserMessage(message) {
   chatbox.value.scrollTop = chatbox.value.scrollHeight;
 }
 
-function addBotMessage(message) {
+function addBotMessage(message,data) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("mb-2");
-
-  let formattedMessage = '';
-  if (typeof message === 'string') {
-    formattedMessage = `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">${message}</p>`;
-  } else if (Array.isArray(message)) {
-    formattedMessage = `<div class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">
-      <ul class="list-disc pl-4">
-        ${message.map(item => `<li>${typeof item === 'object' ? JSON.stringify(item, null, 2) : item}</li>`).join('')}
-      </ul>
-    </div>`;
-  } else if (typeof message === 'object') {
-    formattedMessage = `<div class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">
-      <pre class="whitespace-pre-wrap">
-        ${JSON.stringify(message, null, 2)}
-      </pre>
-    </div>`;
+  let formattedMessage = ''
+  if(data?.text){
+     if(data?.image_url){
+      formattedMessage = `<img src="${data.image_url}" alt="image" class="w-full h-full object-cover">`
+     }
+    formattedMessage += `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">${data.text}</p>`
+  }else{
+    formattedMessage = `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">${message}</p>`
   }
+
+
+  // if (typeof message === 'string') {
+  //   formattedMessage = `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">${message}</p>`;
+  // } else if (Array.isArray(data)) {
+  //   formattedMessage =`${data.text}`
+  //   const items = message.map(item => {
+  //     if (!item) return ''; // Handle null/undefined items
+  //     const entries = Object.entries(item);
+  //     return `
+  //       <div v-for="(item, index) in ${message}" :key="index" class="card p-1 my-2 " style="border-bottom: 1px solid #000;">
+  //         ${entries.map(([key, value]) => `
+  //           <div><strong>${key}:</strong> ${value}</div>
+  //         `).join('')}
+  //       </div>
+  //     `;
+  //   }).join('');
+
+  //   console.log(items,'this is the items')
+  //   formattedMessage = `<div class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 ">${items}</div>`;
+
+
+
+  // } else if (typeof message === 'object' && message !== null) {
+  //   formattedMessage = `<div class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">
+  //     <pre class="whitespace-pre-wrap">
+  //       ${JSON.stringify(message, null, 2)}
+  //     </pre>
+  //   </div>`;
+  // } else {
+  //   formattedMessage = `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">No message available</p>`;
+  // }
 
   messageElement.innerHTML = formattedMessage;
   chatbox.value.appendChild(messageElement);
@@ -94,7 +118,7 @@ function addBotMessage(message) {
 async function respondToUser(userMessage) {
   try {
     const response = await axios.post(
-      "https://bot.shade6.com/api/query",
+      "https://bot.shade6.com/api/query", 
       { query: userMessage },
       {
         headers: {
@@ -103,12 +127,16 @@ async function respondToUser(userMessage) {
       }
     );
     console.log("Response:", response.data);
-    if(response.data.status == "error"){
+    if(response.data.status == "error") {
       addBotMessage(response.data.error)
-    }else{
-      addBotMessage(response.data.data.results)
+    } else {
+      // Filter out created_at from results before displaying
+      const results = response.data.data.results.map(result => {
+        const { created_at, ...rest } = result;
+        return rest;
+      });
+      addBotMessage(results,response.data.data.response);
     }
-     // Access the message property from response.data
   } catch (error) {
     addBotMessage("Sorry, there was an error processing your request.")
     console.error("Error:", error.response ? error.response.data : error.message);
@@ -153,7 +181,7 @@ async function respondToUser(userMessage) {
       </button>
     </div>
   </div>
-  <div id="chat-container" class="hidden fixed bottom-16 right-4 w-96">
+  <div id="chat-container" class="hidden  fixed bottom-16 right-4 w-96">
     <div class="bg-white shadow-md rounded-lg max-w-lg w-full">
       <div
         class="p-4 border-b bg-black text-white rounded-t-lg flex justify-between items-center"
@@ -179,7 +207,7 @@ async function respondToUser(userMessage) {
           </svg>
         </button>
       </div>
-      <div id="chatbox" class="p-4 h-80 overflow-y-auto">
+      <div id="chatbox" class="p-4 h-[530px] overflow-y-auto">
 
       </div>
       <div class="p-4 border-t flex">
