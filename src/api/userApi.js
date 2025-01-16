@@ -87,6 +87,10 @@ export const find_all_lead = async(data)=>{
   return (await axiosInstance.get(`get_leads?mdl=${switchStore.pageId}&&role=${data}`)).data
 }
 
+export const update_single_lead = async(data)=>{
+  return (await axiosInstance.put(`update_single_lead?mdl=${switchStore.pageId}`,data)).data
+}
+
 export const create_lead = async(data)=>{
   return (await axiosInstance.post(`create_lead?mdl=${switchStore.pageId}`,data)).data
 }
@@ -216,3 +220,12 @@ export const delete_lead_attachment = async(data)=>{
   return (await axiosInstance.delete(`delete_lead_attachment?mdl=${switchStore.pageId}&&id=${data}`)).data;
 }
 
+export const remove_lead_assignee = async(data)=>{
+  return (await axiosInstance.delete(`remove_lead_assignee?mdl=${switchStore.pageId}&&lead_id=${data.lead_id}&&id=${data.id}`)).data;
+}
+
+
+export const find_all_lead_by_search = async(data)=>{
+  console.log(data)
+  return (await axiosInstance.get(`find_all_lead_by_search?mdl=${switchStore.pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`)).data
+}

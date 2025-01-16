@@ -12,10 +12,12 @@ import {
   Autocomplete,
 } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
-import { findAllUsers,update_lead_assignee } from "@/api/userApi.js";
+import { useReloadStore } from "@/stores/reload";
+import { findAllUsers,update_lead_assignee,find_single_lead ,remove_lead_assignee} from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
+const lead_details = ref({})
 const props = defineProps({
   assignee: {
     type: Object,
@@ -24,6 +26,7 @@ const props = defineProps({
 });
 const users = ref([]);
 const switchStore = useSwitchStore();
+const reloadStore = useReloadStore()
 const dialog2 = ref(false);
 const handle_create = () => {
   switchStore.changeCreateForm("create_lead");
@@ -58,10 +61,25 @@ const fetch = async () => {
     });
   }
 };
+const find_lead = async()=>{
+  const res = await find_single_lead(switchStore.create_form)
+ if(res.statusCode == 200){
+  lead_details.value = res.data
+ }else{
+  toast.success(res.message, {
+    position: "top-right",
+    duration: 3000,
+    dismissible: true,
+  });
+ }
+} 
 watch(
   () => dialog2.value,
   () => {
     fetch();
+    if(dialog2.value ==true){
+      find_lead()
+    }
   }
 );
 const handle_update = async () => {
@@ -85,6 +103,7 @@ const handle_update = async () => {
         borderLeft: "5px solid green",
       },
     });
+    reloadStore.set_assignee_reload()
   } else {
     toast.success(res.message, {
       position: "top-right",
@@ -102,6 +121,41 @@ const handle_update = async () => {
     });
   }
 };
+const handle_remove = async(id)=>{
+  const res = await remove_lead_assignee({lead_id:lead_details.value.lead_id,id:id})
+  if(res.statusCode == 200){
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    reloadStore.set_assignee_reload()
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+}
 </script>
 
 <template>
@@ -206,6 +260,7 @@ const handle_update = async () => {
                   <div class="">
                     <span class="my-auto"> {{ peop?.label }}</span>
                     <Button
+                    v-if="lead_details.assigned_to !== peop?.value"
                       class="my-auto"
                       :variant="'ghost'"
                       :ref_for="true"
@@ -216,8 +271,11 @@ const handle_update = async () => {
                       :loadingText="null"
                       :disabled="false"
                       :link="null"
+                      @click="handle_remove(peop?.value)"
                     >
-                      <FeatherIcon class="w-4" name="x" />
+                  
+                      
+                      <FeatherIcon  class="w-4" name="x" />
                     </Button>
                   </div>
                 </div>

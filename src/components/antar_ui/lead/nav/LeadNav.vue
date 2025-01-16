@@ -1,18 +1,113 @@
 <script setup>
-import { h } from "vue";
+import { h, ref, watch, defineEmits } from "vue";
+import "@/assets/toast.css";
+import { useToast } from "vue-toast-notification";
+const toast = useToast();
 import {
   Breadcrumbs,
   TextInput,
   FeatherIcon,
   Dropdown,
   Button,
+  Popover,
+  Autocomplete,
+  TabButtons
 } from "frappe-ui";
+const emit = defineEmits(["search", "refresh"]);
+const filter = ref({
+  field:null,
+  type:null,
+  text:null
+})
+
+const sort = ref({
+  field:null,
+  sort_order:null
+})
+const search = ref("");
+
+const handle_refresh = () => {
+  emit("refresh");
+};
+watch(
+  () => search.value,
+  (newValue) => {
+    emit("search", {text:newValue,type:{value:"like"},field:{value:"lead_id"}});
+  }
+);
+watch(()=>sort.value.field,(newValue)=>{
+  sort.value.sort_order = null
+})
+watch(()=>sort.value.sort_order,(newValue)=>{
+  if(sort.value.field==null){
+    toast.success('please select sorting field', {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+  }
+  if(sort.value.sort_order==null){
+    return
+  }
+
+  emit('sort',sort.value)
+})
+
+watch(()=>filter.value.text,(newValue)=>{
+  if(filter.value.field==null){
+    toast.success('please select filter field', {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+    return
+  }
+  if(filter.value.type==null){
+    toast.success('please select filter type', {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+    return
+  }
+  emit('filter',filter.value)
+})
 </script>
 
 <template>
-  <div class="flex justify-between p-4" style="border-bottom: solid 1px #E5E4E2;">
+  <div
+    class="flex justify-between p-4"
+    style="border-bottom: solid 1px #e5e4e2"
+  >
     <div class="p-2 max-w-52">
-      <TextInput placeholder="ID" type="text">
+      <TextInput v-model="search" placeholder="ID" type="text">
         <template #prefix>
           <FeatherIcon class="w-4" name="search" />
         </template>
@@ -31,6 +126,7 @@ import {
           :loadingText="null"
           :disabled="false"
           :link="null"
+          @click="handle_refresh"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -53,51 +149,154 @@ import {
         </Button>
       </div>
       <div class="p-1">
-        <Button
-          :variant="'subtle'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Filter
-        </Button>
+        <Popover>
+          <template #target="{ togglePopover }">
+            <Button @click="togglePopover()"> Filter </Button>
+          </template>
+          <template class="mt-3 w-72" #body-main>
+            <div class="p-2 text-ink-gray-9 mt-3">
+              <div class="p-2">
+                <span class="text-sm font-semibold text-gray-700"
+                  >Select Field</span
+                >
+                <Autocomplete
+                  :options="[
+                    {
+                      label: 'Name',
+                      value: 'first_name',
+                    },
+                    {
+                      label: 'Email',
+                      value: 'email',
+                    },
+
+                    {
+                      label: 'Phone',
+                      value: 'contact',
+                    },
+                    {
+                      label: 'Company',
+                      value: 'company',
+                    },
+                    {
+                      label: 'Status',
+                      value: 'status',
+                    },
+                    {
+                      label: 'Created at',
+                      value: 'created_at',
+                    },
+                  ]"
+                  v-model="filter.field"
+                  placeholder="Select person"
+                />
+              </div>
+              <div class="p-2">
+                <span class="text-sm font-semibold text-gray-700"
+                  >Select Type</span
+                >
+                <Autocomplete
+                  :options="[
+                    {
+                      label: 'Like',
+                      value: 'like',
+                    },
+                    {
+                      label: 'Equal',
+                      value: 'eq',
+                    },
+                    {
+                      label: 'Not Equal',
+                      value: 'ne',
+                    },
+                  ]"
+                  v-model="filter.type"
+                  placeholder="Select person"
+                />
+              </div>
+              <div class="p-2">
+                <span class="text-sm font-semibold text-gray-700"
+                  >Enter Your Text</span
+                >
+                <div class="p-2">
+                  <TextInput
+                    :type="'text'"
+                    :ref_for="true"
+                    size="sm"
+                    variant="subtle"
+                    placeholder="Placeholder"
+                    :disabled="false"
+                    :modelValue="filter.text"
+                    v-model="filter.text"
+                  />
+                </div>
+              </div>
+            </div>
+          </template>
+        </Popover>
       </div>
       <div class="p-1">
-        <Button
-          :variant="'subtle'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Sort
-        </Button>
+        <Popover>
+          <template #target="{ togglePopover }">
+            <Button @click="togglePopover()"> Sort </Button>
+          </template>
+          <template #body-main>
+            <div class="p-2">
+                <span class="text-sm font-semibold text-gray-700"
+                  >Select Field</span
+                >
+                <Autocomplete
+                  :options="[
+                    {
+                      label: 'Name',
+                      value: 'name',
+                    },
+                    {
+                      label: 'Email',
+                      value: 'email',
+                    },
+
+                    {
+                      label: 'Phone',
+                      value: 'mobile',
+                    },
+                    {
+                      label: 'Company',
+                      value: 'organization',
+                    },
+                    {
+                      label: 'Status',
+                      value: 'status',
+                    },
+                    {
+                      label: 'modified at',
+                      value: 'modified',
+                    },
+                  ]"
+                  v-model="sort.field"
+                  placeholder="Select person"
+                />
+              </div>
+              <div class="flex px-3 pb-4 justify-center">
+              <TabButtons
+                :buttons="[
+                  {
+                    label: 'A-Z',
+                    value: 'asc',
+                  },
+                  {
+                    label: 'Z-A',
+                    value: 'desc',
+                  },
+                ]"
+                v-model="sort.sort_order"
+              />
+            </div>
+          </template>
+        </Popover>
       </div>
-      <div class="p-1">
-        <Button
-          :variant="'subtle'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Columns
-        </Button>
-      </div>
-      <Dropdown
+
+      <!-- <Dropdown
         :options="[
           {
             group: 'Manage',
@@ -132,7 +331,7 @@ import {
             <FeatherIcon name="more-horizontal" class="h-4 w-4" />
           </template>
         </Button>
-      </Dropdown>
+      </Dropdown> -->
     </div>
   </div>
 </template>

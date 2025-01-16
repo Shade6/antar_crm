@@ -11,7 +11,8 @@ import {
   ListSelectBanner,
   Button,
 } from "frappe-ui";
-import { find_all_lead, delete_lead } from "@/api/userApi.js";
+import { find_all_lead, delete_lead,find_all_lead_by_search } from "@/api/userApi.js";
+import LeadNav from "@/components/antar_ui/lead/nav/LeadNav.vue";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useSwitchStore } from "@/stores/switch";
@@ -111,10 +112,70 @@ const handleDelete = async (data) => {
     });
   }
 };
+let debounceTimer;
+
+const handle_search = async (data) => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+
+  debounceTimer = setTimeout(async () => {
+    try {
+      const res = await find_all_lead_by_search(data);
+
+      if (res.statusCode === 200) {
+        lead_list.value = res.data.map((val) => ({
+          id: val.lead_id,
+          name: `${val.first_name || ""} ${val.last_name || ""}`.trim(),
+          organization: val.company || "no company",
+          status: val.status,
+          email: val.email,
+          mobile: val.contact,
+          assigned: val.assigned || "Not Assigned",
+          modified: val.modified || new Date().toLocaleDateString(),
+        }));
+      } else {
+        toast.error(res.message, {
+          position: "top-right",
+          duration: 3000,
+          dismissible: true,
+          style: {
+            background: "#FFF5F5",
+            color: "black",
+            padding: "4px 20px",
+            borderRadius: "8px",
+            fontSize: "16px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            borderLeft: "5px solid red",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error in handle_search:", error);
+    }
+  }, 300); // 300ms delay before executing
+};
+
+const handle_refresh = ()=>{
+  fetch()
+}
+const handle_filter=async(data)=>{
+  handle_search(data)
+}
+const handle_sort=async(data)=>{
+  console.log(data.field)
+  lead_list.value = lead_list.value.sort((a, b) => {
+    console.log(a[data.field])
+    if (data.sort_order === 'asc') {
+      return a[data.field.value] < b[data.field.value] ? -1 : 1;
+    } else {
+      return a[data.field.value] > b[data.field.value] ? -1 : 1;
+    }
+  });
+}
 onMounted(fetch);
 </script>
 
 <template>
+      <LeadNav @search="handle_search" @refresh="handle_refresh" @filter="handle_filter" @sort="handle_sort" />
   <ListView
     class="h-[550px] p-4"
     :columns="[

@@ -249,7 +249,7 @@ const delete_attachment = async(id)=>{
       <div class="flex justify-between" v-for="image in array_list">
         <div>
           <img class="mx-2" width="50" height="50" :src="image.title" alt="" />
-          <span>{{ image.title }}</span>
+          <span>... {{image?.title?.slice(-20) ?? 'no image'  }}</span>
         </div>
         <div>
           <span>{{ getTimeDifference(image.created_at) }}</span>

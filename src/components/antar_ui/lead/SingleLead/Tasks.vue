@@ -27,6 +27,7 @@ const array_list = ref([]);
 const Cred_status = ref(null);
 const dialog2 = ref(false);
 
+const note_text = ref("")
 const title_name = ref("");
 const Description = ref("");
 const status = ref("Backlog");
@@ -105,6 +106,7 @@ const save_ = async () => {
     user_id: member.value,
     task_data: dateTimeValue.value,
     task_status: type_status.value,
+    note_text:note_text.value
   };
   const res = await create_lead_task(data);
   if (res.statusCode == 200) {
@@ -156,6 +158,7 @@ const edit_task = async (task) => {
   type_status.value = task.task_status;
   task_id.value = task.lead_task_id;
   dialog2.value = true;
+  note_text.value = task.note_text
 };
 
 const update_task = async () => {
@@ -169,6 +172,7 @@ const update_task = async () => {
     user_id: member.value,
     task_data: dateTimeValue.value,
     task_status: type_status.value,
+    note_text:note_text.value
   };
   const res = await update_lead_task(data);
   if (res.statusCode == 200) {
@@ -452,7 +456,19 @@ function formatCustomDate(dateString) {
                 ]"
               />
             </div>
+ 
           </div>
+          <div class="p-1 mt-3">
+            <span class="text-gray-500">Add Note</span>
+              <Textarea
+                :variant="'outline'"
+                :ref_for="true"
+                size="sm"
+                placeholder="Placeholder"
+                :disabled="false"
+                v-model="note_text"
+              />
+            </div>
         </template>
         <template #actions>
           <Button @click="task_id ? update_task() : save_()" variant="solid">
