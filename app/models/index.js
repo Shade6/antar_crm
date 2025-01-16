@@ -199,6 +199,15 @@ db.leads.belongsTo(db.territory, { //---this is the original table
   targetKey: 'territory_id',         
   as: 'territory'             
 });
+db.users.hasMany(db.leads, { //---this is the reference 
+  foreignKey: 'assigned_to',
+  as: 'leads'      
+});
+db.leads.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'assigned_to', 
+  targetKey: 'user_id',         
+  as: 'assignee'             
+});
 
 //----------------------------------------------------------------------------
 

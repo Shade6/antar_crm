@@ -6,7 +6,7 @@ module.exports = app => {
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
           console.log(file,'file destination')
-          cb(null, path.join(__dirname, '../public'));
+          cb(null, path.join(__dirname, '../../public'));
         },
         filename: function (req, file, cb) {
           console.log(file,'file filename')
@@ -34,10 +34,12 @@ module.exports = app => {
     router.get("/find_single_lead",Authenticator.user,AccessChecker.access_read,controller.find_single_lead)
     router.get("/find_assignees",Authenticator.user,AccessChecker.access_read,controller.find_assignees)
     router.put("/update_lead_assignee",Authenticator.user,AccessChecker.access_amend,controller.update_lead_assignee)
-    
-  
+    router.put("/update_single_lead",Authenticator.user,AccessChecker.access_amend,controller.update_lead)
+    router.delete("/remove_lead_assignee",Authenticator.user,AccessChecker.access_delete,controller.remove_lead_assignee)
    router.post("/create_lead_attachment",Authenticator.user,AccessChecker.access_create,upload.single('file'),attachment_controller.create)
    router.get("/get_attachment_by_lead_id",Authenticator.user,AccessChecker.access_read,attachment_controller.get_by_lead_id)
+   
+   router.get("/find_all_lead_by_search",Authenticator.user,AccessChecker.access_read,attachment_controller.find_all_lead_by_search)
 
    router.post("/create_lead_comment",Authenticator.user,AccessChecker.access_create,comment_controller.create)
    router.get("/get_lead_comment_by_lead_id",Authenticator.user,AccessChecker.access_read,comment_controller.get_by_lead_id)

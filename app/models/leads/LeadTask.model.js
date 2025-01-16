@@ -33,6 +33,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ['Calling', 'Meeting', 'Event'],
       },
+      note_text:{
+        type: Sequelize.STRING,
+      },
       created_by:{
         type: Sequelize.UUID, // Match the data type in `Leads`
         allowNull: false,

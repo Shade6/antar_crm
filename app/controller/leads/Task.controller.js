@@ -13,6 +13,7 @@ exports.create = async (req, res) => {
       big_status,
       task_data,
       task_status,
+      note_text
     } = req.body;
     console.log(req.body);
     const user = req.user;
@@ -56,6 +57,7 @@ exports.create = async (req, res) => {
       created_by: user,
       created_at: new Date(),
       task_status: task_status,
+      note_text:note_text??""
     });
 
     if (creat_) {

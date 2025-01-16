@@ -27,8 +27,10 @@ app.use(
   });
 
   app.use(express.urlencoded({ extended: true }));
-  const publicFolderPath = path.join(__dirname, 'public');
-  app.use('/public', express.static(publicFolderPath));
+
+// const publicFolderPath = path.join(__dirname, 'public');
+app.use('/image',express.static('public'))
+
 
   const db = require("./app/models");
   db.sequelize

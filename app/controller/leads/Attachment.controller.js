@@ -2,11 +2,12 @@ const db = require("../../models");
 const Attachment = db.lead_attachment;
 const Users = db.users;
 const Leads = db.leads;
-
+const { Op } = require("sequelize");
 exports.create = async (req, res) => {
   try {
     let title = null;
     let lead_id = null;
+    console.log(req.file)
 
     if (!req.file) {
       if (!req.body.title) {
@@ -21,7 +22,7 @@ exports.create = async (req, res) => {
       if (!req.query.lead_id) {
         return res.json({ message: "lead_id is required", statusCode: 400 });
       }
-      title = req.file.filename;
+      title = process.env.IMAGE_PORT+req.file.filename;
       lead_id = req.query.lead_id;
     }
 
@@ -108,5 +109,47 @@ exports.delete_lead_attachment = async (req, res) => {
     });
   } catch (error) {
     res.json({ message: error.message, statusCode: 500 });
+  }
+};
+exports.find_all_lead_by_search = async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const field = req.query.field;
+    const type = req.query.type;
+ console.log(field,type,search,'==============')
+    // List of valid operators for dynamic queries
+    const validOperators = ["like", "iLike", "eq", "ne"];
+    if (!validOperators.includes(type)) {
+      return res.json({
+        message: `Invalid search type: '${type}'. Allowed types are: ${validOperators.join(", ")}`,
+        statusCode: 400,
+      });
+    }
+
+    // Validate the field is a column in the Leads model
+    if (!Leads.rawAttributes[field]) {
+      return res.json({
+        message: `Invalid field: '${field}'.`,
+        statusCode: 400,
+      });
+    }
+
+    // Perform the search
+    const find_all_lead = await Leads.findAll({
+      where: {
+        [field]: { [Op[type]]: type === "like" || type === "iLike" ? `%${search}%` : search },
+      },
+    });
+
+    return res.status(200).json({
+      message: "Leads found",
+      statusCode: 200,
+      data: find_all_lead,
+    });
+  } catch (error) {
+    return res.json({
+      message: error.message || "Internal Server Error",
+      statusCode: 500,
+    });
   }
 };
