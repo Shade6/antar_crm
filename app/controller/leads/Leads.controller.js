@@ -49,6 +49,47 @@ exports.create_lead = async (req, res) => {
     if (!find_owner) {
       return res.json({ message: "owner not found", statusCode: 400 });
     }
+    let score = 0;
+    let lead_value ;
+    const find_lead_score = await LeadScore.findOne();
+    if (find_lead_score) {
+      const territory_in_score = find_lead_score.territory;
+      const industry_in_score = find_lead_score.industry;
+      const job_title_in_score = find_lead_score.job_title;
+      const number_of_employees_in_score = find_lead_score.number_of_employees;
+      const annual_revenue_in_score = find_lead_score.annual_revenue;
+
+      if(territory_id){
+         const find_territory = JSON.parse(territory_in_score).some((val)=>val.value == territory_id.value)
+         find_territory ? score=score+find_lead_score.territory_value :0
+      }
+      if(industry_id){
+         const find_industry = JSON.parse(industry_in_score).some((val)=>val.value == industry_id.value)
+         find_industry ? score=score+find_lead_score.industry_value :0
+        }
+      if(revenue){
+        parseInt(revenue) >= find_lead_score.annual_revenue ? score=score+find_lead_score.annual_revenue_value :0
+      }
+      if(employees){
+        const find_employees = JSON.parse(number_of_employees_in_score).some((val)=>val.value == employees.value)
+          find_employees ? score=score+find_lead_score.number_of_employees_value :0
+
+      }
+      if(organization){
+        const find_organization = JSON.parse(job_title_in_score).some((val) => 
+          String(val.value).toLowerCase() === organization.toLowerCase()
+      );
+        find_organization ? score=score+find_lead_score.job_title_value :0
+      }
+      if(score >= find_lead_score.hot_lead_is_greater_than  && score <= find_lead_score.hot_lead_is_lesser_than){
+      lead_value = 'Hot'
+     }else if(score >= find_lead_score.warm_lead_is_greater_than  && score <= find_lead_score.warm_lead_is_lesser_than){
+      lead_value = 'Warm'
+     }else if(score >= find_lead_score.cold_lead_is_greater_than  && score <= find_lead_score.cold_lead_is_lesser_than){
+      lead_value = 'Cold'
+     }
+        
+    }
 
     const create_ = await Leads.create({
       salutation: salutation.value ?? "",
@@ -67,6 +108,8 @@ exports.create_lead = async (req, res) => {
       assigned_to: req.user,
       industry_id: industry_id.value ?? null,
       revenue: revenue,
+      lead_score:score,
+      lead_value:lead_value,
       created_by: find_owner.user_id,
       changed_by: req.user,
       created_at: new Date(),
@@ -409,14 +452,62 @@ exports.delete_lead_scoring_rules = async (req, res) => {
 
 exports.update_lead = async (req, res) => {
   try {
-    console.log(req.body);
-    const lead_id = req.body.lead_id;
-    const find_lead = await Leads.findOne({where:{lead_id:lead_id}})
-    if(!find_lead){
-      return res.json({message:'lead not found',statusCode:400})
+    let score = 0;
+    let lead_value ;
+    console.log(req.body)
+    const find_lead_score = await LeadScore.findOne();
+    if (find_lead_score) {
+      const territory_in_score = find_lead_score.territory;
+      const industry_in_score = find_lead_score.industry;
+      const job_title_in_score = find_lead_score.job_title;
+      const number_of_employees_in_score = find_lead_score.number_of_employees;
+
+      if(req.body.territory_id){
+         const find_territory = JSON.parse(territory_in_score).some((val)=>val.value == req.body.territory_id)
+         find_territory ? score=score+find_lead_score.territory_value :0
+      }
+      if(req.body.industry_id){
+         const find_industry = JSON.parse(industry_in_score).some((val)=>val.value == req.body.industry_id)
+         find_industry ? score=score+find_lead_score.industry_value :0
+        }
+        if(req.body.revenue){
+          parseInt(req.body.revenue) >= find_lead_score.annual_revenue ? score=score+find_lead_score.annual_revenue_value :0
+        }
+        if(req.body.employees){
+          const find_employees = JSON.parse(number_of_employees_in_score).some((val)=>val.value == req.body.employees)
+            find_employees ? score=score+find_lead_score.number_of_employees_value :0
+  
+        }
+   
+      if(req.body.company){
+        const find_organization = JSON.parse(job_title_in_score).some((val) => 
+          String(val.value).toLowerCase() === req.body.company.toLowerCase()
+      );
+        find_organization ? score=score+find_lead_score.job_title_value :0
+      }
+      if(score >= find_lead_score.hot_lead_is_greater_than  && score <= find_lead_score.hot_lead_is_lesser_than){
+      lead_value = 'Hot'
+     }else if(score >= find_lead_score.warm_lead_is_greater_than  && score <= find_lead_score.warm_lead_is_lesser_than){
+      lead_value = 'Warm'
+     }else if(score >= find_lead_score.cold_lead_is_greater_than  && score <= find_lead_score.cold_lead_is_lesser_than){
+      lead_value = 'Cold'
+     }
+        
     }
-    const update_lead = await Leads.update(req.body,{where:{lead_id:lead_id}})
-    return res.json({message:'lead updated successfully',statusCode:200,data:update_lead})
+ 
+    const lead_id = req.body.lead_id;
+    const find_lead = await Leads.findOne({ where: { lead_id: lead_id } });
+    if (!find_lead) {
+      return res.json({ message: "lead not found", statusCode: 400 });
+    }
+    const update_lead = await Leads.update({...req.body,lead_score:score,lead_value:lead_value}, {
+      where: { lead_id: lead_id },
+    });
+    return res.json({
+      message: "lead updated successfully",
+      statusCode: 200,
+      data: update_lead,
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
@@ -426,15 +517,21 @@ exports.remove_lead_assignee = async (req, res) => {
   try {
     console.log(req.body);
     const lead_id = req.query.lead_id;
-    const user_id = req.query.id
-    const find_lead_assignee = await LeadAssignee.findOne({where:{lead_id:lead_id,user_id:user_id}})
-    if(!find_lead_assignee){
-      return res.json({message:'lead assignee not found',statusCode:400})
+    const user_id = req.query.id;
+    const find_lead_assignee = await LeadAssignee.findOne({
+      where: { lead_id: lead_id, user_id: user_id },
+    });
+    if (!find_lead_assignee) {
+      return res.json({ message: "lead assignee not found", statusCode: 400 });
     }
-    await LeadAssignee.destroy({where:{lead_id:lead_id,user_id:user_id}})
-    return res.json({message:'lead assignee removed successfully',statusCode:200})
+    await LeadAssignee.destroy({
+      where: { lead_id: lead_id, user_id: user_id },
+    });
+    return res.json({
+      message: "lead assignee removed successfully",
+      statusCode: 200,
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
 };
-

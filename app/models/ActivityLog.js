@@ -7,21 +7,30 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
       },
+      tenant_id:{
+        type:Sequelize.BIGINT,
+      },
       module_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.BIGINT,
       },
       user_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.BIGINT,
       },
-      action_time: {
+      action:{
+        type:Sequelize.ENUM,
+        values:['create','delete','edit']
+      },
+      description:{
+        type:Sequelize.STRING,
+      },
+      change: {
+        type: Sequelize.JSON,
+      },
+      ip_address:{
+         type:Sequelize.STRING
+      },
+      changed_at: {
         type: Sequelize.DATE,
-      },
-      status:{
-         type:Sequelize.BOOLEAN
-      },
-      action_type: {
-        type: Sequelize.ENUM,
-        values: ['create', 'delete', 'edit'],
       },
     });
     ActivityLog.beforeCreate((data, options) => {
