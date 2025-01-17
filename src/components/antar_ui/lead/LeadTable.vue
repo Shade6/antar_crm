@@ -31,7 +31,7 @@ const fetch = async () => {
       organization: val.company || "no company",
       status: val.status,
       email: val.email,
-      mobile: val.contact,
+      lead_score: val.lead_score + (val.lead_value == null ? "" : " " + val.lead_value),
       assigned: val.assigned || "Not Assigned",
       modified: val.modified || new Date().toLocaleDateString(),
     }));
@@ -130,6 +130,8 @@ const handle_search = async (data) => {
           email: val.email,
           mobile: val.contact,
           assigned: val.assigned || "Not Assigned",
+          lead_score: val.lead_score + (val.lead_value == null ? "" : " " + val.lead_value),
+          lead_status: val.lead_value??'Not Assigned',
           modified: val.modified || new Date().toLocaleDateString(),
         }));
       } else {
@@ -183,7 +185,7 @@ onMounted(fetch);
       { label: 'Organization', key: 'organization', width: '180px' },
       { label: 'Status', key: 'status', width: '150px' },
       { label: 'Email', key: 'email', width: '180px' },
-      { label: 'Lead Score', key: 'mobile', width: '150px' },
+      { label: 'Lead Score', key: 'lead_score', width: '150px' },
       { label: 'Assigned To', key: 'assigned', width: '150px' },
       { label: 'Last Modified', key: 'modified', width: '150px' },
     ]"
@@ -204,7 +206,7 @@ onMounted(fetch);
           { label: 'Organization', key: 'organization', icon: 'briefcase' },
           { label: 'Status', key: 'status', icon: 'check-circle' },
           { label: 'Email', key: 'email', icon: 'at-sign' },
-          { label: 'Lead Score', key: 'mobile', icon: 'star' },
+          { label: 'Lead Score', key: 'lead_score', icon: 'star' },
           { label: 'Assigned To', key: 'assigned', icon: 'user-check' },
           { label: 'Last Modified', key: 'modified', icon: 'clock' },
         ]"
