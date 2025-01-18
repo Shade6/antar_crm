@@ -44,7 +44,8 @@ app.use('/image',express.static('public'))
     console.log("Failed to connect db: " + err.message);
   });
 
-
+ const ActivityLog = require('./app/middleware/ActivityLogs.js');
+  app.use(ActivityLog);
 app.options("*", cors());
 
 app.get('/',(req,res)=>{
@@ -63,3 +64,4 @@ const PORT =  8088;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+

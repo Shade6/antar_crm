@@ -193,6 +193,11 @@ module.exports = (app) => {
     AccessChecker.access_delete,
     attachment_controller.delete_lead_attachment
   );
-
+  router.get(
+    "/get_lead_activity",
+    Authenticator.user,
+    AccessChecker.access_read,
+    controller.get_lead_activity
+  );
   app.use("/api/v1/", router);
 };

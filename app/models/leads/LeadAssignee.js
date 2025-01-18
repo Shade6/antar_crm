@@ -26,5 +26,6 @@ module.exports = (sequelize, Sequelize) => {
     LeadAssignee.beforeCreate((data, options) => {
       data.assignee_id = uuidv4();
     });
+    
     return LeadAssignee;
   };

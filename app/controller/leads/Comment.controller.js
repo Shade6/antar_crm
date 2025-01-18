@@ -22,6 +22,8 @@ exports.create = async (req, res) => {
       comment: comment,
       user_id: user,
       created_at: new Date(),
+    } ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
     });
 
     if (!create_) {
@@ -91,7 +93,9 @@ exports.delete_lead_comment = async(req,res)=>{
     if(!find_lead_comment){
       return res.json({message:'lead comment not found',statusCode:400})
     }
-    await LeadComment.destroy({where:{lead_comment_id:lead_ids}})
+    await LeadComment.destroy({where:{lead_comment_id:lead_ids}} ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
+    })
     return res.json({message:'lead comment deleted successfully',statusCode:200})
   } catch (error) {
     res.json({message:error.message,statusCode:500})
@@ -106,7 +110,9 @@ exports.update_lead_comment = async(req,res)=>{
     if(!find_lead_comment){
       return res.json({message:'lead comment not found',statusCode:400})
     }
-    await LeadComment.update({comment:comment},{where:{lead_comment_id:comment_id}})
+    await LeadComment.update({comment:comment},{where:{lead_comment_id:comment_id}} ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
+    })
     return res.json({message:'lead comment updated successfully',statusCode:200})
   } catch (error) {
     res.json({message:error.message,statusCode:500})

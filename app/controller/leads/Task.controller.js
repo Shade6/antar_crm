@@ -58,6 +58,8 @@ exports.create = async (req, res) => {
       created_at: new Date(),
       task_status: task_status,
       note_text:note_text??""
+    } ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
     });
 
     if (creat_) {
@@ -128,7 +130,9 @@ exports.delete_lead_task = async (req, res) => {
     if (!find_lead_task) {
       return res.json({ message: "lead task not found", statusCode: 400 });
     }
-    await LeadTask.destroy({ where: { lead_task_id: lead_ids } });
+    await LeadTask.destroy({ where: { lead_task_id: lead_ids } } ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
+    });
     return res.json({
       message: "lead task deleted successfully",
       statusCode: 200,
@@ -172,7 +176,9 @@ exports.update_lead_task = async (req, res) => {
         task_data: task_data,
         task_status: task_status,
       },
-      { where: { lead_task_id: task_id } }
+      { where: { lead_task_id: task_id } } ,{
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
     );
     return res.json({
       message: "lead task updated successfully",

@@ -1,4 +1,5 @@
 const field_checker = require("../../utils/validate_body");
+const { Op } = require("sequelize");
 const db = require("../../models");
 const Leads = db.leads;
 const Users = db.users;
@@ -6,6 +7,7 @@ const LeadAssignee = db.lead_assignee;
 const Territory = db.territory;
 const Industry = db.industry;
 const LeadScore = db.lead_score;
+const ActivityLog = db.activity_log;
 exports.create_lead = async (req, res) => {
   try {
     console.log(req.body);
@@ -50,7 +52,7 @@ exports.create_lead = async (req, res) => {
       return res.json({ message: "owner not found", statusCode: 400 });
     }
     let score = 0;
-    let lead_value ;
+    let lead_value;
     const find_lead_score = await LeadScore.findOne();
     if (find_lead_score) {
       const territory_in_score = find_lead_score.territory;
@@ -59,62 +61,88 @@ exports.create_lead = async (req, res) => {
       const number_of_employees_in_score = find_lead_score.number_of_employees;
       const annual_revenue_in_score = find_lead_score.annual_revenue;
 
-      if(territory_id){
-         const find_territory = JSON.parse(territory_in_score).some((val)=>val.value == territory_id.value)
-         find_territory ? score=score+find_lead_score.territory_value :0
-      }
-      if(industry_id){
-         const find_industry = JSON.parse(industry_in_score).some((val)=>val.value == industry_id.value)
-         find_industry ? score=score+find_lead_score.industry_value :0
-        }
-      if(revenue){
-        parseInt(revenue) >= find_lead_score.annual_revenue ? score=score+find_lead_score.annual_revenue_value :0
-      }
-      if(employees){
-        const find_employees = JSON.parse(number_of_employees_in_score).some((val)=>val.value == employees.value)
-          find_employees ? score=score+find_lead_score.number_of_employees_value :0
 
+      if (territory_id) {
+        const find_territory = JSON.parse(territory_in_score).some(
+          (val) => val.value == territory_id.value
+        );
+        find_territory ? (score = score + find_lead_score.territory_value) : 0;
       }
-      if(organization){
-        const find_organization = JSON.parse(job_title_in_score).some((val) => 
-          String(val.value).toLowerCase() === organization.toLowerCase()
-      );
-        find_organization ? score=score+find_lead_score.job_title_value :0
+      if (industry_id) {
+        const find_industry = JSON.parse(industry_in_score).some(
+          (val) => val.value == industry_id.value
+        );
+        find_industry ? (score = score + find_lead_score.industry_value) : 0;
       }
-      if(score >= find_lead_score.hot_lead_is_greater_than  && score <= find_lead_score.hot_lead_is_lesser_than){
-      lead_value = 'Hot'
-     }else if(score >= find_lead_score.warm_lead_is_greater_than  && score <= find_lead_score.warm_lead_is_lesser_than){
-      lead_value = 'Warm'
-     }else if(score >= find_lead_score.cold_lead_is_greater_than  && score <= find_lead_score.cold_lead_is_lesser_than){
-      lead_value = 'Cold'
-     }
-        
+      if (revenue) {
+        parseInt(revenue) >= find_lead_score.annual_revenue
+          ? (score = score + find_lead_score.annual_revenue_value)
+          : 0;
+      }
+      if (employees) {
+        const find_employees = JSON.parse(number_of_employees_in_score).some(
+          (val) => val.value == employees.value
+        );
+        find_employees
+          ? (score = score + find_lead_score.number_of_employees_value)
+          : 0;
+      }
+      if (organization) {
+        const find_organization = JSON.parse(job_title_in_score).some(
+          (val) =>
+            String(val.value).toLowerCase() === organization.toLowerCase()
+        );
+        find_organization
+          ? (score = score + find_lead_score.job_title_value)
+          : 0;
+      }
+      if (
+        score >= find_lead_score.hot_lead_is_greater_than &&
+        score <= find_lead_score.hot_lead_is_lesser_than
+      ) {
+        lead_value = "Hot";
+      } else if (
+        score >= find_lead_score.warm_lead_is_greater_than &&
+        score <= find_lead_score.warm_lead_is_lesser_than
+      ) {
+        lead_value = "Warm";
+      } else if (
+        score >= find_lead_score.cold_lead_is_greater_than &&
+        score <= find_lead_score.cold_lead_is_lesser_than
+      ) {
+        lead_value = "Cold";
+      }
     }
 
-    const create_ = await Leads.create({
-      salutation: salutation.value ?? "",
-      first_name: first_name ?? "",
-      last_name: last_name ?? "",
-      lead_name:
-        find_owner.first_name ?? "" + " " + find_owner.last_name ?? " ",
-      company: organization ?? null,
-      contact: mobile ?? null,
-      email: email ?? null,
-      gender: gender.value ?? null,
-      website: website ?? null,
-      status: status.value ?? null,
-      employees: employees.value ?? null,
-      territory_id: territory_id.value ?? null,
-      assigned_to: req.user,
-      industry_id: industry_id.value ?? null,
-      revenue: revenue,
-      lead_score:score,
-      lead_value:lead_value,
-      created_by: find_owner.user_id,
-      changed_by: req.user,
-      created_at: new Date(),
-      updated_at: new Date(),
-    });
+    const create_ = await Leads.create(
+      {
+        salutation: salutation.value ?? "",
+        first_name: first_name ?? "",
+        last_name: last_name ?? "",
+        lead_name:
+          find_owner.first_name ?? "" + " " + find_owner.last_name ?? " ",
+        company: organization ?? null,
+        contact: mobile ?? null,
+        email: email ?? null,
+        gender: gender.value ?? null,
+        website: website ?? null,
+        status: status.value ?? null,
+        employees: employees.value ?? null,
+        territory_id: territory_id.value ?? null,
+        assigned_to: req.user,
+        industry_id: industry_id.value ?? null,
+        revenue: revenue,
+        lead_score: score,
+        lead_value: lead_value,
+        created_by: find_owner.user_id,
+        changed_by: req.user,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
+    );
     if (create_) {
       await LeadAssignee.create({
         user_id: find_owner.user_id,
@@ -249,11 +277,16 @@ exports.update_lead_assignee = async (req, res) => {
         where: { lead_id: lead_id, user_id: data.value },
       });
       if (!find_user_on_assignee) {
-        await LeadAssignee.create({
-          user_id: data.value,
-          lead_id: lead_id,
-          assigned_by: req.user,
-        });
+        await LeadAssignee.create(
+          {
+            user_id: data.value,
+            lead_id: lead_id,
+            assigned_by: req.user,
+          },
+          {
+            tracker_id: req.tracker_id, // Pass extra ID through options
+          }
+        );
       }
     }
 
@@ -388,18 +421,26 @@ exports.create_lead_scoring_rules = async (req, res) => {
           changedFields[key] = value;
         }
       }
-      result = await LeadScore.update(changedFields, {
-        where: {
-          lead_score_id: find_lead_score.lead_score_id,
+      result = await LeadScore.update(
+        changedFields,
+        {
+          where: {
+            lead_score_id: find_lead_score.lead_score_id,
+          },
         },
-      });
+        {
+          tracker_id: req.tracker_id, // Pass extra ID through options
+        }
+      );
       return res.json({
         message: "lead score updated successfully",
         statusCode: 200,
         data: result,
       });
     } else {
-      result = await LeadScore.create(data);
+      result = await LeadScore.create(data, {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      });
       return res.json({
         message: "lead score created successfully",
         statusCode: 200,
@@ -437,7 +478,12 @@ exports.delete_lead_scoring_rules = async (req, res) => {
     for (let id of ids) {
       const find_lead_score = await Leads.findOne({ where: { lead_id: id } });
       if (find_lead_score) {
-        await Leads.destroy({ where: { lead_id: id } });
+        await Leads.destroy(
+          { where: { lead_id: id } },
+          {
+            tracker_id: req.tracker_id, // Pass extra ID through options
+          }
+        );
         count++;
       }
     }
@@ -453,8 +499,8 @@ exports.delete_lead_scoring_rules = async (req, res) => {
 exports.update_lead = async (req, res) => {
   try {
     let score = 0;
-    let lead_value ;
-    console.log(req.body)
+    let lead_value;
+    console.log(req.body);
     const find_lead_score = await LeadScore.findOne();
     if (find_lead_score) {
       const territory_in_score = find_lead_score.territory;
@@ -462,47 +508,73 @@ exports.update_lead = async (req, res) => {
       const job_title_in_score = find_lead_score.job_title;
       const number_of_employees_in_score = find_lead_score.number_of_employees;
 
-      if(req.body.territory_id){
-         const find_territory = JSON.parse(territory_in_score).some((val)=>val.value == req.body.territory_id)
-         find_territory ? score=score+find_lead_score.territory_value :0
+      if (req.body.territory_id) {
+        const find_territory = JSON.parse(territory_in_score).some(
+          (val) => val.value == req.body.territory_id
+        );
+        find_territory ? (score = score + find_lead_score.territory_value) : 0;
       }
-      if(req.body.industry_id){
-         const find_industry = JSON.parse(industry_in_score).some((val)=>val.value == req.body.industry_id)
-         find_industry ? score=score+find_lead_score.industry_value :0
-        }
-        if(req.body.revenue){
-          parseInt(req.body.revenue) >= find_lead_score.annual_revenue ? score=score+find_lead_score.annual_revenue_value :0
-        }
-        if(req.body.employees){
-          const find_employees = JSON.parse(number_of_employees_in_score).some((val)=>val.value == req.body.employees)
-            find_employees ? score=score+find_lead_score.number_of_employees_value :0
-  
-        }
-   
-      if(req.body.company){
-        const find_organization = JSON.parse(job_title_in_score).some((val) => 
-          String(val.value).toLowerCase() === req.body.company.toLowerCase()
-      );
-        find_organization ? score=score+find_lead_score.job_title_value :0
+      if (req.body.industry_id) {
+        const find_industry = JSON.parse(industry_in_score).some(
+          (val) => val.value == req.body.industry_id
+        );
+        find_industry ? (score = score + find_lead_score.industry_value) : 0;
       }
-      if(score >= find_lead_score.hot_lead_is_greater_than  && score <= find_lead_score.hot_lead_is_lesser_than){
-      lead_value = 'Hot'
-     }else if(score >= find_lead_score.warm_lead_is_greater_than  && score <= find_lead_score.warm_lead_is_lesser_than){
-      lead_value = 'Warm'
-     }else if(score >= find_lead_score.cold_lead_is_greater_than  && score <= find_lead_score.cold_lead_is_lesser_than){
-      lead_value = 'Cold'
-     }
-        
+      if (req.body.revenue) {
+        parseInt(req.body.revenue) >= find_lead_score.annual_revenue
+          ? (score = score + find_lead_score.annual_revenue_value)
+          : 0;
+      }
+      if (req.body.employees) {
+        const find_employees = JSON.parse(number_of_employees_in_score).some(
+          (val) => val.value == req.body.employees
+        );
+        find_employees
+          ? (score = score + find_lead_score.number_of_employees_value)
+          : 0;
+      }
+
+      if (req.body.company) {
+        const find_organization = JSON.parse(job_title_in_score).some(
+          (val) =>
+            String(val.value).toLowerCase() === req.body.company.toLowerCase()
+        );
+        find_organization
+          ? (score = score + find_lead_score.job_title_value)
+          : 0;
+      }
+      if (
+        score >= find_lead_score.hot_lead_is_greater_than &&
+        score <= find_lead_score.hot_lead_is_lesser_than
+      ) {
+        lead_value = "Hot";
+      } else if (
+        score >= find_lead_score.warm_lead_is_greater_than &&
+        score <= find_lead_score.warm_lead_is_lesser_than
+      ) {
+        lead_value = "Warm";
+      } else if (
+        score >= find_lead_score.cold_lead_is_greater_than &&
+        score <= find_lead_score.cold_lead_is_lesser_than
+      ) {
+        lead_value = "Cold";
+      }
     }
- 
+
     const lead_id = req.body.lead_id;
     const find_lead = await Leads.findOne({ where: { lead_id: lead_id } });
     if (!find_lead) {
       return res.json({ message: "lead not found", statusCode: 400 });
     }
-    const update_lead = await Leads.update({...req.body,lead_score:score,lead_value:lead_value}, {
-      where: { lead_id: lead_id },
-    });
+    const update_lead = await Leads.update(
+      { ...req.body, lead_score: score, lead_value: lead_value },
+      {
+        where: { lead_id: lead_id },
+      },
+      {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
+    );
     return res.json({
       message: "lead updated successfully",
       statusCode: 200,
@@ -524,13 +596,38 @@ exports.remove_lead_assignee = async (req, res) => {
     if (!find_lead_assignee) {
       return res.json({ message: "lead assignee not found", statusCode: 400 });
     }
-    await LeadAssignee.destroy({
-      where: { lead_id: lead_id, user_id: user_id },
-    });
+    await LeadAssignee.destroy(
+      {
+        where: { lead_id: lead_id, user_id: user_id },
+      },
+      {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
+    );
     return res.json({
       message: "lead assignee removed successfully",
       statusCode: 200,
     });
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+};
+
+exports.get_lead_activity = async (req, res) => {
+  try {
+    const lead_id = req.query.lead_id;
+    const find_activity = await ActivityLog.findAll({
+      where: {
+        [Op.or]: [
+          { module_name: "lead_attachment" },
+          { module_name: "lead_comment" },
+          { module_name: "lead_note" },
+          { module_name: "lead_task" },
+        ],
+        id_value:lead_id
+      },
+    });
+    res.json({ message: "activity found", statusCode: 200, data: find_activity });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }

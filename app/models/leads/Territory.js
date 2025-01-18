@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const Activity= require('../../utils/Activity.controller'); // Adjust the path
 module.exports = (sequelize, Sequelize) => {
     const Territory = sequelize.define("territory", {
     territory_id: {
@@ -25,6 +26,15 @@ module.exports = (sequelize, Sequelize) => {
     });
     Territory.beforeCreate((data, options) => {
       data.territory_id = uuidv4();
+    });
+    Territory.afterCreate((data, options) => {
+      Activity.logs_entry(data.dataValues, options, 'create', 'territory',sequelize);
+    });
+    Territory.afterUpdate((data, options) => {
+      Activity.logs_entry(data.dataValues, options, 'update', 'territory',sequelize);
+    });
+    Territory.beforeDestroy((data, options) => {
+      Activity.logs_entry(data.dataValues, options, 'delete', 'territory',sequelize);
     });
     return Territory;
   };

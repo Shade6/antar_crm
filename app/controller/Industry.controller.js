@@ -6,6 +6,7 @@ const UserEmail = db.user_email;
 exports.create_industry = async (req, res) => {
   try {
     const { industry_name } = req.body;
+
     if (!industry_name) {
       return res.json({ message: "industry name cannot be empty" });
     }
@@ -18,9 +19,17 @@ exports.create_industry = async (req, res) => {
         statusCode: 400,
       });
     }
-    const create_ = await Industry.create({
-      industry_name: industry_name,
-    });
+
+    const create_ = await Industry.create(
+      {
+        industry_name: industry_name,
+        created_by: req.user,
+        created_at: new Date(),
+      },
+      {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
+    );
     if (create_) {
       return res.json({
         message: "industry created successfully",
@@ -147,23 +156,24 @@ exports.create_email_user_email = async (req, res) => {
       send_notification,
       send_me_a_copy,
       allowed_in_mentions,
-
     } = req.body;
-    console.log(req.body,'user')
+    console.log(req.body, "user");
     const find_email = await UserEmail.findOne({ where: { user_id: user_id } });
     if (find_email) {
       return res.json({ message: "email already exist", statusCode: 400 });
     }
-    const find_user_email = await UserEmail.findOne({where:{user_id:user_id}})
+    const find_user_email = await UserEmail.findOne({
+      where: { user_id: user_id },
+    });
 
     const create_ = await UserEmail.create({
       user_id: user_id,
       email_id: email_id.value,
-      signature: signature??"",
+      signature: signature ?? "",
       send_notification: send_notification,
       send_me_a_copy: send_me_a_copy,
       allowed_in_mentions: allowed_in_mentions,
-      default_email: find_user_email ? false :true,
+      default_email: find_user_email ? false : true,
       created_by: req.user,
       created_at: new Date(),
     });
@@ -180,10 +190,13 @@ exports.create_email_user_email = async (req, res) => {
 exports.find_selected_user_email = async (req, res) => {
   try {
     const id = req.query.user_id;
-    const find_email = await UserEmail.findAll({ where: { user_id: id },include:{
-      model:Email,
-      as:'email'
-    } });
+    const find_email = await UserEmail.findAll({
+      where: { user_id: id },
+      include: {
+        model: Email,
+        as: "email",
+      },
+    });
     return res.json({
       message: "email found",
       statusCode: 200,

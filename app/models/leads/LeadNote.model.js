@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const Activity= require('../../utils/Activity.controller'); // Adjust the path
 module.exports = (sequelize, Sequelize) => {
   const LeadNote = sequelize.define("lead_note", {
     lead_note_id: {
@@ -30,6 +31,15 @@ module.exports = (sequelize, Sequelize) => {
   });
   LeadNote.beforeCreate((data, options) => {
     data.lead_note_id = uuidv4();
+  });
+  LeadNote.afterCreate((data, options) => {
+    Activity.logs_entry(data.dataValues, options, 'create', 'lead_note',sequelize);
+  });
+  LeadNote.afterUpdate((data, options) => {
+    Activity.logs_entry(data.dataValues, options, 'update', 'lead_note',sequelize);
+  });
+  LeadNote.beforeDestroy((data, options) => {
+    Activity.logs_entry(data.dataValues, options, 'delete', 'lead_note',sequelize);
   });
   return LeadNote;
 };

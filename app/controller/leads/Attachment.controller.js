@@ -31,6 +31,8 @@ exports.create = async (req, res) => {
       title: title,
       user_id: req.user,
       created_at: new Date(),
+    } ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
     });
 
     if (!create_) {
@@ -92,6 +94,8 @@ exports.delete_lead_attachment = async (req, res) => {
     }
     const find_by_id = await Attachment.findOne({
       where: { lead_attachment_id: lead_attachment_id },
+    } ,{
+      tracker_id: req.tracker_id, // Pass extra ID through options
     });
     if (!find_by_id) {
       return res.json({

@@ -1,5 +1,7 @@
 const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
+
+
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
@@ -24,6 +26,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 
+db.activity_log_tracker = require("./LogTracker.js")(sequelize,Sequelize)
 db.users = require("./users/Users.model.js")(sequelize, Sequelize);
 db.module = require("./users/Module.model.js")(sequelize,Sequelize)
 db.role = require("./users/Roles.model.js")(sequelize,Sequelize)

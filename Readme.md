@@ -8,3 +8,11 @@
       created_at:{
         type:Sequelize.DATE
       }
+
+
+
+
+
+      const Activity= require('../../utils/Activity.controller'); // Adjust the path
+
+       Activity.logs_entry(data.dataValues, options, 'create', 'industry',sequelize);

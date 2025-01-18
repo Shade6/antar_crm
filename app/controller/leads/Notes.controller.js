@@ -25,6 +25,8 @@ exports.create = async (req, res) => {
         content: content ?? "",
         status: status,
         created_at: new Date(),
+      } ,{
+        tracker_id: req.tracker_id, // Pass extra ID through options
       });
   
       if (creat_) {
@@ -96,7 +98,9 @@ exports.get_by_lead_id = async (req, res) => {
         if(!find_lead_note){
             return res.json({message:'lead note not found',statusCode:400})
         }
-        await LeadNote.destroy({where:{lead_note_id:lead_note_id}})
+        await LeadNote.destroy({where:{lead_note_id:lead_note_id}} ,{
+          tracker_id: req.tracker_id, // Pass extra ID through options
+        })
         return res.json({message:'lead note deleted successfully',statusCode:200})
     } catch (error) {
         res.json({message:error.message,statusCode:500})
@@ -110,7 +114,9 @@ exports.get_by_lead_id = async (req, res) => {
         if(!find_lead_note){
             return res.json({message:'lead note not found',statusCode:400})
         }
-        await LeadNote.update({title:title,content:content,status:status??false},{where:{lead_note_id:lead_note_id}})
+        await LeadNote.update({title:title,content:content,status:status??false},{where:{lead_note_id:lead_note_id}} ,{
+          tracker_id: req.tracker_id, // Pass extra ID through options
+        })
         return res.json({message:'lead note updated successfully',statusCode:200})
     } catch (error) {
         res.json({message:error.message,statusCode:500})

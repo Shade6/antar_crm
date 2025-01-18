@@ -8,13 +8,19 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.UUIDV4,
       },
       tenant_id:{
-        type:Sequelize.BIGINT,
+        type:Sequelize.UUID,
       },
       module_id: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.UUID,
+      },
+      module_name:{
+        type:Sequelize.STRING
       },
       user_id: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.UUID,
+      },
+      id_value:{
+        type:Sequelize.UUID
       },
       action:{
         type:Sequelize.ENUM,
