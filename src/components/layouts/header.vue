@@ -139,9 +139,7 @@ const go_to_settings = () => {
           <ContactsIcon v-else-if="menu.module.module_name == 'contacts'" />
           <TaskIcon v-else-if="menu.module.module_name == 'task'" />
           <FileTextIcon v-else-if="menu.module.module_name == 'notes'" />
-          <OrganizationsIcon
-            v-else-if="menu.module.module_name == 'organizations'"
-          />
+          <OrganizationsIcon v-else-if="menu.module.module_name == 'organizations'" />
           <Email2Icon v-else-if="menu.module.module_name == 'email-template'" />
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">

@@ -83,20 +83,7 @@ const fetch = async () => {
 };
 
 const save_ = async () => {
-  toast.success("create lead task", {
-    position: "top-right",
-    duration: 3000,
-    dismissible: true,
-    style: {
-      background: "#FFF5F5",
-      color: "black",
-      padding: "4px 20px",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-      borderLeft: "5px solid red",
-    },
-  });
+
   const data = {
     lead_id: switchStore.create_form,
     title: title_name.value,

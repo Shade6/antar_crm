@@ -166,7 +166,6 @@ const delete_attachment = async(id)=>{
 </script>
 
 <template>
-  <img width="100" height="100" src="http://localhost:8088/public/1736967679777-bike4.jpeg" alt="dfa">
   <div class="p-3 flex justify-between">
     <span class="text-2xl font-medium"> Attachments </span>
     <div class="p-1">
