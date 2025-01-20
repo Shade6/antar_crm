@@ -13,7 +13,7 @@ exports.create = async (req, res) => {
       big_status,
       task_data,
       task_status,
-      note_text
+      note_text,
     } = req.body;
     console.log(req.body);
     const user = req.user;
@@ -46,21 +46,24 @@ exports.create = async (req, res) => {
       });
     }
 
-    const creat_ = await LeadTask.create({
-      lead_id: lead_id,
-      user_id: user_id.val,
-      title: title ?? "",
-      description: description ?? "",
-      type: type,
-      big_status: big_status,
-      task_date: task_data,
-      created_by: user,
-      created_at: new Date(),
-      task_status: task_status,
-      note_text:note_text??""
-    } ,{
-      tracker_id: req.tracker_id, // Pass extra ID through options
-    });
+    const creat_ = await LeadTask.create(
+      {
+        lead_id: lead_id,
+        user_id: user_id.val,
+        title: title ?? "",
+        description: description ?? "",
+        type: type,
+        big_status: big_status,
+        task_date: task_data,
+        created_by: user,
+        created_at: new Date(),
+        task_status: task_status,
+        note_text: note_text ?? "",
+      },
+      {
+        tracker_id: req.tracker_id, // Pass extra ID through options
+      }
+    );
 
     if (creat_) {
       return res.json({
@@ -123,15 +126,16 @@ exports.get_by_lead_id = async (req, res) => {
 exports.delete_lead_task = async (req, res) => {
   try {
     const lead_ids = req.query.id;
-    console.log(lead_ids,'lead_ids')
+    console.log(lead_ids, "lead_ids");
     const find_lead_task = await LeadTask.findOne({
       where: { lead_task_id: lead_ids },
     });
     if (!find_lead_task) {
       return res.json({ message: "lead task not found", statusCode: 400 });
     }
-    await LeadTask.destroy({ where: { lead_task_id: lead_ids } } ,{
-      tracker_id: req.tracker_id, // Pass extra ID through options
+    await LeadTask.destroy({
+      where: { lead_task_id: lead_ids },
+      context: { tracker_id: req.tracker_id },
     });
     return res.json({
       message: "lead task deleted successfully",
@@ -152,11 +156,20 @@ exports.update_lead_task = async (req, res) => {
       big_status,
       task_data,
       task_status,
-      user_id
+      user_id,
     } = req.body;
-   console.log(req.body,'req.body')
+    console.log(req.body, "req.body");
     // Check if any required field is missing
-    if (!task_id || !user_id.val || !title || !description || !type || !big_status || !task_data || !task_status) {
+    if (
+      !task_id ||
+      !user_id.val ||
+      !title ||
+      !description ||
+      !type ||
+      !big_status ||
+      !task_data ||
+      !task_status
+    ) {
       return res.json({ message: "All fields are required", statusCode: 400 });
     }
 
@@ -171,13 +184,14 @@ exports.update_lead_task = async (req, res) => {
         title: title,
         description: description,
         type: type,
-        user_id:user_id.val,
+        user_id: user_id.val,
         big_status: big_status,
         task_data: task_data,
         task_status: task_status,
       },
-      { where: { lead_task_id: task_id } } ,{
-        tracker_id: req.tracker_id, // Pass extra ID through options
+      {
+        where: { lead_task_id: task_id },
+        context: { tracker_id: req.tracker_id },
       }
     );
     return res.json({

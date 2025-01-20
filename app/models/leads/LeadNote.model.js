@@ -35,11 +35,23 @@ module.exports = (sequelize, Sequelize) => {
   LeadNote.afterCreate((data, options) => {
     Activity.logs_entry(data.dataValues, options, 'create', 'lead_note',sequelize);
   });
-  LeadNote.afterUpdate((data, options) => {
-    Activity.logs_entry(data.dataValues, options, 'update', 'lead_note',sequelize);
+  let before = {}
+  LeadNote.beforeBulkUpdate(async(options) => {
+    const rowsToDelete = await LeadNote.findAll({ where: options.where });
+    before = rowsToDelete[0].dataValues
   });
-  LeadNote.beforeDestroy((data, options) => {
-    Activity.logs_entry(data.dataValues, options, 'delete', 'lead_note',sequelize);
+
+  LeadNote.afterBulkUpdate(async(options) => {
+    const rowsToDelete = await LeadNote.findAll({ where: options.where });
+    Activity.logs_entry({
+      before: before,
+      after: rowsToDelete[0].dataValues
+    }, options?.context, 'edit', 'lead_note',sequelize);
+  });
+
+  LeadNote.beforeBulkDestroy(async(options) => {
+    const rowsToDelete = await LeadNote.findAll({ where: options.where });
+    Activity.logs_entry(rowsToDelete[0].dataValues, options?.context, 'delete', 'lead_note',sequelize);
   });
   return LeadNote;
 };

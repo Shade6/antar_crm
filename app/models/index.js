@@ -255,4 +255,14 @@ db.user_email.belongsTo(db.emails, {
   as: 'email', 
 });
 
+//----------------------------------------------------------
+db.users.hasMany(db.activity_log, {
+  foreignKey: 'user_id',
+  as: 'activity_log', // Changed alias
+});
+db.activity_log.belongsTo(db.users, {
+  foreignKey: 'user_id',
+  as: 'user', 
+});
+
 module.exports = db;

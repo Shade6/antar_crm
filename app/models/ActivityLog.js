@@ -38,6 +38,10 @@ module.exports = (sequelize, Sequelize) => {
       changed_at: {
         type: Sequelize.DATE,
       },
+      created_at:{
+        type:Sequelize.DATE,
+        defaultValue:Sequelize.NOW
+      }
     });
     ActivityLog.beforeCreate((data, options) => {
       data.log_id = uuidv4();

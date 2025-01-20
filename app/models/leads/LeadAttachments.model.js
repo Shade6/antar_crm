@@ -29,11 +29,11 @@ module.exports = (sequelize, Sequelize) => {
     LeadAttachment.afterCreate((data, options) => {
       Activity.logs_entry(data.dataValues, options, 'create', 'lead_attachment',sequelize);
     });
-    LeadAttachment.afterUpdate((data, options) => {
-      Activity.logs_entry(data.dataValues, options, 'update', 'lead_attachment',sequelize);
+
+    LeadAttachment.beforeBulkDestroy(async(options) => {
+      const rowsToDelete = await LeadAttachment.findAll({ where: options.where });
+      Activity.logs_entry(rowsToDelete[0].dataValues, options?.context, 'delete', 'lead_attachment',sequelize);
     });
-    LeadAttachment.beforeDestroy((data, options) => {
-      Activity.logs_entry(data.dataValues, options, 'delete', 'lead_attachment',sequelize);
-    });
+  
     return LeadAttachment;
   };

@@ -624,8 +624,14 @@ exports.get_lead_activity = async (req, res) => {
           { module_name: "lead_note" },
           { module_name: "lead_task" },
         ],
-        id_value:lead_id
+        id_value: lead_id
       },
+      include: {
+        model: Users,
+        as: 'user',
+        attributes: ['first_name', 'last_name', 'user_id']
+      },
+      order: [['created_at', 'DESC']], // Corrected sorting by data
     });
     res.json({ message: "activity found", statusCode: 200, data: find_activity });
   } catch (error) {
