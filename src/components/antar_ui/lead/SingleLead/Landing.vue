@@ -140,7 +140,7 @@
                     :link="null"
                     @click="update_lead"
                   >
-                    <FeatherIcon class="w-4 mx-3" name="edit" />
+                    update
                   </Button>
                 </div>
               </div>

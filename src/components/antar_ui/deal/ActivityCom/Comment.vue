@@ -1,13 +1,13 @@
-<script setup >
+<script setup>
 
 </script>
 
 <template>
     <div>
-        nav bar
+        this is the single page
     </div>
 </template>
 
-<style  scoped>
+<style scoped>
 
 </style>

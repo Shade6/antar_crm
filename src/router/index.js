@@ -3,6 +3,7 @@ import defaultLayout from "@/layout/defaultLayout.vue";
 import customLayout from "@/layout/customLayout.vue";
 
 import Details from "../views/antar_/deals/dealsPage/Details.vue";
+import Single from "@/views/antar_/deals/Single.vue";
 import Create from "../views/antar_/deals/dealsPage/Create.vue";
 import Kanban from "../views/antar_/deals/dealsPage/Kanban.vue";
 const router = createRouter({
@@ -69,7 +70,7 @@ const router = createRouter({
             {
               path: ":id",
               name: "deal-detail", // Consistent naming convention
-              component: Details,
+              component: Single,
             },
             {
               path: "kanban",
@@ -80,14 +81,53 @@ const router = createRouter({
         },
         {
           path: "/antar_/contacts",
-          name: "contacts",
-          component: () => import("../views/antar_/contacts/contacts.vue"),
+          children: [
+            {
+              path: "",
+              name: "contact-list", // Corrected name for this route
+              component: () => import("../views/antar_/contacts/List.vue"), // Corrected component path
+            },
+            {
+              path: "create",
+              name: "create-contact", // Corrected naming convention
+              component: () => import("../views/antar_/contacts/Create.vue"), // Corrected component path
+            },
+            {
+              path: ":id",
+              name: "contact-detail", // Corrected naming convention
+              component: () => import("../views/antar_/contacts/Single.vue"), // Corrected component path
+            },
+            {
+              path: "kanban",
+              name: "kanban-contact-view", // More descriptive name
+              component: Kanban,
+            },
+          ],
         },
         {
           path: "/antar_/organizations",
-          name: "organizations",
-          component: () =>
-            import("../views/antar_/organizations/organizations.vue"),
+          children: [
+            {
+              path: "",
+              name: "organization-list", // Unique name for this route
+              component: () => import("../views/antar_/organizations/List.vue"),
+            },
+            {
+              path: "create",
+              name: "create-organization", // Consistent naming convention
+              component: () => import("../views/antar_/organizations/Create.vue"),
+            },
+            {
+              path: ":id",
+              name: "organization-detail", // Consistent naming convention
+              component: () => import("../views/antar_/organizations/Single.vue"),
+            },
+            {
+              path: "kanban",
+              name: "kanban-organization-view", // More descriptive name
+              component: Kanban,
+            },
+          ],
         },
         {
           path: "/antar_/notes",

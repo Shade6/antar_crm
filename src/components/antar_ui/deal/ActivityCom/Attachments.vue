@@ -3,11 +3,11 @@
 </script>
 
 <template>
-    <div class="p-5">
-        organizations 
+    <div>
+        this is the single page
     </div>
 </template>
 
-<style  scoped>
+<style scoped>
 
 </style>

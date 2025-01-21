@@ -7,6 +7,9 @@ import { USER_API } from "./EndPoint";
 import axios from "axios";
 import axiosInstance from "./APIintercepter";
 import { useSwitchStore } from '@/stores/switch';
+import { getActivePinia, setActivePinia, createPinia } from 'pinia';
+
+
 const switchStore = useSwitchStore();
 
 export const userLogin = async (data) => {
