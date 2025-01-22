@@ -1,15 +1,17 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
-import CreateAddress from "@/components/modal/CreateAddress.vue";
-import Nav from "@/views/antar_/contacts/nav/Nav.vue";
+import Nav from "@/views/antar_/deals/nav/Nav.vue";
 import {
     find_all_industry,
     find_all_territories,
     findAllUsers,
-    get_all_address,
-    create_contact
+    create_deal,
+    get_all_organization,
+    get_all_contact,
 } from "@/api/userApi.js";
+
+
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useRouter } from "vue-router";
@@ -22,7 +24,6 @@ const checked = ref({
   organization: false,
   contact: false,
 });
-const address_list = ref([]);
 const form_details = ref({
   salutation: null,
   first_name: null,
@@ -30,18 +31,25 @@ const form_details = ref({
   email: null,
   mobile: null,
   gender: null,
-  designation: null,
-  company_name: null,
-  address: null,
-
+  organization: null,
+  website: null,
+  employees: null,
+  territory_id: null,
+  revenue: null,
+  industry_id: null,
+  status: null,
+  owner_id: null,
 });
 
+const organization_list = ref([]);
+const contact_list = ref([]);
 const fetch = async () => {
-  const [industry_res, territory_res, users_res,address_res] = await Promise.all([
+  const [industry_res, territory_res, users_res,organization_res,contact_res] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
-    get_all_address()
+    get_all_organization(),
+    get_all_contact(),
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -67,13 +75,17 @@ const fetch = async () => {
   } else {
     show_error(users_res);
   }
-  if(address_res.statusCode == 200){
-    address_list.value = address_res.data.map((val, i) => ({
-      label: val.address_title,
-      value: val.address_id,
+  if(organization_res.statusCode == 200){
+    organization_list.value = organization_res.data.map((val, i) => ({
+      label: val?.organization_name || 'N/A',
+      value: val?.org_id || 'N/A',
     }));
-  }else{
-    show_error(address_res)
+  }
+  if(contact_res.statusCode == 200){
+    contact_list.value = contact_res.data.map((val, i) => ({
+      label: val.first_name,
+      value: val.contact_id,
+    }));
   }
 };
 const show_error = (res) => {
@@ -93,9 +105,15 @@ const show_error = (res) => {
   });
 };
 
-const handle_save_contact = async () => {
-  const res = await create_contact(form_details.value);
+const handle_save_deal = async () => {
+    const details = {
+        ...form_details.value,
+        organization_id: checked.value.organization ? checked.value.organization : null,
+        contact_id: checked.value.contact ? checked.value.contact : null,
+    }
+  const res = await create_deal(details);
   if (res.statusCode == 200) {
+    router.push('/antar_/deals')
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -131,13 +149,31 @@ onMounted(fetch);
 </script>
 
 <template>
-  <Nav @save="handle_save_contact" />
-  <div class=" mx-4">
- 
- 
+  <Nav @save="handle_save_deal" />
+  <div class="p-4 mx-auto">
+   
+  
+    <div class="flex my-4">
+      <Switch
+        size="sm"
+        label="Choose Existing Organization"
+        description=""
+        :disabled="false"
+        v-model="checked.organization"
+      />
+      <Switch
+        size="sm"
+        label="Choose Existing Contact"
+        description=""
+        :disabled="false"
+        v-model="checked.contact"
+      />
+    </div>
 
     <hr />
-    <div class="p-2 w-full">
+    <div v-if="checked.contact == false">
+      <div class="flex justify-between">
+        <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
           <Autocomplete
             class="w-[90%]"
@@ -167,8 +203,6 @@ onMounted(fetch);
             placeholder="Select salutation"
           />
         </div>
-      <div class="flex justify-between">
-      
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">First Name</span>
           <TextInput
@@ -198,7 +232,9 @@ onMounted(fetch);
           />
         </div>
       </div>
-      <div class="p-2 w-full">
+
+      <div class="flex justify-between">
+        <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Email</span>
           <TextInput
             class="text-gray-500 font-medium text-sm my-1"
@@ -212,8 +248,6 @@ onMounted(fetch);
             v-model="form_details.email"
           />
         </div>
-      <div class="flex justify-between">
-      
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
           <TextInput
@@ -249,16 +283,25 @@ onMounted(fetch);
           />
         </div>
       </div>
-  
-
-      
-   
-    
-
-      <div class="">
+    </div>
+    <div v-else>
+      <div>
+        <span>Contact</span>
+        <div class="p-2  w-1/3">
+          <Autocomplete
+            :options="contact_list"
+            v-model="checked.contact"
+            placeholder="Select contact"
+          />
+        </div>
+      </div>
+    </div>
+    <hr class="my-3" />
+    <div v-if="checked.organization == false">
+      <div class="flex justify-between">
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1"
-            >company name</span
+            >Organization</span
           >
           <TextInput
             class="text-gray-500 font-medium text-sm my-1"
@@ -268,44 +311,156 @@ onMounted(fetch);
             variant="subtle"
             placeholder="enter organization"
             :disabled="false"
-            :modelValue="form_details.company_name"
-            v-model="form_details.company_name"
+            :modelValue="form_details.organization"
+            v-model="form_details.organization"
           />
         </div>
         <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Designation</span>
+          <span class="text-gray-500 font-medium text-sm my-1">Website</span>
           <TextInput
             :type="'text'"
             :ref_for="true"
             size="sm"
             variant="subtle"
-            placeholder="enter designation"
+            placeholder="enter website"
             :disabled="false"
-            :modelValue="form_details.designation"
-            v-model="form_details.designation"
+            :modelValue="form_details.website"
+            v-model="form_details.website"
           />
         </div>
-        <div class="">
-        <span class="text-gray-500 font-medium text-sm my-1">Address</span>
-        <div class="p-2 w-full flex justify-center">
-          <div class="w-[87%]">
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >No. of Employees
+          </span>
+
           <Autocomplete
-            :options="address_list"
-            v-model="form_details.address"
-            placeholder="Select address"
+            :options="[
+              {
+                label: '1-10',
+                value: '1-10',
+              },
+              {
+                label: '11-50',
+                value: 'jane-doe',
+              },
+              {
+                label: '51-200',
+                value: '51-200',
+              },
+              {
+                label: '201-500',
+                value: '201-500',
+              },
+              {
+                label: '501-1000',
+                value: '501-1000',
+              },
+              {
+                label: '1000+',
+                value: '1000+',
+              },
+            ]"
+            v-model="form_details.employees"
+            placeholder="Select employee"
             :hideSearch="true"
-           class="w-[90%]"
           />
-     
-
-          </div>
-          <div class="w-[20%] mx-3"> 
-            <CreateAddress @get_all_address="fetch"/>
-          </div>
         </div>
       </div>
+      <div class="flex justify-between">
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
+          <Autocomplete
+            :options="territory_list"
+            v-model="form_details.territory_id"
+            placeholder="Select territory"
+          />
+        </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >Annual Revenue
+          </span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="select annual revenue"
+            :disabled="false"
+            :modelValue="form_details.revenue"
+            v-model="form_details.revenue"
+          />
+        </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
+          <Autocomplete
+            :options="industry_list"
+            v-model="form_details.industry_id"
+            placeholder="Select industry"
+          />
+        </div>
       </div>
-
+    </div>
+    <div v-else>
+      <div>
+        <span>Organization</span>
+        <div class="p-2 w-1/3">
+          <Autocomplete
+            :options="organization_list"
+            v-model="checked.organization"
+            placeholder="Select organization"
+          />
+        </div>
+      </div>
+    </div>
+    <hr class="my-3" />
+    <div>
+      <div class="flex justify-between">
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Status </span>
+          <Autocomplete
+            :options="[
+              {
+                label: 'New',
+                value: 'New',
+              },
+              {
+                label: 'Contacted',
+                value: 'Contacted',
+              },
+              {
+                label: 'Nurture',
+                value: 'Nurture',
+              },
+              {
+                label: 'Qualified',
+                value: 'Qualified',
+              },
+              {
+                label: 'UnQualified',
+                value: 'UnQualified',
+              },
+              {
+                label: 'Junk',
+                value: 'Junk',
+              },
+            ]"
+            v-model="form_details.status"
+            placeholder="Select status"
+          />
+        </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >Deal Owner
+          </span>
+          <Autocomplete
+            :options="user_list"
+            v-model="form_details.owner_id"
+            placeholder="Select owner"
+          />
+        </div>
+      </div>
+  
+    </div>
   </div>
 </template>
 

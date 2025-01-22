@@ -1,15 +1,13 @@
 <template>
     <Nav />
-    <div class="p-7">
+    <div class="p-4">
       <ListView
       class="h-[550px] p-4"
       :columns="[
         { label: 'Name', key: 'name', icon: 'user', width: '180px' },
-        { label: 'Organization', key: 'organization', width: '180px' },
-        { label: 'Status', key: 'status', width: '150px' },
         { label: 'Email', key: 'email', width: '180px' },
-        { label: 'Lead Score', key: 'lead_score', width: '150px' },
-        { label: 'Assigned To', key: 'assigned', width: '150px' },
+        { label: 'Phone', key: 'phone', width: '150px' },
+        { label: 'Organization', key: 'organization', width: '180px' },
         { label: 'Last Modified', key: 'modified', width: '150px' },
       ]"
       :rows="lead_list"
@@ -25,13 +23,11 @@
       <ListHeader>
         <ListHeaderItem
           v-for="column in [
-            { label: 'Name', key: 'name', icon: 'user' },
-            { label: 'Organization', key: 'organization', icon: 'briefcase' },
-            { label: 'Status', key: 'status', icon: 'check-circle' },
-            { label: 'Email', key: 'email', icon: 'at-sign' },
-            { label: 'Lead Score', key: 'lead_score', icon: 'star' },
-            { label: 'Assigned To', key: 'assigned', icon: 'user-check' },
-            { label: 'Last Modified', key: 'modified', icon: 'clock' },
+            { label: 'Name', key: 'name', icon: 'user'},
+            { label: 'Email', key: 'email'},
+            { label: 'Phone', key: 'phone'},
+            { label: 'Organization', key: 'organization'},
+            { label: 'Last Modified', key: 'modified'},
           ]"
           :key="column.key"
           :item="column"
@@ -77,8 +73,9 @@
     </div>
   </template>
   <script setup>
-  import { ref } from "vue";
+  import { ref,onMounted } from "vue";
   import { useRouter } from "vue-router";
+  import { get_all_contact,delete_contact } from '@/api/userApi';
   import {
     ListView,
     FeatherIcon,
@@ -97,16 +94,6 @@
   import { useToast } from "vue-toast-notification";
   const toast = useToast();
   const lead_list = ref([
-    {
-      id: 1,
-      name: "John Doe",
-      organization: "Acme Inc.",
-      status: "Active",
-      email: "john.doe@example.com",
-      lead_score: 85,
-      assigned: "Jane Smith",
-      modified: "2024-01-01",
-    },
   ]);
   
   
@@ -114,7 +101,7 @@
   const handleRowClick = (row) => {
     router.push(`/antar_/contacts/${row.id}`);
   };
-  
+
   const handleSelectionChange = (rows) => {
     selectedRows.value = rows;
     if (rows.length > 0) {
@@ -134,5 +121,42 @@
       });
     }
   };
+  const fetch_contact = async()=>{
+    const res = await get_all_contact()
+    lead_list.value = res.data.map((item) => ({
+        id: item?.contact_id,
+        name:item?.first_name || 'N/A',
+        email:item?.email_id || 'N/A',
+        phone:item?.phone || 'N/A',
+        organization:item?.company_name || 'N/A',
+        modified:item?.created_on || 'N/A',
+      }));
+  }
+  onMounted(async()=>{
+    await fetch_contact()
+  })
+
+  const handleDelete = async(rows) => {
+    console.log(rows)
+    const res = await delete_contact(rows)
+    if(res.statusCode === 200){ 
+      toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    fetch_contact()
+    }
+ 
+}
   </script>
   

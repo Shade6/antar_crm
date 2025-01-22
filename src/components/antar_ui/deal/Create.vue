@@ -2,11 +2,13 @@
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import Nav from "@/views/antar_/deals/nav/Nav.vue";
-// import {
-//     find_all_industry,
-//     find_all_territories,
-//     findAllUsers,
-// } from "@/api/userApi.js";
+import {
+    find_all_industry,
+    find_all_territories,
+    findAllUsers,
+} from "@/api/userApi.js";
+
+
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useRouter } from "vue-router";
@@ -126,22 +128,7 @@ onMounted(fetch);
   <div class="container mx-auto">
     <div class="my-3 flex justify-center relative">
       <span class="text-3xl font-semibold">Create Deal</span>
-      <div class="p-1 absolute start-0">
-        <Button
-          @click="router.push('/antar_/deals/')"
-          :variant="'outline'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Close
-        </Button>
-      </div>
+
     </div>
     <hr />
     <div class="flex my-4">
@@ -313,7 +300,7 @@ onMounted(fetch);
               },
             ]"
             v-model="single"
-            placeholder="Select person"
+            placeholder="Select contact"
           />
         </div>
       </div>
@@ -424,7 +411,7 @@ onMounted(fetch);
     </div>
     <div v-else>
       <div>
-        <span>Contact</span>
+        <span>Organization</span>
         <div class="p-2 w-1/3">
           <Autocomplete
             :options="[
@@ -460,7 +447,7 @@ onMounted(fetch);
               },
             ]"
             v-model="single"
-            placeholder="Select person"
+            placeholder="Select organization"
           />
         </div>
       </div>
@@ -503,7 +490,7 @@ onMounted(fetch);
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1"
-            >Lead Owner
+            >Deal Owner
           </span>
           <Autocomplete
             :options="user_list"

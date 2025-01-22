@@ -4,7 +4,7 @@ import customLayout from "@/layout/customLayout.vue";
 
 import Details from "../views/antar_/deals/dealsPage/Details.vue";
 import Single from "@/views/antar_/deals/Single.vue";
-import Create from "../views/antar_/deals/dealsPage/Create.vue";
+import Create from "../views/antar_/deals/Create.vue";
 import Kanban from "../views/antar_/deals/dealsPage/Kanban.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

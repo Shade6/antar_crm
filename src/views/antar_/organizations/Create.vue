@@ -1,12 +1,15 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
+import CreateAddress from "@/components/modal/CreateAddress.vue";
 import Nav from "@/views/antar_/organizations/nav/Nav.vue";
-// import {
-//     find_all_industry,
-//     find_all_territories,
-//     findAllUsers,
-// } from "@/api/userApi.js";
+import {
+    find_all_industry,
+    find_all_territories,
+    findAllUsers,
+    get_all_address,
+    create_organization
+} from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useRouter } from "vue-router";
@@ -15,32 +18,27 @@ const toast = useToast();
 const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
+const address_list = ref([]);
 const checked = ref({
   organization: false,
   contact: false,
 });
 const form_details = ref({
-  salutation: null,
-  first_name: null,
-  last_name: null,
-  email: null,
-  mobile: null,
-  gender: null,
-  organization: null,
+  organization_name: null,
   website: null,
-  employees: null,
-  territory_id: null,
-  revenue: null,
-  industry_id: null,
-  status: null,
-  owner_id: null,
+  annual_revenue: null,
+  no_of_employee: null,
+  industry: null,
+  territory: null,
+  address: null,
 });
 
 const fetch = async () => {
-  const [industry_res, territory_res, users_res] = await Promise.all([
+  const [industry_res, territory_res, users_res,address_res] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
+    get_all_address()
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -66,6 +64,14 @@ const fetch = async () => {
   } else {
     show_error(users_res);
   }
+  if(address_res.statusCode == 200){
+    address_list.value = address_res.data.map((val, i) => ({
+      label: val.address_title,
+      value: val.address_id,
+    }));
+  }else{
+    show_error(address_res)
+  }
 };
 const show_error = (res) => {
   toast.success(res.message, {
@@ -84,8 +90,8 @@ const show_error = (res) => {
   });
 };
 
-const handle_save_lead = async () => {
-  const res = await create_lead(form_details.value);
+const handle_save_organization = async () => {
+  const res = await create_organization(form_details.value);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
@@ -122,28 +128,9 @@ onMounted(fetch);
 </script>
 
 <template>
-  <Nav />
-  <div class="w-1/2 mx-24">
-    <div class="my-3 flex justify-center relative">
-      <span class="text-3xl font-semibold">Create Contact</span>
-      <div class="p-1 absolute start-0">
-        <Button
-          @click="router.push('/antar_/contacts/')"
-          :variant="'outline'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Close
-        </Button>
-      </div>
-    </div>
-    <hr />
+  <Nav @save="handle_save_organization" />
+  <div class=" mx-4">
+
  
 
     <hr />
@@ -157,8 +144,8 @@ onMounted(fetch);
             variant="subtle"
             placeholder="enter organization name"
             :disabled="false"
-            :modelValue="form_details.first_name"
-            v-model="form_details.first_name"
+            :modelValue="form_details.organization_name"
+            v-model="form_details.organization_name"
           />
         </div>
       <div class="flex justify-between">
@@ -173,8 +160,8 @@ onMounted(fetch);
             variant="subtle"
             placeholder="enter website"
             :disabled="false"
-            :modelValue="form_details.first_name"
-            v-model="form_details.first_name"
+            :modelValue="form_details.website"
+            v-model="form_details.website"
           />
         </div>
         <div class="p-2 w-full">
@@ -187,29 +174,16 @@ onMounted(fetch);
             variant="subtle"
             placeholder="enter annual revenue"
             :disabled="false"
-            :modelValue="form_details.last_name"
-            v-model="form_details.last_name"
+            :modelValue="form_details.annual_revenue"
+            v-model="form_details.annual_revenue"
           />
         </div>
       </div>
       <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
           <Autocomplete
-            :options="[
-              {
-                label: 'Asia',
-                value: 'Asia',
-              },
-              {
-                label: 'Europe',
-                value: 'Europe',
-              },
-              {
-                label: 'Other',
-                value: 'Other',
-              },
-            ]"
-            v-model="form_details.gender"
+            :options="territory_list"
+            v-model="form_details.territory"
             placeholder="Select territory"
           />
         </div>
@@ -228,33 +202,24 @@ onMounted(fetch);
                 value: '11-50',
               },
               {
-                label: 'Other',
-                value: 'Other',
+                label: '50-100',
+                value: '50-100',
+              },
+              {
+                label: '100+',
+                value: '100+',
               },
             ]"
-            v-model="form_details.gender"
-            placeholder="Select gender"
+            v-model="form_details.no_of_employee"
+            placeholder="Select no of employee"
           />
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
           <Autocomplete
-            :options="[
-              {
-                label: 'Automotive',
-                value: 'Automotive',
-              },
-              {
-                label: 'Healthcare',
-                value: 'Healthcare',
-              },
-              {
-                label: 'Other',
-                value: 'Other',
-              },
-            ]"
-            v-model="form_details.gender"
-            placeholder="Select gender"
+            :options="industry_list"
+            v-model="form_details.industry"
+            placeholder="Select industry"
           />
         </div>
       </div>
@@ -265,46 +230,27 @@ onMounted(fetch);
     
 
       <div class="">
-        
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1"
-            >Address
-          </span>
-
+        <span class="text-gray-500 font-medium text-sm my-1">Address</span>
+        <div class="p-2 w-full flex justify-center">
+          <div class="w-[87%]">
           <Autocomplete
-            :options="[
-              {
-                label: '1-10',
-                value: '1-10',
-              },
-              {
-                label: '11-50',
-                value: 'jane-doe',
-              },
-              {
-                label: '51-200',
-                value: '51-200',
-              },
-              {
-                label: '201-500',
-                value: '201-500',
-              },
-              {
-                label: '501-1000',
-                value: '501-1000',
-              },
-              {
-                label: '1000+',
-                value: '1000+',
-              },
-            ]"
-            v-model="form_details.employees"
-            placeholder="Select employee"
+            :options="address_list"
+            v-model="form_details.address"
+            placeholder="Select address"
             :hideSearch="true"
+           class="w-[85%]"
           />
+     
+
+          </div>
+          <div class=" w-[20%] mx-3"> 
+            <CreateAddress @get_all_address="fetch"/>
+          </div>
         </div>
       </div>
+      
   </div>
+
 </template>
 
 <style scoped></style>

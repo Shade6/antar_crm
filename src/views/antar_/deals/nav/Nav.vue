@@ -1,56 +1,55 @@
 <script setup>
-import { h, ref, watch } from "vue";
+import { h, ref, watch, defineEmits } from "vue";
 import { useRouter } from "vue-router";
 import ListIcon from "@/components/icons/ListIcon.vue";
-import {
-  Dropdown,
-  FeatherIcon,
-  Button,
-  Breadcrumbs,
-} from "frappe-ui";
+import { Dropdown, FeatherIcon, Button, Breadcrumbs } from "frappe-ui";
 
+const emit = defineEmits(["save"]);
 const router = useRouter();
 import { useSwitchStore } from "@/stores/switch";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-
+const route_list = ref([
+  {
+    label: "Deals",
+    icon: "",
+    route: "/antar_/deals",
+  },
+]);
 
 const switchStore = useSwitchStore();
 
+const handle_create = () => {
+  router.push("/antar_/deals/create");
+};
 
-const handle_create = ()=>{
-    router.push("/antar_/deals/create");
-}
+const isCreateRoute = () => {
+  const currentPath = router.currentRoute.value.path;
+  if (currentPath === "/antar_/deals/create") {
+    route_list.value.push({ label: "New Deal", route: "/antar_/deals/create" });
+  } else if (currentPath.includes("/antar_/deals/")) {
+    const dealId = currentPath.split("/").pop();
+    route_list.value.push({ label: `Deal ${dealId}`, route: currentPath });
+  }
+  return currentPath === "/antar_/deals/create";
+};
 
-
-
+const handle_save = () => {
+  emit("save");
+};
 </script>
 
 <template>
   <div class="w-full px-6 py-3 border-b flex justify-between">
     <div class="w-1/2 flex">
-      <Breadcrumbs
-        :items="[
-          {
-            label: 'Deals',
-            icon: '',
-            route: '/antar_/deals',
-          },
-          {
-            label: 'Views',
-            icon: '',
-            route: '/antar_/deals/kanban',
-          },
-        ]"
-      >
+      <Breadcrumbs :items="route_list">
         <template #prefix="{ item }">
           <span class="mr-1">
             {{ item.icon }}
           </span>
         </template>
       </Breadcrumbs>
-      
 
       <Dropdown
         :options="[
@@ -64,7 +63,7 @@ const handle_create = ()=>{
               {
                 label: 'Kanban',
                 icon: () => h(FeatherIcon, { name: 'bar-chart-2' }),
-                onClick: () => router.push('/antar_/deals/kanban')
+                onClick: () => router.push('/antar_/deals/kanban'),
               },
               {
                 label: 'Group By',
@@ -83,7 +82,7 @@ const handle_create = ()=>{
           },
         ]"
       >
-        <Button class="mx-2 hover:bg-gray-300 px-2 rounded-sm">
+        <Button class="mx-2 hover:bg-gray-300 px-2 rounded-sm my-auto">
           <div class="flex gap-2">
             <div class="my-auto">
               <ListIcon />
@@ -93,11 +92,12 @@ const handle_create = ()=>{
             </div>
           </div>
         </Button>
-      </Dropdown> 
+      </Dropdown>
     </div>
 
     <div class="p-1 flex">
       <Button
+        v-if="!isCreateRoute()"
         :variant="'solid'"
         :ref_for="true"
         theme="gray"
@@ -109,8 +109,22 @@ const handle_create = ()=>{
         :link="null"
         @click="handle_create"
       >
-        <span class="text-bold">+</span>
-        Create
+        create
+      </Button>
+      <Button
+        v-else
+        :variant="'solid'"
+        :ref_for="true"
+        theme="gray"
+        size="sm"
+        label="Button"
+        :loading="false"
+        :loadingText="null"
+        :disabled="false"
+        :link="null"
+        @click="handle_save"
+      >
+        save
       </Button>
     </div>
   </div>

@@ -1,16 +1,14 @@
 <template>
     <Nav />
-    <div class="p-7">
+    <div class="p-4">
       <ListView
       class="h-[550px] p-4"
       :columns="[
-        { label: 'Name', key: 'name', icon: 'user', width: '180px' },
-        { label: 'Organization', key: 'organization', width: '180px' },
-        { label: 'Status', key: 'status', width: '150px' },
-        { label: 'Email', key: 'email', width: '180px' },
-        { label: 'Lead Score', key: 'lead_score', width: '150px' },
-        { label: 'Assigned To', key: 'assigned', width: '150px' },
-        { label: 'Last Modified', key: 'modified', width: '150px' },
+        { label: 'Organization ', key: 'organization', icon: 'user', width: '180px' },
+        { label: 'website', key: 'website', width: '180px' },
+        { label: 'industry', key: 'industry', width: '150px' },
+        { label: 'annual revenue', key: 'annual_revenue', width: '180px' },
+        { label: 'last modified', key: 'last_modified', width: '150px' },
       ]"
       :rows="lead_list"
       :options="{
@@ -25,13 +23,11 @@
       <ListHeader>
         <ListHeaderItem
           v-for="column in [
-            { label: 'Name', key: 'name', icon: 'user' },
-            { label: 'Organization', key: 'organization', icon: 'briefcase' },
-            { label: 'Status', key: 'status', icon: 'check-circle' },
-            { label: 'Email', key: 'email', icon: 'at-sign' },
-            { label: 'Lead Score', key: 'lead_score', icon: 'star' },
-            { label: 'Assigned To', key: 'assigned', icon: 'user-check' },
-            { label: 'Last Modified', key: 'modified', icon: 'clock' },
+          { label: 'Organization ', key: 'organization', icon: 'user'},
+          { label: 'website', key: 'website'},
+          { label: 'industry', key: 'industry'},
+          { label: 'annual revenue', key: 'annual_revenue' },
+          { label: 'last modified', key: 'last_modified' },
           ]"
           :key="column.key"
           :item="column"
@@ -77,7 +73,7 @@
     </div>
   </template>
   <script setup>
-  import { ref } from "vue";
+  import { ref ,onMounted} from "vue";
   import { useRouter } from "vue-router";
   import {
     ListView,
@@ -95,20 +91,45 @@
   const router = useRouter();
   import "@/assets/toast.css";
   import { useToast } from "vue-toast-notification";
+  import { get_all_organization,delete_organization } from '@/api/userApi';
   const toast = useToast();
-  const lead_list = ref([
-    {
-      id: 1,
-      name: "John Doe",
-      organization: "Acme Inc.",
-      status: "Active",
-      email: "john.doe@example.com",
-      lead_score: 85,
-      assigned: "Jane Smith",
-      modified: "2024-01-01",
-    },
-  ]);
-  
+  const lead_list = ref([]);
+  const fetch_organization = async()=>{
+    const res = await get_all_organization()
+    lead_list.value = res.data.map((item) => ({
+        id:item.org_id,
+        organization: item.organization_name || 'N/A',
+        website: item.website || 'N/A',
+        industry: item.industry || 'N/A',
+        annual_revenue: item.annual_revenue || 'N/A',
+        last_modified: item.last_modified || 'N/A',
+      }));
+  }
+  onMounted(async()=>{
+    await fetch_organization()
+  })
+
+  const handleDelete = async(rows) => {
+    const res = await delete_organization(rows) 
+    if(res.statusCode === 200){ 
+      toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    fetch_organization()
+    }
+ 
+}
   
   
   const handleRowClick = (row) => {

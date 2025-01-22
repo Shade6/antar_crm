@@ -103,11 +103,11 @@ watch(()=>filter.value.text,(newValue)=>{
 
 <template>
   <div
-    class="flex justify-between p-4"
+    class="flex justify-between px-4"
     style="border-bottom: solid 1px #e5e4e2"
   >
     <div class="p-2 max-w-52">
-      <TextInput v-model="search" placeholder="ID" type="text">
+      <TextInput v-model="search" placeholder="Search By Name" type="text">
         <template #prefix>
           <FeatherIcon class="w-4" name="search" />
         </template>

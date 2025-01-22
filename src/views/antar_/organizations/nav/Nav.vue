@@ -1,5 +1,5 @@
 <script setup>
-import { h, ref, watch } from "vue";
+import { h, ref, watch, defineEmits } from "vue";
 import { useRouter } from "vue-router";
 import ListIcon from "@/components/icons/ListIcon.vue";
 import {
@@ -9,17 +9,48 @@ import {
   Breadcrumbs,
 } from "frappe-ui";
 
+const emit = defineEmits(["save"]);
 const router = useRouter();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
 
+const route_list = ref([
+  {
+    label: "Organizations",
+    icon: "",
+    route: "/antar_/organizations",
+  },
+]);
 
-const handle_create = ()=>{
-    router.push("/antar_/organizations/create");
+const isCreateRoute = () => {
+  return router.currentRoute.value.path === "/antar_/organizations/create";
+};
+
+const isSingleViewRoute = () => {
+  return router.currentRoute.value.path.includes("/antar_/organizations/");
+};
+
+if (isCreateRoute()) {
+  route_list.value.push({
+    label: "New Organization",
+    route: "/antar_/organizations/create",
+  });
+} else if (isSingleViewRoute()) {
+  const orgId = router.currentRoute.value.path.split("/").pop();
+  route_list.value.push({
+    label: `Organization ${orgId}`,
+    route: router.currentRoute.value.path,
+  });
 }
 
+const handle_create = () => {
+    router.push("/antar_/organizations/create");
+};
 
+const handle_save = () => {
+    emit("save");
+};
 
 </script>
 
@@ -27,18 +58,7 @@ const handle_create = ()=>{
   <div class="w-full px-6 py-3 border-b flex justify-between">
     <div class="w-1/2 flex">
       <Breadcrumbs
-        :items="[
-          {
-            label: 'Organizations',
-            icon: '',
-            route: '/antar_/organizations',
-          },
-          {
-            label: 'Views',
-            icon: '',
-            route: '/antar_/deals/kanban',
-          },
-        ]"
+        :items="route_list"
       >
         <template #prefix="{ item }">
           <span class="mr-1">
@@ -94,6 +114,7 @@ const handle_create = ()=>{
 
     <div class="p-1 flex">
       <Button
+        v-if="!isCreateRoute()"
         :variant="'solid'"
         :ref_for="true"
         theme="gray"
@@ -107,6 +128,22 @@ const handle_create = ()=>{
       >
         <span class="text-bold">+</span>
         Create
+      </Button>
+      <Button
+        v-else
+        :variant="'solid'"
+        :ref_for="true"
+        theme="gray"
+        size="sm"
+        label="Button"
+        :loading="false"
+        :loadingText="null"
+        :disabled="false"
+        :link="null"
+        @click="handle_save"
+      >
+        <span class="text-bold">+</span>
+        Save
       </Button>
     </div>
   </div>

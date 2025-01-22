@@ -120,7 +120,7 @@ onMounted(fetch);
 </script>
 
 <template>
-  <div class="container mx-auto">
+  <div class="mx-4">
     <div class="my-3 flex justify-center relative">
       <span class="text-3xl font-semibold">Create Lead</span>
       <div class="p-1 absolute start-0">

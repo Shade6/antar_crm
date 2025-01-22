@@ -37,7 +37,7 @@ watch(
 
 <template>
   <NavBar :assignee="assignees" />
-  <div v-if="switchStore.create_form == null">
+  <div class="px-4" v-if="switchStore.create_form == null">
     <LeadTable />
   </div>
   <div v-else-if="switchStore.create_form == 'create_lead'">
