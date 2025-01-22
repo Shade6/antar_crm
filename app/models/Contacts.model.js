@@ -55,6 +55,16 @@ module.exports = (sequelize, Sequelize) => {
       department: {
         type: Sequelize.STRING,
       },
+      address:{
+        type: Sequelize.UUID,
+      },
+      created_by: {
+        type: Sequelize.UUID,
+      },
+      created_on: {
+        type: Sequelize.DATE,
+        defaultValue:Sequelize.NOW
+      },
     });
     Contact.beforeCreate((data, options) => {
       data.contact_id = uuidv4();

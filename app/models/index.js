@@ -35,7 +35,7 @@ db.module_permission = require("./users/ModulePermissions.model.js")(sequelize,S
 
 
 db.communication = require("./communication/Communication.model.js")(sequelize, Sequelize);
-db.contacts = require("./contact/Contacts.model.js")(sequelize, Sequelize);
+db.contacts = require("./Contacts.model.js")(sequelize, Sequelize);
 db.customers = require("./customer/Customers.model.js")(sequelize, Sequelize);
 db.leads = require("./leads/Leads.model.js")(sequelize, Sequelize);
 db.notes = require("./notes/Notes.model.js")(sequelize, Sequelize);
@@ -62,12 +62,12 @@ db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Seque
 db.user_email = require("./users/UserEmail.model.js")(sequelize,Sequelize)
 db.contact_email = require("./deals/ContactEmail.js")(sequelize,Sequelize)
 db.deal_status = require("./deals/DealStatus.js")(sequelize,Sequelize)
-db.organization = require("./deals/Organization.js")(sequelize,Sequelize)
+db.organization = require("./Organization.js")(sequelize,Sequelize)
 db.currency = require("./deals/Currency.js")(sequelize,Sequelize) 
 db.deal = require("./deals/Deal.js")(sequelize,Sequelize)
 db.contact_phone = require("./deals/ContactPhone.js")(sequelize,Sequelize)
 db.country = require("./deals/Country.js")(sequelize,Sequelize)
-
+db.address = require("./users/Address.model.js")(sequelize,Sequelize)
 db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
 

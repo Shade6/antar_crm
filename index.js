@@ -59,6 +59,10 @@ require("./app/router/userAccess/Role_.routes")(app)
 require("./app/router/Industry.routes")(app)
 require("./app/router/Territory.routes")(app)
 require("./app/router/Leads.routes")(app)
+require("./app/router/deals.routes")(app)
+require("./app/router/organization.routes")(app)
+require("./app/router/contact.routes")(app)
+require("./app/router/userAccess/address.routes")(app)
 
 const PORT =  8088;
 app.listen(PORT, () => {

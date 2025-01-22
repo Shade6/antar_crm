@@ -5,6 +5,7 @@ const Role = db.role;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const emailValidator = require("email-validator");
+const Address = db.address;
 
 exports.create_user = async (req, res) => {
   try {
@@ -170,6 +171,46 @@ exports.delete_user = async (req, res) => {
   try {
     res.json({ message: "delete user on maintanance", statusCode: 200 });
   } catch (error) {
+    res.json({ message: error.message, statusCode: 500 });
+  }
+};
+
+
+exports.get_user_address = async (req, res) => {
+  try {
+   console.log(req.user)
+    const userAddress = await Address.findAll({ where: { user_id: req.user } });
+
+    if (!userAddress || userAddress.length === 0) {
+      return res.json({ message: "No addresses found for this user", statusCode: 404 });
+    }
+
+    res.json({ message: "User addresses retrieved successfully", statusCode: 200, data: userAddress });
+  } catch (error) {
+    res.json({ message: error.message, statusCode: 500 });
+  }
+};
+
+exports.create_user_address = async (req, res) => {
+  try {
+    const { address_title, address_type, address_line_one, address_line_two, city_town, state_province, country, postal_code } = req.body;
+    console.log(req.body);
+    
+    const newAddress = await Address.create({
+      address_title: address_title,
+      address_type: address_type,
+      address_line_1: address_line_one,
+      address_line_2: address_line_two,
+      city: city_town,
+      state: state_province,
+      country: country,
+      zip_code: postal_code,
+      user_id: req.user // Corrected the user_id assignment
+    });
+
+    res.json({ message: "User address created successfully", statusCode: 200, data: newAddress });
+  } catch (error) {
+    console.log(error.message);
     res.json({ message: error.message, statusCode: 500 });
   }
 };

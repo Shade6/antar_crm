@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       annual_revenue: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       organization_logo: {
         type: Sequelize.STRING,
@@ -26,13 +26,13 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       territory: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
       },
       industry: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
       },
       address: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
       },
       created_by: {
         type: Sequelize.UUID,

@@ -31,7 +31,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       lead_id:{
          type:Sequelize.UUID,
-         allowNull: false,
       },
       website: {
         type: Sequelize.STRING,
@@ -101,12 +100,14 @@ module.exports = (sequelize, Sequelize) => {
       },
       created_on: {
         type: Sequelize.DATE,
+        
       },
       changed_by: {
         type: Sequelize.INTEGER,
       },
       changed_on: {
         type: Sequelize.DATE,
+        defaultValue:Sequelize.NOW
       },
     });
     Deal.beforeCreate((data, options) => {
