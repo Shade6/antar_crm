@@ -3,14 +3,13 @@ import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import Nav from "@/views/antar_/deals/nav/Nav.vue";
 import {
-    find_all_industry,
-    find_all_territories,
-    findAllUsers,
-    create_deal,
-    get_all_organization,
-    get_all_contact,
+  find_all_industry,
+  find_all_territories,
+  findAllUsers,
+  create_deal,
+  get_all_organization,
+  get_all_contact,
 } from "@/api/userApi.js";
-
 
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -44,7 +43,13 @@ const form_details = ref({
 const organization_list = ref([]);
 const contact_list = ref([]);
 const fetch = async () => {
-  const [industry_res, territory_res, users_res,organization_res,contact_res] = await Promise.all([
+  const [
+    industry_res,
+    territory_res,
+    users_res,
+    organization_res,
+    contact_res,
+  ] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
@@ -75,13 +80,13 @@ const fetch = async () => {
   } else {
     show_error(users_res);
   }
-  if(organization_res.statusCode == 200){
+  if (organization_res.statusCode == 200) {
     organization_list.value = organization_res.data.map((val, i) => ({
-      label: val?.organization_name || 'N/A',
-      value: val?.org_id || 'N/A',
+      label: val?.organization_name || "N/A",
+      value: val?.organization_id || "N/A",
     }));
   }
-  if(contact_res.statusCode == 200){
+  if (contact_res.statusCode == 200) {
     contact_list.value = contact_res.data.map((val, i) => ({
       label: val.first_name,
       value: val.contact_id,
@@ -106,14 +111,16 @@ const show_error = (res) => {
 };
 
 const handle_save_deal = async () => {
-    const details = {
-        ...form_details.value,
-        organization_id: checked.value.organization ? checked.value.organization : null,
-        contact_id: checked.value.contact ? checked.value.contact : null,
-    }
+  const details = {
+    ...form_details.value,
+    organization_id: checked.value.organization
+      ? checked.value.organization
+      : null,
+    contact_id: checked.value.contact ? checked.value.contact : null,
+  };
   const res = await create_deal(details);
   if (res.statusCode == 200) {
-    router.push('/antar_/deals')
+    router.push("/antar_/opportunities");
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -151,8 +158,6 @@ onMounted(fetch);
 <template>
   <Nav @save="handle_save_deal" />
   <div class="p-4 mx-auto">
-   
-  
     <div class="flex my-4">
       <Switch
         size="sm"
@@ -287,7 +292,7 @@ onMounted(fetch);
     <div v-else>
       <div>
         <span>Contact</span>
-        <div class="p-2  w-1/3">
+        <div class="p-2 w-1/3">
           <Autocomplete
             :options="contact_list"
             v-model="checked.contact"
@@ -450,7 +455,7 @@ onMounted(fetch);
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1"
-            >Deal Owner
+            >Opportunity Owner
           </span>
           <Autocomplete
             :options="user_list"
@@ -459,7 +464,6 @@ onMounted(fetch);
           />
         </div>
       </div>
-  
     </div>
   </div>
 </template>

@@ -54,22 +54,22 @@ const router = createRouter({
           component: () => import("../views/antar_/leads/leads.vue"),
         },
         {
-          path: "/antar_/deals",
+          path: "/antar_/opportunities",
           
           children: [
             {
               path: "",
-              name: "deals-list", // Unique name for this route
+              name: "opportunities-list", // Unique name for this route
               component: () => import("../views/antar_/deals/deals.vue"),
             },
             {
               path: "create",
-              name: "create-deal", // Consistent naming convention
+              name: "create-opportunities", // Consistent naming convention
               component: Create,
             },
             {
               path: ":id",
-              name: "deal-detail", // Consistent naming convention
+              name: "opportunities-detail", // Consistent naming convention
               component: Single,
             },
             {

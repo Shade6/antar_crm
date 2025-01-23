@@ -97,7 +97,7 @@
   const fetch_organization = async()=>{
     const res = await get_all_organization()
     lead_list.value = res.data.map((item) => ({
-        id:item.org_id,
+        id:item.organization_id,
         organization: item.organization_name || 'N/A',
         website: item.website || 'N/A',
         industry: item.industry || 'N/A',

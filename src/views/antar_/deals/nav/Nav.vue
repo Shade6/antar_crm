@@ -12,27 +12,27 @@ import { useToast } from "vue-toast-notification";
 const toast = useToast();
 const route_list = ref([
   {
-    label: "Deals",
+    label: "Opportunities",
     icon: "",
-    route: "/antar_/deals",
+    route: "/antar_/opportunities",
   },
 ]);
 
 const switchStore = useSwitchStore();
 
 const handle_create = () => {
-  router.push("/antar_/deals/create");
+  router.push("/antar_/opportunities/create");
 };
 
 const isCreateRoute = () => {
   const currentPath = router.currentRoute.value.path;
-  if (currentPath === "/antar_/deals/create") {
-    route_list.value.push({ label: "New Deal", route: "/antar_/deals/create" });
-  } else if (currentPath.includes("/antar_/deals/")) {
+  if (currentPath === "/antar_/opportunities/create") {
+    route_list.value.push({ label: "New Opportunity", route: "/antar_/opportunities/create" });
+  } else if (currentPath.includes("/antar_/opportunities/")) {
     const dealId = currentPath.split("/").pop();
-    route_list.value.push({ label: `Deal ${dealId}`, route: currentPath });
+    route_list.value.push({ label: `Opportunity ${dealId}`, route: currentPath });
   }
-  return currentPath === "/antar_/deals/create";
+  return currentPath === "/antar_/opportunities/create";
 };
 
 const handle_save = () => {
@@ -63,7 +63,7 @@ const handle_save = () => {
               {
                 label: 'Kanban',
                 icon: () => h(FeatherIcon, { name: 'bar-chart-2' }),
-                onClick: () => router.push('/antar_/deals/kanban'),
+                onClick: () => router.push('/antar_/opportunities/kanban'),
               },
               {
                 label: 'Group By',

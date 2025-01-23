@@ -134,7 +134,7 @@ const go_to_settings = () => {
       >
         <div class="nav-item__icon">
           <LeadsIcon v-if="menu.module.module_name == 'leads'" />
-          <DealsIcon v-else-if="menu.module.module_name == 'deals'" />
+          <DealsIcon v-else-if="menu.module.module_name == 'opportunities'" />
           <PhoneIcon v-else-if="menu.module.module_name == 'call-logs'" />
           <ContactsIcon v-else-if="menu.module.module_name == 'contacts'" />
           <TaskIcon v-else-if="menu.module.module_name == 'task'" />

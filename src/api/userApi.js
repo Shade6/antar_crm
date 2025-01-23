@@ -242,11 +242,11 @@ export const get_lead_activity = async(data)=>{
 }
 
 export const create_deal = async(data)=>{
-  return (await axiosInstance.post(`create_deal?mdl=${switchStore()?.pageId || ''}`,data)).data
+  return (await axiosInstance.post(`create_opportunity?mdl=${switchStore()?.pageId || ''}`,data)).data
 }
 
 export const get_all_deal = async(data)=>{
-  return (await axiosInstance.get(`get_deals?mdl=${switchStore()?.pageId || ''}&&role=${data}`)).data
+  return (await axiosInstance.get(`get_opportunity?mdl=${switchStore()?.pageId || ''}&&role=${data}`)).data
 }
 
 export const create_contact = async(data)=>{
@@ -280,7 +280,7 @@ export const delete_contact = async(data)=>{
 
 export const delete_deal = async(data)=>{
   const formattedData = Array.from(data).join(',');
-  return (await axiosInstance.delete(`delete_deal?mdl=${switchStore().pageId}&&id=${formattedData}`)).data
+  return (await axiosInstance.delete(`delete_opportunity?mdl=${switchStore().pageId}&&id=${formattedData}`)).data
 }
 
 export const delete_organization = async(data)=>{

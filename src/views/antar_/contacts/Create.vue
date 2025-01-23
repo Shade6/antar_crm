@@ -96,6 +96,7 @@ const show_error = (res) => {
 const handle_save_contact = async () => {
   const res = await create_contact(form_details.value);
   if (res.statusCode == 200) {
+    router.push("/antar_/contacts");
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,

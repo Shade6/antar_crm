@@ -106,7 +106,7 @@ const lead_list = ref([]);
 
 
 const handleRowClick = (row) => {
-  router.push(`/antar_/deals/${row.id}`);
+  router.push(`/antar_/opportunities/${row.id}`);
 };
 
 const handleSelectionChange = (rows) => {
@@ -131,14 +131,14 @@ const handleSelectionChange = (rows) => {
 const fetch_deal = async()=>{
   const res = await get_all_deal()
   lead_list.value = res.data.map(deal => ({
-      id: deal.deal_id,
-      name: deal.first_name || '' + ' ' + deal.last_name || '',
-      organization: deal.organization || 'Not Assigned',
+      id: deal.opportunity_id,
+      name: deal.contact.first_name || '' + ' ' + deal.contact.last_name || '',
+      organization: deal.organization.organization_name || 'Not Assigned',
       status: deal.status || 'Not Assigned',
-      email: deal.email || 'Not Assigned',
+      email: deal.contact.email || 'Not Assigned',
       performace: deal.deal_score || 'Not added',
       assigned: deal.deal_owner || 'Not Assigned',
-      modified: deal.modified || 'Not Assigned',
+      modified: new Date(deal.changed_on).toLocaleDateString() || 'Not Assigned',
     }));
 
 

@@ -93,6 +93,7 @@ const show_error = (res) => {
 const handle_save_organization = async () => {
   const res = await create_organization(form_details.value);
   if (res.statusCode == 200) {
+    router.push("/antar_/organizations");
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
