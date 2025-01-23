@@ -287,3 +287,15 @@ export const delete_organization = async(data)=>{
   const formattedData = Array.from(data).join(',');
   return (await axiosInstance.delete(`delete_organization?mdl=${switchStore().pageId}&&id=${formattedData}`)).data
 }
+
+export const get_single_opportunity = async(data)=>{
+  return (await axiosInstance.get(`get_opportunity_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
+}
+
+export const get_single_organization = async(data)=>{
+  return (await axiosInstance.get(`get_organization_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
+} 
+
+export const contact_details_by_id = async(data)=>{
+  return (await axiosInstance.get(`contact_details_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
+}

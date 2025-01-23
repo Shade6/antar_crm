@@ -19,6 +19,7 @@ const toast = useToast();
 const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
+const product_list = ref([]);
 const checked = ref({
   organization: false,
   contact: false,
@@ -38,6 +39,9 @@ const form_details = ref({
   industry_id: null,
   status: null,
   owner_id: null,
+  opportunity_name: null,
+  opportunity_value: null,
+  product:null
 });
 
 const organization_list = ref([]);
@@ -418,6 +422,47 @@ onMounted(fetch);
       </div>
     </div>
     <hr class="my-3" />
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >opportunity name
+          </span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="enter opportunity name"
+            :disabled="false"
+            :modelValue="form_details.opportunity_name"
+            v-model="form_details.opportunity_name"
+          />
+        </div>
+
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >opportunity value
+          </span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="enter opportunity value"
+            :disabled="false"
+            :modelValue="form_details.opportunity_value"
+            v-model="form_details.opportunity_value"
+          />
+        </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Product/Service</span>
+          <Autocomplete
+            :options="product_list"
+            v-model="form_details.product"
+            placeholder="Select product/service"
+          />
+        </div>
+      </div>
     <div>
       <div class="flex justify-between">
         <div class="p-2 w-full">

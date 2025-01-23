@@ -1,12 +1,60 @@
 <script setup>
 import Nav from "./nav/Nav.vue";
-import { ref } from "vue";
-import { FeatherIcon, Button, Tabs } from "frappe-ui";
+import { ref, onMounted } from "vue";
+import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
+import { contact_details_by_id } from "@/api/userApi.js"; // Import the function to get user by ID
+import "@/assets/toast.css";
+import { useToast } from "vue-toast-notification";
+const toast = useToast();
+import { useRoute } from "vue-router";
+const route = useRoute();
 
-const state = ref({
-    index: 0, // Initialize index to 0 for the first tab
-    deals: [] // Initialize deals as an empty array
+const contacts = ref({});
+const opportunities = ref([]);
+
+// Function to fetch contact by ID
+const fetchContactById = async (id) => {
+  try {
+    const res = await contact_details_by_id(id);
+    if(res.statusCode == 200){
+      contacts.value = res.data.contact; // Set the fetched contact to the contacts ref
+      opportunities.value = res.data.opportunities.map((item)=>{
+        return {
+          id: item.opportunity_id || 'not found',
+          name: item.opportunity_name || 'not found',
+          value: item.opportunity_value || 'not found',
+          probability: item.probability || 'not found',
+          status: item.status || 'not found',
+          created_at: new Date(item.changed_on).toLocaleDateString() || 'not found',
+        }
+      });
+    }else{
+      toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching contact:", error);
+  }
+};
+
+// Use onMounted to call the function when the component is mounted
+onMounted(() => {
+  const contactId = route.params.id; // Get the ID from the route parameters
+  fetchContactById(contactId);
 });
+
 </script>
 
 <template>
@@ -74,24 +122,61 @@ const state = ref({
       </div>
     </div>
   </div>
-  <Tabs
-    as="div"
-    class="border rounded"
-    v-model="state.index"
-    :tabs="[
-      {
-        label: 'Deals',
-        content: state.deals.length > 0 ? 'Deals available.' : 'No Deals Found',
-      }
-    ]"
-  >
-    <template #tab-panel="{ tab }">
-      <div class="p-5">
-        {{ tab.content }}
-      </div>
-    </template>
-  </Tabs>
-
+  <hr />
+  <div class="p-3">
+    <h1 class="text-gray-700 font-medium text-xl my-1">Deals</h1>
+  </div>
+  <hr />
+  <div>
+    <ListView
+      class="h-[250px]"
+      :columns="[
+        {
+          label: 'opportunities name',
+          key: 'name',
+      
+        },
+        {
+          label: 'opportunities value',
+          key: 'value',
+       
+        },
+        {
+          label: 'opportunities probability',
+          key: 'probability',
+        },
+        {
+          label: 'opportunities status',
+          key: 'status',
+        },
+        {
+          label: 'opportunities created at',
+          key: 'created_at',
+        },
+      ]"
+      :rows="opportunities"
+      :options="{
+        selectable: true,
+        showTooltip: true,
+        resizeColumn: true,
+        emptyState: {
+          title: 'No records found',
+          description: 'Create a new record to get started',
+          button: {
+            label: 'New Record',
+            variant: 'solid',
+          },
+        },
+      }"
+      row-key="id"
+    >
+      <template #cell="{ item, row, column }">
+        <span class="font-medium text-ink-gray-7">
+          {{ item }}
+        </span>
+      </template>
+    </ListView>
+  </div>
 </template>
 
 <style scoped></style>

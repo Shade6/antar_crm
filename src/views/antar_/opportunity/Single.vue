@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import Nav from "./nav/Nav.vue";
+import Tabs from "@/components/antar_ui/opportunity/Tabs.vue";
+import Details from "@/components/antar_ui/opportunity/Details.vue";
 const tabsWidth = ref(70);
 const sidebarWidth = ref(30);
 const startResizing = () => {
@@ -29,10 +31,10 @@ const stopResizing = () => {
     <div class="flex h-[675px]">
       <!-- Tabs Component -->
       <div
-        class="flex-grow h-[98%] bg-red-100 p-3"
+        class="flex-grow h-[98%]  p-3"
         :style="{ width: tabsWidth + '%' }"
       >
-            
+        <Tabs></Tabs>
       </div>
 
       <!-- Resizable Handle -->
@@ -42,8 +44,8 @@ const stopResizing = () => {
       ></div>
 
       <!-- Resizable Sidebar -->
-      <div class="h-[98%] bg-blue-400 p-3" :style="{ width: sidebarWidth + '%' }">
-        safsdfasd
+      <div class="h-[98%] bg-gray-50 p-3" :style="{ width: sidebarWidth + '%' }">
+        <Details></Details>
       </div>
     </div>
   </div>
