@@ -2,10 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 import defaultLayout from "@/layout/defaultLayout.vue";
 import customLayout from "@/layout/customLayout.vue";
 
-import Details from "../views/antar_/deals/dealsPage/Details.vue";
-import Single from "@/views/antar_/deals/Single.vue";
-import Create from "../views/antar_/deals/Create.vue";
-import Kanban from "../views/antar_/deals/dealsPage/Kanban.vue";
+import Details from "../views/antar_/opportunity/dealsPage/Details.vue";
+import Single from "@/views/antar_/opportunity/Single.vue";
+import Create from "../views/antar_/opportunity/Create.vue";
+import Kanban from "../views/antar_/opportunity/dealsPage/Kanban.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,7 +60,7 @@ const router = createRouter({
             {
               path: "",
               name: "opportunities-list", // Unique name for this route
-              component: () => import("../views/antar_/deals/deals.vue"),
+              component: () => import("../views/antar_/opportunity/deals.vue"),
             },
             {
               path: "create",

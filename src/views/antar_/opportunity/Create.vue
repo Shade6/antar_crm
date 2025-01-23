@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
-import Nav from "@/views/antar_/deals/nav/Nav.vue";
+import Nav from "@/views/antar_/opportunity/nav/Nav.vue";
 import {
   find_all_industry,
   find_all_territories,
