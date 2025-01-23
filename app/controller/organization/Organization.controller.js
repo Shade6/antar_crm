@@ -1,6 +1,8 @@
 const db = require("../../models");
 
 const Organization = db.organization;
+const Opportunity = db.opportunity;
+const Contact = db.contacts;
 exports.createOrganization = async (req, res) => {
     try {
    
@@ -14,9 +16,9 @@ exports.createOrganization = async (req, res) => {
             website:website,
             annual_revenue:parseInt(annual_revenue) || null,
             no_of_employees: no_of_employee?.value || null, // Assuming you want the value from the object
-            industry: industry?.value || null, // Assuming you want the value from the object
-            territory: territory?.value || null, // Assuming you want the value from the object
-            address:address?.value || null, // Assuming address is already in the correct forma
+            industry_id: industry?.value || null, // Assuming you want the value from the object
+            territory_id: territory?.value || null, // Assuming you want the value from the object
+            address_id:address?.value || null, // Assuming address is already in the correct forma
             website:website,
             created_by:req.user,
             created_on:new Date()
@@ -72,10 +74,30 @@ exports.deleteOrganization = async (req, res) => {
     if(!organizationId){
         return res.json({ message: "Organization id is required", statusCode: 400 });
     }
-    const deleted = await Organization.destroy({ where: { org_id: organizationId } });
+    const deleted = await Organization.destroy({ where: { organization_id: organizationId } });
     if (deleted) {
         return res.json({ message: "Organization deleted successfully", statusCode: 200 });
     }
     return res.json({ message: "Organization not found", statusCode: 400 });
 }
+
+exports.getOrganizationById = async (req, res) => {
+    try {
+        const organizationId = req.query.id;
+        console.log(organizationId);
+        const organization = await Organization.findOne({ where: { organization_id: organizationId } });
+        
+        if (organization) {
+            const opportunities = await Opportunity.findAll({
+                where: { organization_id: organizationId },
+                include: [{ model: Contact, as: "contact" }]
+            });
+            return res.json({ data: { organization :organization ??'not found', opportunities:opportunities } ,message:'organization fetched ',statusCode:200});
+        }
+        return res.json({ message: "Organization not found" ,statusCode:400});
+    } catch (error) {
+        return res.json({ message: error.message, statusCode: 400 });
+    }
+}
+
 

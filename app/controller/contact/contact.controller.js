@@ -1,5 +1,6 @@
 const db = require("../../models");
 const Contact = db.contacts;
+const Opportunity = db.opportunity;
 exports.createContact = async (req, res) => {
     try {
         const { salutation, first_name, last_name, email, mobile, gender, designation, company_name, address } = req.body;
@@ -61,5 +62,27 @@ exports.deleteContact = async (req, res) => {
         return res.json({ message: "Contact deleted successfully", statusCode: 200 });
     }
     return res.json({ message: "Contact not found", statusCode: 400 });
+}
+
+exports.contact_details_by_id = async (req, res) => {
+    try {
+        const contactId = req.query.id;
+        console.log(contactId);
+        
+        const contact = await Contact.findOne({ where: { contact_id: contactId } });
+        
+        if (contact) {
+            const opportunities = await Opportunity.findAll({ where: { contact_id: contactId } });
+            return res.json({ 
+                data: { contact:contact, opportunities:opportunities }, 
+                message: "Contact and opportunities fetched successfully", 
+                statusCode: 200 
+            });
+        }
+        
+        return res.json({ message: "Contact not found", statusCode: 400 });
+    } catch (error) {
+        return res.json({ message: error.message, statusCode: 400 });
+    }
 }
 

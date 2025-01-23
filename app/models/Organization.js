@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
     const Organization = sequelize.define("organization", {
-     org_id: {
+      organization_id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false,
@@ -25,13 +25,13 @@ module.exports = (sequelize, Sequelize) => {
       website: {
         type: Sequelize.STRING,
       },
-      territory: {
+      territory_id: {
         type: Sequelize.UUID,
       },
-      industry: {
+      industry_id: {
         type: Sequelize.UUID,
       },
-      address: {
+      address_id: {
         type: Sequelize.UUID,
       },
       created_by: {

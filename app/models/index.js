@@ -39,7 +39,6 @@ db.contacts = require("./Contacts.model.js")(sequelize, Sequelize);
 db.customers = require("./customer/Customers.model.js")(sequelize, Sequelize);
 db.leads = require("./leads/Leads.model.js")(sequelize, Sequelize);
 db.notes = require("./notes/Notes.model.js")(sequelize, Sequelize);
-db.opportunities = require("./opportunity/Opportunities.model.js")(sequelize, Sequelize);
 db.salesInvoices = require("./salesinvoice/SalesInvoices.model.js")(sequelize, Sequelize);
 db.salesOrders = require("./salesorder/SalesOrders.model.js")(sequelize, Sequelize);
 db.tasksAndActivities = require("./taskactivity/TasksAndActivities.model.js")(sequelize, Sequelize);
@@ -60,16 +59,67 @@ db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Seque
 
 
 db.user_email = require("./users/UserEmail.model.js")(sequelize,Sequelize)
-db.contact_email = require("./deals/ContactEmail.js")(sequelize,Sequelize)
-db.deal_status = require("./deals/DealStatus.js")(sequelize,Sequelize)
+db.contact_email = require("./opportunity/ContactEmail.js")(sequelize,Sequelize)
+db.deal_status = require("./opportunity/DealStatus.js")(sequelize,Sequelize)
 db.organization = require("./Organization.js")(sequelize,Sequelize)
-db.currency = require("./deals/Currency.js")(sequelize,Sequelize) 
-db.deal = require("./deals/Deal.js")(sequelize,Sequelize)
-db.contact_phone = require("./deals/ContactPhone.js")(sequelize,Sequelize)
-db.country = require("./deals/Country.js")(sequelize,Sequelize)
+db.currency = require("./opportunity/Currency.js")(sequelize,Sequelize) 
+db.opportunity = require("./opportunity/Opportunities.js")(sequelize,Sequelize)
+db.contact_phone = require("./opportunity/ContactPhone.js")(sequelize,Sequelize)
+db.country = require("./opportunity/Country.js")(sequelize,Sequelize)
 db.address = require("./users/Address.model.js")(sequelize,Sequelize)
 db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
+
+// ------------------------------------------------------------
+
+db.industry.hasMany(db.organization, { //---this is the reference 
+  foreignKey: 'industry_id',
+  as: 'organization'      
+});
+db.organization.belongsTo(db.industry, { //---this is the original table
+  foreignKey: 'industry_id', 
+  targetKey: 'industry_id',         
+  as: 'industry'             
+});
+db.territory.hasMany(db.organization, { //---this is the reference 
+  foreignKey: 'territory_id',
+  as: 'organization'      
+});
+db.organization.belongsTo(db.territory, { //---this is the original table
+  foreignKey: 'territory_id', 
+  targetKey: 'territory_id',         
+  as: 'territory'             
+});
+
+//-----------------------------------------------------
+db.contacts.hasMany(db.opportunity, { //---this is the reference 
+  foreignKey: 'contact_id',
+  as: 'deal'      
+});
+db.opportunity.belongsTo(db.contacts, { //---this is the original table
+  foreignKey: 'contact_id', 
+  targetKey: 'contact_id',         
+  as: 'contact'             
+});
+db.organization.hasMany(db.opportunity, { //---this is the reference 
+  foreignKey: 'organization_id',
+  as: 'deal'      
+});
+db.opportunity.belongsTo(db.organization, { //---this is the original table
+  foreignKey: 'organization_id', 
+  targetKey: 'organization_id',         
+  as: 'organization'             
+});
+db.users.hasMany(db.opportunity, { //---this is the reference 
+  foreignKey: 'deal_owner_id',
+  as: 'deal'      
+});
+db.opportunity.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'deal_owner_id', 
+  targetKey: 'user_id',         
+  as: 'deal_owner'             
+});
+//-----------------------------------------------------
 
 //-------------------------------------------------------------------------------------------
 db.users.hasMany(db.lead_task, { //---this is the reference 
