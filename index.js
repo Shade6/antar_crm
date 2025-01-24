@@ -63,6 +63,7 @@ require("./app/router/opportunity.routes.js")(app)
 require("./app/router/organization.routes")(app)
 require("./app/router/contact.routes")(app)
 require("./app/router/userAccess/address.routes")(app)
+require("./app/router/products.routes")(app)
 
 const PORT =  8088;
 app.listen(PORT, () => {

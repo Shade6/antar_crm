@@ -71,7 +71,7 @@ db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
 db.address_contact = require("./opportunity/AddressContact.js")(sequelize,Sequelize)
 db.address_org = require("./opportunity/AddressOrg.js")(sequelize,Sequelize)
-
+db.product = require("./Product.js")(sequelize,Sequelize)
 
 db.address_contact.hasMany(db.contacts, { //---this is the reference 
   foreignKey: 'address_contact_id',
