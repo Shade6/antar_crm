@@ -332,3 +332,20 @@ export const get_all_address_contact = async () => {
 export const create_product = async(data) => {
   return (await axiosInstance.post(`create_product?mdl=${switchStore().pageId}`, data)).data;
 }
+
+export const get_all_product = async(data) => {
+  return (await axiosInstance.get(`get_all_product?mdl=${switchStore().pageId}&&role=${data}`)).data;
+}
+
+export const get_single_product = async(data) => {
+  return (await axiosInstance.get(`get_single_product?mdl=${switchStore().pageId}&&id=${data}`)).data;
+}
+
+export const update_product = async(data) => {
+  return (await axiosInstance.put(`update_product?mdl=${switchStore().pageId}`, data)).data;
+}
+
+export const delete_product = async(data) => {
+  const formattedData = Array.from(data).join(',');
+  return (await axiosInstance.delete(`delete_product?mdl=${switchStore().pageId}&&id=${formattedData}`)).data;
+}

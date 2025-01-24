@@ -1,6 +1,87 @@
 <script setup>
+import { onMounted, ref } from "vue";
 import Nav from "./nav/Nav.vue";
-import { ListView } from "frappe-ui";
+import "@/assets/toast.css";
+import { useToast } from "vue-toast-notification";
+const toast = useToast();
+import {
+    ListView,
+    FeatherIcon,
+    ListHeader,
+    ListHeaderItem,
+    ListRows,
+    ListRow,
+    ListRowItem,
+    ListSelectBanner,
+    Button,
+  } from "frappe-ui";
+import { get_all_product,delete_product } from "@/api/userApi";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const products = ref([]);
+const fetch_products = async()=>{
+  try {
+    const res = await get_all_product();
+    if (res.statusCode === 200) {
+      products.value = res.data.map(product => ({
+        id: product.product_id,
+        name: {
+          label: product.product_name,
+          image: 'https://via.placeholder.com/150', // Placeholder image
+        },
+        email: product.email || 'N/A', // Assuming email is part of the product data
+        role: {
+          label: product.product_type,
+          color: 'blue', // Placeholder color
+        },
+        status: {
+          label: product.status,
+          bg_color: product.status === 'Active' ? 'bg-surface-green-3' : 'bg-surface-red-5',
+        },
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  }
+}
+onMounted(async () => {
+  fetch_products()
+});
+const handleDelete = async(id)=>{
+  const res = await delete_product(id)
+  if(res.statusCode === 200){
+    fetch_products()
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  }else{
+    toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+        style: {
+          background: "#FFF5F5",
+          color: "black",
+          padding: "4px 20px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          borderLeft: "5px solid red",
+        },
+      });
+  }
+}
 </script>
 
 <template>
@@ -8,73 +89,91 @@ import { ListView } from "frappe-ui";
   <div class="p-4">
     <div>
       <ListView
-        class="h-[250px]"
+        class="h-[150px]"
         :columns="[
           {
             label: 'Name',
             key: 'name',
             width: 3,
-            getLabel: ({ row }) => row.name,
-            prefix: ({ row }) => {
-              return h(Avatar, {
-                shape: 'circle',
-                image: row.user_image,
-                size: 'sm',
-              });
-            },
+            icon: 'user',
           },
           {
             label: 'Email',
             key: 'email',
             width: '200px',
+            icon: 'at-sign',
           },
           {
             label: 'Role',
             key: 'role',
+            icon: 'users',
           },
           {
             label: 'Status',
             key: 'status',
+            icon: 'check-circle',
           },
         ]"
-        :rows="[
-          {
-            id: 1,
-            name: 'John Doe',
-            email: 'john@doe.com',
-            status: 'Active',
-            role: 'Developer',
-            user_image: 'https://avatars.githubusercontent.com/u/499550',
-          },
-          {
-            id: 2,
-            name: 'Jane Doe',
-            email: 'jane@doe.com',
-            status: 'Inactive',
-            role: 'HR',
-            user_image: 'https://avatars.githubusercontent.com/u/499120',
-          },
-        ]"
+        :rows="products"
         :options="{
+          onRowClick: (row) => router.push(`/antar_/product-services/${row.id}`),
           selectable: true,
           showTooltip: true,
           resizeColumn: true,
           emptyState: {
-            title: 'No records found',
-            description: 'Create a new record to get started',
+            title: 'No products found',
+            description: 'Create a new product to get started',
             button: {
-              label: 'New Record',
+              label: 'New Product',
               variant: 'solid',
             },
           },
         }"
         row-key="id"
       >
-        <template #cell="{ item, row, column }">
-          <span class="font-medium text-ink-gray-7">
-            {{ item }}
-          </span>
-        </template>
+        <ListHeader>
+          <ListHeaderItem
+            v-for="column in $options.columns"
+            :key="column.key"
+            :item="column"
+          >
+            <template #prefix="{ item }">
+              <FeatherIcon
+                :name="item.icon"
+                class="h-4 w-4"
+              />
+            </template>
+          </ListHeaderItem>
+        </ListHeader>
+        <ListRows>
+          <ListRow
+            v-for="row in products"
+            :key="row.id"
+            :row="row"
+          >
+            <template #default="{ column, item }">
+              <ListRowItem
+                :item="item"
+                :align="column.align"
+              >
+                <template #prefix>
+                </template>
+              </ListRowItem>
+            </template>
+          </ListRow>
+        </ListRows>
+        <ListSelectBanner>
+          <template #actions="{ selections,unselectAll }">
+            <div class="flex gap-2">
+              <Button
+                variant="ghost"
+                label="Delete"
+              @click="handleDelete(selections)"
+              />
+      
+            </div>
+          </template>
+        </ListSelectBanner>
       </ListView>
     </div>
   </div>
