@@ -17,6 +17,7 @@ import PinIcon from "@/components/icons/PinIcon.vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 import { useSwitchStore } from "@/stores/switch";
+import ERPNextIcon from "../icons/ERPNextIcon.vue";
 
 const switchStore = useSwitchStore();
 
@@ -141,6 +142,7 @@ const go_to_settings = () => {
           <FileTextIcon v-else-if="menu.module.module_name == 'notes'" />
           <OrganizationsIcon v-else-if="menu.module.module_name == 'organizations'" />
           <Email2Icon v-else-if="menu.module.module_name == 'email-template'" />
+          <ERPNextIcon v-else-if="menu.module.module_name == 'product-services'" />
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">
           {{ menu.module.module_name }}

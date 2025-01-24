@@ -2,14 +2,17 @@
 import Nav from "./nav/Nav.vue";
 import { ref, onMounted } from "vue";
 import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
-import { get_single_organization } from "@/api/userApi.js"; // Import the API function
-import { useRoute } from "vue-router"; // Import useRoute to access route parameters
+
+import { get_single_organization,delete_organization } from "@/api/userApi.js"; // Import the API function
+import { useRoute, useRouter } from "vue-router"; // Import useRoute to access route parameters
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
+import EditIcon from "@/components/icons/EditIcon.vue";
 const toast = useToast();
 
 const tab = ref(0);
 const route = useRoute(); // Get the current route
+const router = useRouter(); // Get the current route
 const organizationId = route.params.id; // Extract the organization ID from the route parameters
 
 const state = ref({
@@ -81,6 +84,42 @@ onMounted(() => {
   fetchOrganizationData(); // Call the fetch function to get organization data
 });
 
+const handle_delete_organization = async () => {
+  const res = await delete_organization([organizationId]);
+  if (res.statusCode === 200) {
+    
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    router.push("/antar_/organizations");
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
 // Example data for testing (optional)
 state.value.deals = [
   { id: 1, name: "Deal 1", amount: "$500", status: "Closed" },
@@ -120,9 +159,10 @@ state.value.contacts = [
               :loadingText="null"
               :disabled="false"
               :link="null"
+              @click="router.push(`/antar_/organizations/edit/${organizationId}`)"
             >
               <div class="flex gap-2">
-                <FeatherIcon icon="pencil" class="w-4 h-4" />
+                <EditIcon icon="pencil" class="w-4 h-4" />
                 Edit
               </div>
             </Button>
@@ -138,9 +178,12 @@ state.value.contacts = [
               :loadingText="null"
               :disabled="false"
               :link="null"
+              @click="handle_delete_organization"
             >
               <div class="flex gap-2">
-                <FeatherIcon icon="trash" class="w-4 h-4" />
+                <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                </svg>
                 Delete
               </div>
             </Button>

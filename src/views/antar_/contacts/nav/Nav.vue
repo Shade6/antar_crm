@@ -10,7 +10,7 @@ import {
 } from "frappe-ui";
 
 const router = useRouter();
-const emit = defineEmits(["save"]);
+const emit = defineEmits(["save", "update"]);
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -27,6 +27,10 @@ const isCreateRoute = () => {
   return router.currentRoute.value.path === "/antar_/contacts/create";
 };
 
+const isEditRoute = () => {
+  return router.currentRoute.value.path.startsWith("/antar_/contacts/edit");
+};
+
 const isDetailRoute = () => {
   return router.currentRoute.value.params.id !== undefined;
 };
@@ -35,6 +39,12 @@ if (isCreateRoute()) {
   route_list.value.push({
     label: "New Contact",
     route: "/antar_/contacts/create",
+  });
+} else if (isEditRoute()) {
+  const contactId = router.currentRoute.value.hash.split('#')[1];
+  route_list.value.push({
+    label: `Edit Contact ${contactId}`,
+    route: router.currentRoute.value.path,
   });
 } else if (isDetailRoute()) {
   const contactId = router.currentRoute.value.params.id;
@@ -54,6 +64,10 @@ const handle_save = () => {
 
 const handle_view = () => {
     router.push("/antar_/contacts/kanban");
+};
+
+const handle_update = () => {
+    emit("update");
 };
 
 </script>
@@ -117,8 +131,24 @@ const handle_view = () => {
     </div>
 
     <div class="p-1 flex">
+ 
       <Button
-        v-if="!isCreateRoute()"
+        v-if="isEditRoute()"
+        :variant="'solid'"
+        :ref_for="true"
+        theme="gray"
+        size="sm"
+        label="Button"
+        :loading="false"
+        :loadingText="null"
+        :disabled="false"
+        :link="null"
+        @click="handle_update"
+      >
+        Update
+      </Button>
+      <Button
+        v-else-if="!isCreateRoute()"
         :variant="'solid'"
         :ref_for="true"
         theme="gray"

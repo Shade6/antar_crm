@@ -299,3 +299,36 @@ export const get_single_organization = async(data)=>{
 export const contact_details_by_id = async(data)=>{
   return (await axiosInstance.get(`contact_details_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
 }
+export const get_contact_by_id = async(data)=>{
+  return (await axiosInstance.get(`get_contact_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
+}
+export const get_only_organization_by_id = async(data)=>{
+  return (await axiosInstance.get(`get_only_organization_by_id?mdl=${switchStore().pageId}&&id=${data}`)).data
+}
+
+export const update_contact = async(data)=>{
+  return (await axiosInstance.put(`update_contact?mdl=${switchStore().pageId}`,data)).data
+}
+export const update_organization = async(data)=>{
+  return (await axiosInstance.put(`update_organization?mdl=${switchStore().pageId}`,data)).data
+}
+
+export const create_address_org = async(data) => {
+  return (await axiosInstance.post(`create_address_org?mdl=${switchStore().pageId}`, data)).data;
+}
+
+export const create_address_contact = async(data) => {
+  return (await axiosInstance.post(`create_address_contact?mdl=${switchStore().pageId}`, data)).data;
+}
+export const get_all_address_org = async () => {
+  return (await axiosInstance.get(`get_all_address_org?mdl=${switchStore().pageId}`)).data;
+}
+
+export const get_all_address_contact = async () => {
+  return (await axiosInstance.get(`get_all_address_contact?mdl=${switchStore().pageId}`)).data;
+}
+
+
+export const create_product = async(data) => {
+  return (await axiosInstance.post(`create_product?mdl=${switchStore().pageId}`, data)).data;
+}

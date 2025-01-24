@@ -6,9 +6,12 @@ import { contact_details_by_id } from "@/api/userApi.js"; // Import the function
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-import { useRoute } from "vue-router";
-const route = useRoute();
-
+import { useRoute, useRouter } from "vue-router"; // Import useRouter for navigation
+import EditIcon from "@/components/icons/EditIcon.vue";
+import Email2Icon from "@/components/icons/Email2Icon.vue";
+import PinIcon from "@/components/icons/PinIcon.vue";
+const route = useRoute(); // Use route to access route parameters
+const router = useRouter(); // Initialize router for navigation
 const contacts = ref({});
 const opportunities = ref([]);
 
@@ -55,11 +58,27 @@ onMounted(() => {
   fetchContactById(contactId);
 });
 
+const handle_edit = () => {
+  const contactId = route.params.id; // Use the actual contact ID from the route
+  router.push(`/antar_/contacts/edit#${contactId}`); // Navigate to the edit page with the correct ID
+}
+const handle_delete = async () => {
+    const res = await delete_contact(route.params.id);
+    if(res.statusCode == 200){
+      router.push("/antar_/contacts");
+    }else{
+      toast.success(res.message, {
+        position: "top-right",
+        duration: 3000,
+        dismissible: true,
+      });
+    }
+}
 </script>
 
 <template>
   <Nav></Nav>
-  <div class="m-3">
+  <div class="m-3" >
     <div class="flex">
       <div
         class="p-16 w-24 h-24 rounded-full bg-gray-200 flex justify-center items-center"
@@ -74,9 +93,9 @@ onMounted(() => {
           <br />
           <div class="flex items-center">
             <span class="flex gap-2 my-auto">
-              <FeatherIcon icon="mail" class="w-4 h-4 my-auto" />
+              <Email2Icon icon="mail" class="w-4 h-4 my-auto" />
               www.vidhul@gmail.com
-              <FeatherIcon icon="phone" class="w-4 h-4 my-auto" />
+              <PinIcon icon="phone" class="w-4 h-4 my-auto" />
               more
             </span>
           </div>
@@ -93,9 +112,10 @@ onMounted(() => {
               :loadingText="null"
               :disabled="false"
               :link="null"
+              @click="handle_edit"
             >
               <div class="flex gap-2">
-                <FeatherIcon icon="pencil" class="w-4 h-4" />
+                <EditIcon icon="edit-3" class="w-4 h-4" />
                 Edit
               </div>
             </Button>
@@ -111,9 +131,13 @@ onMounted(() => {
               :loadingText="null"
               :disabled="false"
               :link="null"
+              @click="handle_delete"
             >
               <div class="flex gap-2">
-                <FeatherIcon icon="trash" class="w-4 h-4" />
+                <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                </svg>
+
                 Delete
               </div>
             </Button>
@@ -122,6 +146,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
   <hr />
   <div class="p-3">
     <h1 class="text-gray-700 font-medium text-xl my-1">Deals</h1>

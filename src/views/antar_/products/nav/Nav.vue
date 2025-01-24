@@ -17,45 +17,45 @@ const toast = useToast();
 
 const route_list = ref([
   {
-    label: "Organizations",
+    label: "Products-Services",
     icon: "",
-    route: "/antar_/organizations",
+    route: "/antar_/product-services",
   },
 ]);
 
 const isCreateRoute = () => {
-  return router.currentRoute.value.path === "/antar_/organizations/create";
+  return router.currentRoute.value.path === "/antar_/product-services/create";
 };
 
 const isEditRoute = () => {
-  return router.currentRoute.value.path.includes("/antar_/organizations/edit");
+  return router.currentRoute.value.path.includes("/antar_/product-services/edit");
 };
 
 const isSingleViewRoute = () => {
-  return router.currentRoute.value.path.includes("/antar_/organizations/");
+  return router.currentRoute.value.path.includes("/antar_/product-services/");
 };
 
 if (isCreateRoute()) {
   route_list.value.push({
-    label: "New Organization",
-    route: "/antar_/organizations/create",
+    label: "New Product/service",
+    route: "/antar_/product-services/create",
   });
 } else if (isEditRoute()) {
   const orgId = router.currentRoute.value.path.split("/").pop();
   route_list.value.push({
-    label: `Organization Edit ${orgId}`,
+    label: `Product Edit ${orgId}`,
     route: router.currentRoute.value.path,
   });
 } else if (isSingleViewRoute()) {
   const orgId = router.currentRoute.value.path.split("/").pop();
   route_list.value.push({
-    label: `Organization ${orgId}`,
+    label: `Product ${orgId}`,
     route: router.currentRoute.value.path,
   });
 }
 
 const handle_create = () => {
-    router.push("/antar_/organizations/create");
+    router.push("/antar_/product-services/create");
 };
 
 const handle_save = () => {

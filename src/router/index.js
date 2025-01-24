@@ -67,6 +67,7 @@ const router = createRouter({
               name: "create-opportunities", // Consistent naming convention
               component: Create,
             },
+            
             {
               path: ":id",
               name: "opportunities-detail", // Consistent naming convention
@@ -98,6 +99,11 @@ const router = createRouter({
               component: () => import("../views/antar_/contacts/Single.vue"), // Corrected component path
             },
             {
+              path: "edit",
+              name: "contact-edit", // Corrected naming convention
+              component: () => import("../views/antar_/contacts/Update.vue"), // Corrected component path
+            },
+            {
               path: "kanban",
               name: "kanban-contact-view", // More descriptive name
               component: Kanban,
@@ -121,6 +127,11 @@ const router = createRouter({
               path: ":id",
               name: "organization-detail", // Consistent naming convention
               component: () => import("../views/antar_/organizations/Single.vue"),
+            },
+            {
+              path: "edit/:id",
+              name: "organization-edit", // Consistent naming convention
+              component: () => import("../views/antar_/organizations/Update.vue"),
             },
             {
               path: "kanban",
@@ -173,6 +184,36 @@ const router = createRouter({
           path: "/antar_/settings",
           name: "settings",
           component: () => import("../views/antar_/settings.vue"),
+        },
+        {
+          path: "/antar_/product-services",
+          children: [
+            {
+              path: "",
+              name: "product-list", // Unique name for this route
+              component: () => import("../views/antar_/products/List.vue"),
+            },
+            {
+              path: "create",
+              name: "create-product", // Consistent naming convention
+              component: () => import("../views/antar_/products/Create.vue"),
+            },
+            {
+              path: ":id",
+              name: "product-detail", // Consistent naming convention
+              component: () => import("../views/antar_/products/Single.vue"),
+            },
+            {
+              path: "edit",
+              name: "product-edit", // Consistent naming convention
+              component: () => import("../views/antar_/products/Edit.vue"),
+            },
+            {
+              path: "kanban",
+              name: "kanban-product-view", // More descriptive name
+              component: Kanban,
+            },
+          ],
         },
       ],
     },

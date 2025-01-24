@@ -7,7 +7,7 @@ import {
     find_all_industry,
     find_all_territories,
     findAllUsers,
-    get_all_address,
+    get_all_address_contact,
     create_contact
 } from "@/api/userApi.js";
 import "@/assets/toast.css";
@@ -41,7 +41,7 @@ const fetch = async () => {
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
-    get_all_address()
+    get_all_address_contact()
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -70,7 +70,7 @@ const fetch = async () => {
   if(address_res.statusCode == 200){
     address_list.value = address_res.data.map((val, i) => ({
       label: val.address_title,
-      value: val.address_id,
+      value: val.address_contact_id,
     }));
   }else{
     show_error(address_res)
@@ -301,7 +301,7 @@ onMounted(fetch);
 
           </div>
           <div class="w-[20%] mx-3"> 
-            <CreateAddress @get_all_address="fetch"/>
+            <CreateAddress :type="'contact'" @get_all_address="fetch"/>
           </div>
         </div>
       </div>

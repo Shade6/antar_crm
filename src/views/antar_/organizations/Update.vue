@@ -8,7 +8,8 @@ import {
     find_all_territories,
     findAllUsers,
     get_all_address_org,
-    create_organization
+    update_organization,
+    get_only_organization_by_id
 } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -24,13 +25,14 @@ const checked = ref({
   contact: false,
 });
 const form_details = ref({
+    organization_id: null,
   organization_name: null,
   website: null,
   annual_revenue: null,
   no_of_employee: null,
   industry: null,
   territory: null,
-  address: null,
+  address: [],
 });
 
 const fetch = async () => {
@@ -91,7 +93,7 @@ const show_error = (res) => {
 };
 
 const handle_save_organization = async () => {
-  const res = await create_organization(form_details.value);
+  const res = await update_organization(form_details.value);
   if (res.statusCode == 200) {
     router.push("/antar_/organizations");
     toast.success(res.message, {
@@ -125,14 +127,44 @@ const handle_save_organization = async () => {
     });
   }
 };
-onMounted(fetch);
+
+const fetch_organization = async (id) => {
+  const res = await get_only_organization_by_id(id);
+  if (res.statusCode == 200) {
+    form_details.value = {  
+      organization_id: res.data.organization.organization_id,
+      organization_name: res.data.organization.organization_name,
+      website: res.data.organization.website,
+      annual_revenue: res.data.organization.annual_revenue,
+      no_of_employee:res.data.organization.no_of_employees,
+      industry: res.data.organization.industry.industry_id,
+      territory: res.data.organization.territory.territory_id,
+      address: res.data.address.address ? res.data.address.map((val, i) => (val.address_org_id)) : [],
+    };
+     if(res.data?.address){
+        address_list.value.push(...res.data.address.map((val, i) => ({
+          label: val.address_title,
+          value: val.address_org_id,
+        })));
+     }
+  } else {
+    show_error(res);
+  }
+};
+
+onMounted(async()=>{
+  const orgId = router.currentRoute.value.path.split("/").pop();
+  await fetch();
+  await fetch_organization(orgId);
+
+});
 </script>
 
 <template>
-  <Nav @save="handle_save_organization" />
+  <Nav @update="handle_save_organization" />
   <div class=" mx-4">
-
  
+
 
     <hr />
     <div class="p-2 w-full">
@@ -220,7 +252,6 @@ onMounted(fetch);
           <Autocomplete
             :options="industry_list"
             v-model="form_details.industry"
-            
             placeholder="Select industry"
           />
         </div>
@@ -240,8 +271,11 @@ onMounted(fetch);
             v-model="form_details.address"
             placeholder="Select address"
             :multiple="true"
-            class="w-[85%]"
-           />
+            :hideSearch="true"
+           class="w-[85%]"
+          />
+     
+
           </div>
           <div class=" w-[20%] mx-3"> 
             <CreateAddress :type="'organization'" @get_all_address="fetch"/>
