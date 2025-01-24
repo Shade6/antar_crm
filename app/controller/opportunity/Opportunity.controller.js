@@ -4,6 +4,8 @@ const Organization = db.organization;
 const Contact = db.contacts;
 const Industry = db.industry;
 const Territory = db.territory;
+const AddressContact = db.address_contact;
+const AddressOrg = db.address_org;
 const User = db.users;
 exports.createDeal = async (req, res) => {
   try {
@@ -218,6 +220,114 @@ exports.getOpportunityById = async (req, res) => {
       data: opportunity,
     });
   } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+exports.createAddressContact = async (req, res) => {
+  try {
+    const {
+      address_title,
+      address_type,
+      address_line_one, // updated to match the incoming data structure
+      address_line_two, // updated to match the incoming data structure
+      city_town, // updated to match the incoming data structure
+      state_province, // updated to match the incoming data structure
+      country,
+      postal_code, // updated to match the incoming data structure
+      user_id,
+    } = req.body;
+
+    console.log(req.body);
+    const newAddressContact = await AddressContact.create({
+      address_title: address_title,
+      address_type: address_type.value,
+      address_line_1: address_line_one, // updated to match the incoming data structure
+      address_line_2: address_line_two, // updated to match the incoming data structure
+      city: city_town, // updated to match the incoming data structure
+      state: state_province, // updated to match the incoming data structure
+      country: country,
+      zip_code: postal_code, // updated to match the incoming data structure
+      user_id: req.user,
+      created_on: new Date(),
+      created_by: req.user,
+    });
+
+    return res.json({
+      message: "Address contact created successfully",
+      statusCode: 200,
+      data: newAddressContact,
+    });
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+exports.createAddressOrg = async (req, res) => {
+  console.log(req.body);
+  try {
+    const {
+      address_title,
+      address_type,
+      address_line_one, // updated to match the incoming data structure
+      address_line_two, // updated to match the incoming data structure
+      city_town, // updated to match the incoming data structure
+      state_province, // updated to match the incoming data structure
+      country,
+      postal_code, // updated to match the incoming data structure
+    } = req.body;
+
+    const newAddressOrg = await AddressOrg.create({
+      address_title: address_title,
+      address_type: address_type.value,
+      address_line_1: address_line_one, // updated to match the incoming data structure
+      address_line_2: address_line_two, // updated to match the incoming data structure
+      city: city_town, // updated to match the incoming data structure
+      state: state_province, // updated to match the incoming data structure
+      country: country,
+      zip_code: postal_code, // updated to match the incoming data structure
+      user_id: req.user,
+      created_on: new Date(),
+      created_by: req.user,
+    });
+
+    return res.json({
+      message: "Address organization created successfully",
+      statusCode: 200,
+      data: newAddressOrg,
+    });
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+
+exports.getAllAddressOrg = async (req, res) => {
+  try {
+
+    const addressOrgs = await AddressOrg.findAll({ where: { organization_id: null } });
+    return res.json({
+      message: "Address organizations retrieved successfully",
+      statusCode: 200,
+      data: addressOrgs,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+exports.getAllAddressContact = async (req, res) => {
+  console.log(req.body);
+  try {
+    const addressContacts = await AddressContact.findAll({where:{status:false,user_id:req.user}});
+    return res.json({
+      message: "Address contacts retrieved successfully",
+      statusCode: 200,
+      data: addressContacts,
+    });
+  } catch (error) {
+    console.log(error);
     return res.json({ message: error.message, statusCode: 400 });
   }
 };

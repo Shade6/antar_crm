@@ -1,13 +1,14 @@
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = (sequelize, Sequelize) => {
-  const Address = sequelize.define("address", {
-    address_id: {
+  const AddressContact = sequelize.define("address_contact", {
+    address_contact_id: {
       type: Sequelize.UUID,
       primaryKey: true,
       allowNull: false,
       defaultValue: Sequelize.UUIDV4,
     },
+
     address_title:{
         type:Sequelize.STRING,
     },
@@ -48,21 +49,25 @@ module.exports = (sequelize, Sequelize) => {
     },
     status: {
       type: Sequelize.BOOLEAN,
-      defaultValue: true
+      defaultValue: false
     },
     created_by: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.UUID,
     },
-    updated_by: {
-      type: Sequelize.INTEGER,
-    },
-    created_at: {
+    created_on: {
       type: Sequelize.DATE,
-      defaultValue:Sequelize.NOW
+    },
+    changed_by: {
+      type: Sequelize.INTEGER,
+    },
+    changed_on: {
+      type: Sequelize.DATE,
     },
   });
-  Address.beforeCreate((data, options) => {
-    data.address_id = uuidv4();
+
+  AddressContact.beforeCreate((data, options) => {
+    data.address_contact_id = uuidv4();
   });
-  return Address;
+
+  return AddressContact;
 };

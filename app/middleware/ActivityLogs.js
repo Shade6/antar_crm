@@ -23,6 +23,7 @@ async function ActivityLog(req, res, next) {
 
     try {
         // Save tracking data to the database
+        if(req.method !== 'GET'){   
         const create_id = await ApiTrack.create({
             user_id: user_id,
             method: req.method,
@@ -36,6 +37,7 @@ async function ActivityLog(req, res, next) {
 
         tracker_id = create_id.log_tracker_id;
         req.tracker_id = tracker_id; // Set tracker_id on the request object
+        }
     } catch (err) {
         console.error('Error saving API tracking data:', err);
     }

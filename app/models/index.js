@@ -69,6 +69,19 @@ db.country = require("./opportunity/Country.js")(sequelize,Sequelize)
 db.address = require("./users/Address.model.js")(sequelize,Sequelize)
 db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
+db.address_contact = require("./opportunity/AddressContact.js")(sequelize,Sequelize)
+db.address_org = require("./opportunity/AddressOrg.js")(sequelize,Sequelize)
+
+
+db.address_contact.hasMany(db.contacts, { //---this is the reference 
+  foreignKey: 'address_contact_id',
+  as: 'contacts'      
+});
+db.contacts.belongsTo(db.address_contact, { //---this is the original table
+  foreignKey: 'address_contact_id', 
+  targetKey: 'address_contact_id',         
+  as: 'address_contact' // Changed alias to avoid naming collision
+});
 
 // ------------------------------------------------------------
 
@@ -89,6 +102,16 @@ db.organization.belongsTo(db.territory, { //---this is the original table
   foreignKey: 'territory_id', 
   targetKey: 'territory_id',         
   as: 'territory'             
+});
+
+db.address.hasMany(db.organization, { //---this is the reference 
+  foreignKey: 'address_id',
+  as: 'organization'      
+});
+db.organization.belongsTo(db.address, { //---this is the original table
+  foreignKey: 'address_id', 
+  targetKey: 'address_id',         
+  as: 'address_contact' // Changed alias to avoid naming collision
 });
 
 //-----------------------------------------------------

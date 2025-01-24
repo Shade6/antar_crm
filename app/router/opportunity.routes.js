@@ -8,5 +8,11 @@ module.exports = (app) => {
   router.get("/get_opportunity_by_id", Authenticator.user, AccessChecker.access_create,controller.getOpportunityById);
   router.get("/get_opportunity", Authenticator.user, AccessChecker.access_create,controller.getAllOpportunity);
   router.delete("/delete_opportunity", Authenticator.user, AccessChecker.access_create,controller.deleteDeal);
+
+  router.post("/create_address_contact", Authenticator.user, AccessChecker.access_create, controller.createAddressContact);
+  router.post("/create_address_org", Authenticator.user, AccessChecker.access_create, controller.createAddressOrg);
+  
+  router.get("/get_all_address_contact", Authenticator.user, AccessChecker.access_create, controller.getAllAddressContact);
+  router.get("/get_all_address_org", Authenticator.user, AccessChecker.access_create, controller.getAllAddressOrg);
   app.use("/api/v1/", router);
 };

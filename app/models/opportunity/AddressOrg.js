@@ -1,43 +1,46 @@
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = (sequelize, Sequelize) => {
-  const Address = sequelize.define("address", {
-    address_id: {
+  const AddressOrg = sequelize.define("address_org", {
+    address_org_id: {
       type: Sequelize.UUID,
       primaryKey: true,
       allowNull: false,
       defaultValue: Sequelize.UUIDV4,
     },
-    address_title:{
-        type:Sequelize.STRING,
+    organization_id: {
+      type: Sequelize.UUID,
+    },
+    address_title: {
+      type: Sequelize.STRING,
     },
     address_type: {
       type: Sequelize.STRING,
-      allowNull:false   
+      allowNull: false,
     },
     address_line_1: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     address_line_2: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     city: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     state: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     country: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     zip_code: {
       type: Sequelize.STRING,
-      allowNull:false
+      allowNull: false,
     },
     is_active: {
       type: Sequelize.BOOLEAN,
@@ -48,21 +51,25 @@ module.exports = (sequelize, Sequelize) => {
     },
     status: {
       type: Sequelize.BOOLEAN,
-      defaultValue: true
+      defaultValue: false,
     },
     created_by: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.UUID,
     },
-    updated_by: {
-      type: Sequelize.INTEGER,
-    },
-    created_at: {
+    created_on: {
       type: Sequelize.DATE,
-      defaultValue:Sequelize.NOW
+    },
+    changed_by: {
+      type: Sequelize.INTEGER,
+    },
+    changed_on: {
+      type: Sequelize.DATE,
     },
   });
-  Address.beforeCreate((data, options) => {
-    data.address_id = uuidv4();
+
+  AddressOrg.beforeCreate((data, options) => {
+    data.address_org_id = uuidv4();
   });
-  return Address;
+
+  return AddressOrg;
 };

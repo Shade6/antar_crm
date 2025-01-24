@@ -179,7 +179,7 @@ exports.delete_user = async (req, res) => {
 exports.get_user_address = async (req, res) => {
   try {
    console.log(req.user)
-    const userAddress = await Address.findAll({ where: { user_id: req.user } });
+    const userAddress = await Address.findAll({ where: { user_id: req.user ,status:false} });
 
     if (!userAddress || userAddress.length === 0) {
       return res.json({ message: "No addresses found for this user", statusCode: 404 });
@@ -194,18 +194,19 @@ exports.get_user_address = async (req, res) => {
 exports.create_user_address = async (req, res) => {
   try {
     const { address_title, address_type, address_line_one, address_line_two, city_town, state_province, country, postal_code } = req.body;
-    console.log(req.body);
+   
     
     const newAddress = await Address.create({
       address_title: address_title,
-      address_type: address_type,
+      address_type: address_type.value,
       address_line_1: address_line_one,
       address_line_2: address_line_two,
       city: city_town,
       state: state_province,
       country: country,
       zip_code: postal_code,
-      user_id: req.user // Corrected the user_id assignment
+      user_id: req.user,
+      status:false
     });
 
     res.json({ message: "User address created successfully", statusCode: 200, data: newAddress });

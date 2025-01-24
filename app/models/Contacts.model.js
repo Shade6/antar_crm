@@ -25,8 +25,8 @@ module.exports = (sequelize, Sequelize) => {
       user_id: {
         type: Sequelize.UUID,
       },
-      address: {
-        type: Sequelize.STRING,
+      address_contact_id: {
+        type: Sequelize.UUID,
       },
       status: {
         type: Sequelize.STRING,
@@ -58,9 +58,7 @@ module.exports = (sequelize, Sequelize) => {
       department: {
         type: Sequelize.STRING,
       },
-      address:{
-        type: Sequelize.UUID,
-      },
+
       created_by: {
         type: Sequelize.UUID,
       },
