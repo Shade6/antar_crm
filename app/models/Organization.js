@@ -34,6 +34,9 @@ module.exports = (sequelize, Sequelize) => {
       address_id: {
         type: Sequelize.UUID,
       },
+      image:{
+        type: Sequelize.STRING,
+      },
       created_by: {
         type: Sequelize.UUID,
       },

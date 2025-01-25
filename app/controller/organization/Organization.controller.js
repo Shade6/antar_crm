@@ -18,6 +18,7 @@ exports.createOrganization = async (req, res) => {
       industry,
       territory,
       address,
+      image
     } = req.body;
 
     console.log(req.body);
@@ -35,6 +36,7 @@ exports.createOrganization = async (req, res) => {
       territory_id: territory?.value || null, // Assuming you want the value from the object
       website: website,
       created_by: req.user,
+      image:image || '',
       created_on: new Date(),
     };
     console.log(organizationData);
@@ -201,6 +203,7 @@ exports.updateOrganization = async (req, res) => {
       industry,
       territory,
       address,
+      image
     } = req.body;
     console.log(req.body);
     const organization = await Organization.findOne({
@@ -221,6 +224,7 @@ exports.updateOrganization = async (req, res) => {
         no_of_employees: no_of_employee.value,
         industry_id: industry.value,
         territory_id: territory.value,
+        image:image || organization.image 
       },
       {
         where: { organization_id: organization_id },

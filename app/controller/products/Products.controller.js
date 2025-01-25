@@ -1,10 +1,14 @@
 const db = require("../../models");
+
 const Product = db.product;
 
 exports.createProduct = async (req, res) => {
-  console.log(req.body);
+  
+  console.log(req.body)
+
   try {
     const {
+      product_image,
       product_name,
       product_type,
       product_description,
@@ -40,6 +44,7 @@ exports.createProduct = async (req, res) => {
       product_name,
       product_type:product_type.value,
       description: product_description,
+      product_image:product_image,
       unit_price,
       unit_of_measure,
       currency,
@@ -146,4 +151,10 @@ exports.updateProduct = async (req, res) => {
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
+};
+
+exports.d_product_image = async (req, res) => {
+  const { id } = req.query;
+
+  return res.json({message:'image deleted successfully',statusCode:200,data:d})
 };
