@@ -29,6 +29,7 @@ module.exports = (sequelize, Sequelize) => {
       symbol_on_right: {
         type: Sequelize.STRING,
       },
+    
       number_format: {
         type: Sequelize.STRING,
       },

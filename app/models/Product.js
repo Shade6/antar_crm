@@ -9,7 +9,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         opportunity_id: {
             type: Sequelize.UUID,
-
+        },
+        product_image:{
+            type: Sequelize.STRING,
         },
         product_name: {
             type: Sequelize.STRING,
