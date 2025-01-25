@@ -27,7 +27,7 @@ const fetch_products = async()=>{
         id: product.product_id,
         name: {
           label: product.product_name,
-          image: 'https://via.placeholder.com/150', // Placeholder image
+          image: product.product_image, // Placeholder image
         },
         unit_price: product.unit_price || 'N/A', // Assuming email is part of the product data
         type: {
@@ -157,6 +157,7 @@ const handleDelete = async(id)=>{
                 :align="column.align"
               >
                 <template #prefix>
+                 <img v-if="item.image" width="30" height="30" :src="item.image" alt="">
                 </template>
               </ListRowItem>
             </template>

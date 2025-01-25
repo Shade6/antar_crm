@@ -42,18 +42,12 @@
         <ListRow v-for="row in lead_list" :key="row.id" :row="row">
           <template #default="{ column, item }">
             <ListRowItem
-              :item="item"
-              :align="column.align || 'left'"
-              class="truncate-cell"
-            >
-              <template #prefix v-if="column.key === 'name' && item.image">
-                <img
-                  :src="item.image"
-                  class="h-6 w-6 rounded-full"
-                  :alt="item.label"
-                />
-              </template>
-            </ListRowItem>
+                :item="item"
+                :align="column.align"
+              >
+                <template #prefix>
+                </template>
+              </ListRowItem>
           </template>
         </ListRow>
       </ListRows>
@@ -103,6 +97,7 @@
         industry: item.industry || 'N/A',
         annual_revenue: item.annual_revenue || 'N/A',
         last_modified: item.last_modified || 'N/A',
+        image:item.image || ''
       }));
   }
   onMounted(async()=>{

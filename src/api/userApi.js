@@ -9,6 +9,23 @@ let switchStore = () => {
   return data;
 };
 
+export const create_images= async (data) => {
+  return (
+    await axios.post(
+      `${USER_API}create_image?mdl=${switchStore().pageId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      }
+    )
+  ).data;
+};
+
+
+
 export const userLogin = async (data) => {
   return (await axiosInstance.post(`login`, data)).data;
 };
@@ -581,18 +598,11 @@ export const get_all_address_contact = async () => {
   ).data;
 };
 
-export const create_product = async (data, lead_id) => {
+export const create_product = async (data) => {
   return (
-    await axios.post(
-      `${USER_API}create_product?mdl=${switchStore().pageId}`,
-      data,
-      lead_id,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      }
+    await axiosInstance.post(
+      `create_product?mdl=${switchStore().pageId}`,
+      data
     )
   ).data;
 };

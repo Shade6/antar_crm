@@ -9,7 +9,8 @@ import {
     findAllUsers,
     get_all_address_org,
     update_organization,
-    get_only_organization_by_id
+    get_only_organization_by_id,
+    create_images
 } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -20,19 +21,21 @@ const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
 const address_list = ref([]);
+const Image_set = ref(null)
 const checked = ref({
   organization: false,
   contact: false,
 });
 const form_details = ref({
     organization_id: null,
-  organization_name: null,
-  website: null,
-  annual_revenue: null,
-  no_of_employee: null,
-  industry: null,
-  territory: null,
-  address: [],
+    organization_name: null,
+    website: null,
+    annual_revenue: null,
+    no_of_employee: null,
+    industry: null,
+    territory: null,
+    address: [],
+    image:null
 });
 
 const fetch = async () => {
@@ -93,6 +96,9 @@ const show_error = (res) => {
 };
 
 const handle_save_organization = async () => {
+  if(Image_set.value !=null){
+    form_details.value.image = Image_set.value
+  }
   const res = await update_organization(form_details.value);
   if (res.statusCode == 200) {
     router.push("/antar_/organizations");
@@ -140,6 +146,7 @@ const fetch_organization = async (id) => {
       industry: res.data.organization.industry.industry_id,
       territory: res.data.organization.territory.territory_id,
       address: res.data.address.address ? res.data.address.map((val, i) => (val.address_org_id)) : [],
+     
     };
      if(res.data?.address){
         address_list.value.push(...res.data.address.map((val, i) => ({
@@ -147,6 +154,7 @@ const fetch_organization = async (id) => {
           value: val.address_org_id,
         })));
      }
+     Image_set.value = res.data.organization.image
   } else {
     show_error(res);
   }
@@ -158,13 +166,71 @@ onMounted(async()=>{
   await fetch_organization(orgId);
 
 });
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if(!file){
+    return toast.error("file looks like empty", {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await create_images(formData);
+  if (res.statusCode == 200) {
+    Image_set.value = res.data?.file;
+    
+  } else {
+    toast.error(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
 </script>
 
 <template>
   <Nav @update="handle_save_organization" />
   <div class=" mx-4">
  
-
+    <div v-if="Image_set == null" class="my-3 mx-2">
+      <span class="text-gray-500 font-medium text-sm my-1">select Image for org</span>
+      <br />
+      <input @change="handleFileChange" type="file" />
+    </div>
+    <div v-else class="relative">
+      <span
+        @click="handle_remove"
+        class="absolute top-0 start-28 bg-red-500 rounded px-1 shadow-lg cursor-pointer"
+        >del</span
+      >
+      <img
+        width="150"
+        :src="Image_set"
+        alt=""
+      />
+    </div>
 
     <hr />
     <div class="p-2 w-full">

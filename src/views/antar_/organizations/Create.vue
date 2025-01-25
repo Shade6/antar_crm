@@ -4,11 +4,12 @@ import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import CreateAddress from "@/components/modal/CreateAddress.vue";
 import Nav from "@/views/antar_/organizations/nav/Nav.vue";
 import {
-    find_all_industry,
-    find_all_territories,
-    findAllUsers,
-    get_all_address_org,
-    create_organization
+  find_all_industry,
+  find_all_territories,
+  findAllUsers,
+  get_all_address_org,
+  create_organization,
+  create_images
 } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -23,6 +24,7 @@ const checked = ref({
   organization: false,
   contact: false,
 });
+const Image_set = ref(null);
 const form_details = ref({
   organization_name: null,
   website: null,
@@ -31,15 +33,59 @@ const form_details = ref({
   industry: null,
   territory: null,
   address: null,
+  image:null
 });
 
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if(!file){
+    return toast.error("file looks like empty", {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await create_images(formData);
+  if (res.statusCode == 200) {
+    Image_set.value = res.data?.file;
+    
+  } else {
+    toast.error(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
+
 const fetch = async () => {
-  const [industry_res, territory_res, users_res,address_res] = await Promise.all([
-    find_all_industry(),
-    find_all_territories(),
-    findAllUsers(),
-    get_all_address_org()
-  ]);
+  const [industry_res, territory_res, users_res, address_res] =
+    await Promise.all([
+      find_all_industry(),
+      find_all_territories(),
+      findAllUsers(),
+      get_all_address_org(),
+    ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
       label: val.industry_name,
@@ -64,13 +110,13 @@ const fetch = async () => {
   } else {
     show_error(users_res);
   }
-  if(address_res.statusCode == 200){
+  if (address_res.statusCode == 200) {
     address_list.value = address_res.data.map((val, i) => ({
       label: val.address_title,
       value: val.address_org_id,
     }));
-  }else{
-    show_error(address_res)
+  } else {
+    show_error(address_res);
   }
 };
 const show_error = (res) => {
@@ -91,6 +137,9 @@ const show_error = (res) => {
 };
 
 const handle_save_organization = async () => {
+  if(Image_set.value !=null){
+    form_details.value.image = Image_set.value
+  }
   const res = await create_organization(form_details.value);
   if (res.statusCode == 200) {
     router.push("/antar_/organizations");
@@ -126,131 +175,170 @@ const handle_save_organization = async () => {
   }
 };
 onMounted(fetch);
+const handle_remove = ()=>{
+  Image_set.value = null
+}
 </script>
 
 <template>
   <Nav @save="handle_save_organization" />
-  <div class=" mx-4">
-
- 
-
+  <div class="mx-4">
     <hr />
+    <div v-if="Image_set == null" class="my-3 mx-2">
+      <span class="text-gray-500 font-medium text-sm my-1">select Image for org</span>
+      <br />
+      <input @change="handleFileChange" type="file" />
+    </div>
+    <div v-else class="relative">
+      <span
+        @click="handle_remove"
+        class="absolute top-0 start-28 bg-red-500 rounded px-1 shadow-lg cursor-pointer"
+        >del</span
+      >
+      <img
+        width="150"
+        :src="Image_set"
+        alt=""
+      />
+    </div>
+
     <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Organization Name</span>
-          <TextInput
-            class="text-gray-500 font-medium text-sm my-1"
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter organization name"
-            :disabled="false"
-            :modelValue="form_details.organization_name"
-            v-model="form_details.organization_name"
-          />
-        </div>
-      <div class="flex justify-between">
-      
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Website</span>
-          <TextInput
-            class="text-gray-500 font-medium text-sm my-1"
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter website"
-            :disabled="false"
-            :modelValue="form_details.website"
-            v-model="form_details.website"
-          />
-        </div>
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Annual Revenue</span>
-          <TextInput
-            class="text-gray-500 font-medium text-sm my-1"
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter annual revenue"
-            :disabled="false"
-            :modelValue="form_details.annual_revenue"
-            v-model="form_details.annual_revenue"
-          />
-        </div>
+      <span class="text-gray-500 font-medium text-sm my-1"
+        >Organization Name</span
+      >
+      <TextInput
+        class="text-gray-500 font-medium text-sm my-1"
+        :type="'text'"
+        :ref_for="true"
+        size="sm"
+        variant="subtle"
+        placeholder="enter organization name"
+        :disabled="false"
+        :modelValue="form_details.organization_name"
+        v-model="form_details.organization_name"
+      />
+    </div>
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Website</span>
+        <TextInput
+          class="text-gray-500 font-medium text-sm my-1"
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter website"
+          :disabled="false"
+          :modelValue="form_details.website"
+          v-model="form_details.website"
+        />
       </div>
       <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
-          <Autocomplete
-            :options="territory_list"
-            v-model="form_details.territory"
-            placeholder="Select territory"
-          />
-        </div>
-      <div class="flex justify-between">
-      
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">No of employee</span>
-          <Autocomplete
-            :options="[
-              {
-                label: '1-10',
-                value: '1-10',
-              },
-              {
-                label: '11-50',
-                value: '11-50',
-              },
-              {
-                label: '50-100',
-                value: '50-100',
-              },
-              {
-                label: '100+',
-                value: '100+',
-              },
-            ]"
-            v-model="form_details.no_of_employee"
-            placeholder="Select no of employee"
-          />
-        </div>
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
-          <Autocomplete
-            :options="industry_list"
-            v-model="form_details.industry"
-            
-            placeholder="Select industry"
-          />
-        </div>
+        <span class="text-gray-500 font-medium text-sm my-1"
+          >Annual Revenue</span
+        >
+        <TextInput
+          class="text-gray-500 font-medium text-sm my-1"
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter annual revenue"
+          :disabled="false"
+          :modelValue="form_details.annual_revenue"
+          v-model="form_details.annual_revenue"
+        />
       </div>
-  
+    </div>
+    <div class="p-2 w-full">
+      <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
+      <Autocomplete
+        :options="territory_list"
+        v-model="form_details.territory"
+        placeholder="Select territory"
+      />
+    </div>
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1"
+          >No of employee</span
+        >
+        <Autocomplete
+          :options="[
+            {
+              label: '1-10',
+              value: '1-10',
+            },
+            {
+              label: '11-50',
+              value: '11-50',
+            },
+            {
+              label: '50-100',
+              value: '50-100',
+            },
+            {
+              label: '100+',
+              value: '100+',
+            },
+          ]"
+          v-model="form_details.no_of_employee"
+          placeholder="Select no of employee"
+        />
+      </div>
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
+        <Autocomplete
+          :options="industry_list"
+          v-model="form_details.industry"
+          placeholder="Select industry"
+        />
+      </div>
+    </div>
 
-      
-   
-    
-
-      <div class="">
-        <span class="text-gray-500 font-medium text-sm my-1">Address</span>
-        <div class="p-2 w-full flex justify-center">
-          <div class="w-[87%]">
+    <div class="">
+      <span class="text-gray-500 font-medium text-sm my-1">Address</span>
+      <div class="p-2 w-full flex justify-center">
+        <div class="w-[87%]">
           <Autocomplete
             :options="address_list"
             v-model="form_details.address"
             placeholder="Select address"
             :multiple="true"
             class="w-[85%]"
-           />
-          </div>
-          <div class=" w-[20%] mx-3"> 
-            <CreateAddress :type="'organization'" @get_all_address="fetch"/>
-          </div>
+          />
+        </div>
+        <div class="w-[20%] mx-3">
+          <CreateAddress :type="'organization'" @get_all_address="fetch" />
         </div>
       </div>
-      
+    </div>
   </div>
-
 </template>
 
-<style scoped></style>
+<style scoped>
+.file-upload {
+  display: block;
+  margin: 0 auto;
+  color: #fff;
+}
+#fileLoader {
+  position: absolute;
+  left: -9999px;
+}
+label[for="fileLoader"] {
+  padding: 0.5em;
+  background: #999;
+  cursor: pointer;
+  float: left;
+  color: #000;
+}
+#filename {
+  padding: 0.5em;
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  background: #739bae;
+  float: left;
+}
+</style>

@@ -136,10 +136,14 @@ state.value.contacts = [
   <Nav></Nav>
   <div class="m-3">
     <div class="flex">
+      <img class="rounded-full mx-3" v-if="state?.organization?.image" width="150px" height="150px" :src="state?.organization?.image" alt="">
       <div
+      v-else
         class="p-16 w-24 h-24 rounded-full bg-gray-200 flex justify-center items-center"
       >
       {{ state?.organization?.organization_name[0] }}
+      
+      
       </div>
       <div>
         <div class="mt-8 mx-4">
