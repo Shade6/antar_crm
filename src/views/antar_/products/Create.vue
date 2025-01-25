@@ -43,7 +43,7 @@ const product_details = ref({
 })
 
 
-const uploadedImages = ref([]); // New ref to store uploaded images
+const uploadedImages = ref(null); // New ref to store uploaded images
 
 // Function to trigger file input click
 const triggerFileInput = () => {
@@ -55,21 +55,21 @@ const triggerFileInput = () => {
 
 // Function to handle file selection
 const handleFileChange = (event) => {
-  const files = event.target.files;
-  if (files.length) {
-    Array.from(files).forEach(file => {
-      uploadedImages.value.push(URL.createObjectURL(file)); // Push each file's object URL to the array
-    });
+  const file = event.target.files[0];
+  if (file) {
+    uploadedImages.value=URL.createObjectURL(file); // Push the file's object URL to the array
   }
 };
 
 
 const handle_save = async()=>{
-      product_details.value.product_image = uploadedImages.value
-
-
-
-    const res = await create_product(product_details.value)
+      const fileInput = document.querySelector('.file-input');
+      if (fileInput && fileInput.files[0]) {
+        product_details.value.product_image = fileInput.files[0];
+      }
+    
+  console.log(product_details.value)
+    const res = await create_product( product_details.value)
     if(res.statusCode == 200){
         toast.success(res.message, {
       position: "top-right",
@@ -102,6 +102,9 @@ const handle_save = async()=>{
       });
     }
 }
+const deleteImage = ()=>{
+  uploadedImages.value = null
+}
 </script>
 
 <template>
@@ -116,11 +119,14 @@ const handle_save = async()=>{
         <p>Browse File to Upload</p>
       </form>
    
-      <section class="uploaded-area mx-4 py-6 ">
-        <div class="flex" v-for="(image, index) in uploadedImages" :key="index">
-          <img width="100" :src="image" alt="Uploaded Image" class="uploaded-image" /> 
+      <section v-if="uploadedImages !=null " class="uploaded-area mx-4 py-6 relative">
+        <div class="flex border-2 relative">
+          <img width="200" height="200" :src="uploadedImages" alt="Uploaded Image" class="uploaded-image" /> 
           <span>{{ image }}</span>
           <!-- Display uploaded images -->
+          <button @click="deleteImage" class="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
       </section>
     </div>

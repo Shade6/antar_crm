@@ -29,8 +29,8 @@ const fetch_products = async()=>{
           label: product.product_name,
           image: 'https://via.placeholder.com/150', // Placeholder image
         },
-        email: product.email || 'N/A', // Assuming email is part of the product data
-        role: {
+        unit_price: product.unit_price || 'N/A', // Assuming email is part of the product data
+        type: {
           label: product.product_type,
           color: 'blue', // Placeholder color
         },
@@ -92,20 +92,20 @@ const handleDelete = async(id)=>{
         class="h-[150px]"
         :columns="[
           {
-            label: 'Name',
+            label: 'Product Name',
             key: 'name',
-            width: 3,
+            width: 1,
             icon: 'user',
           },
           {
-            label: 'Email',
-            key: 'email',
+            label: 'Unit Price',
+            key: 'unit_price',
             width: '200px',
             icon: 'at-sign',
           },
           {
-            label: 'Role',
-            key: 'role',
+            label: 'Product Type',
+            key: 'type',
             icon: 'users',
           },
           {

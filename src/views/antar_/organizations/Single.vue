@@ -8,6 +8,7 @@ import { useRoute, useRouter } from "vue-router"; // Import useRoute to access r
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import EditIcon from "@/components/icons/EditIcon.vue";
+import AppsIcon from "@/components/icons/AppsIcon.vue";
 const toast = useToast();
 
 const tab = ref(0);
@@ -249,6 +250,18 @@ state.value.contacts = [
             <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
           </svg>
           Contacts
+          <span
+            class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
+            >{{ state.opportunities.length }}</span
+          >
+        </button>
+        <button
+          type="button"
+          class="hs-tab-active:font-semibold hs-tab-active:border-black hs-tab-active:text-black py-4 px-1 inline-flex items-center gap-x-2 border-b-2 border-transparent text-xl whitespace-nowrap text-gray-500 hover:text-black focus:outline-none focus:text-black disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500"
+          @click="tab = 1"
+        >
+   <AppsIcon/>
+          Estimates
           <span
             class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
             >{{ state.opportunities.length }}</span
