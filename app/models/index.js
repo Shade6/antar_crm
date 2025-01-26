@@ -72,7 +72,19 @@ db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 db.address_contact = require("./opportunity/AddressContact.js")(sequelize,Sequelize)
 db.address_org = require("./opportunity/AddressOrg.js")(sequelize,Sequelize)
 db.product = require("./Product.js")(sequelize,Sequelize)
+db.product_mapping = require('./opportunity/ContactMapping.js')(sequelize,Sequelize)
 
+//---------------------
+db.contacts.hasMany(db.product_mapping, { //---this is the reference 
+  foreignKey: 'contact_id',
+  as: 'contacts'      
+});
+db.product_mapping.belongsTo(db.contacts, { //---this is the original table
+  foreignKey: 'contact_id', 
+  targetKey: 'contact_id',         
+  as: 'contact' // Changed alias to avoid naming collision
+});
+//------------------------------------
 db.address_contact.hasMany(db.contacts, { //---this is the reference 
   foreignKey: 'address_contact_id',
   as: 'contacts'      

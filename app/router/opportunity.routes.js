@@ -14,5 +14,9 @@ module.exports = (app) => {
   
   router.get("/get_all_address_contact", Authenticator.user, AccessChecker.access_create, controller.getAllAddressContact);
   router.get("/get_all_address_org", Authenticator.user, AccessChecker.access_create, controller.getAllAddressOrg);
+  router.post("/create_extra_contact",Authenticator.user, AccessChecker.access_create, controller.create_extra_contact)
+  
+  router.get("/find_extra_contacts", Authenticator.user, AccessChecker.access_create, controller.find_extra_contacts);
+  router.delete("/handle_remove_extra_contact",Authenticator.user, AccessChecker.access_create, controller.handle_remove_extra_contact)
   app.use("/api/v1/", router);
 };

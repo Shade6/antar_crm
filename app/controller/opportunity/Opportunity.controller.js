@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const db = require("../../models");
 const Opportunity = db.opportunity;
 const Organization = db.organization;
@@ -7,6 +8,8 @@ const Territory = db.territory;
 const AddressContact = db.address_contact;
 const AddressOrg = db.address_org;
 const User = db.users;
+const Product = db.product;
+const ContactMapping = db.product_mapping;
 exports.createDeal = async (req, res) => {
   try {
     const {
@@ -24,7 +27,9 @@ exports.createDeal = async (req, res) => {
       industry_id,
       status,
       owner_id,
+      product,
     } = req.body;
+    console.log(req.body, "000");
 
     let organization_data = {
       organization_name: organization,
@@ -103,12 +108,18 @@ exports.createDeal = async (req, res) => {
       contact_id: contact_created_id,
       opportunity_owner_id: owner_id.value,
       status: status.value,
-      opportunity_name:req.body.opportunity_name,
-      opportunity_value:req.body.opportunity_value,
+      opportunity_name: req.body.opportunity_name,
+      opportunity_value: req.body.opportunity_value,
       created_by: req.user.id, // Assuming req.user.id contains the ID of the user creating the deal
       created_on: new Date(), // Adding the current date as the creation date
     };
     const newDeal = await Opportunity.create(complete_details);
+    if (product) {
+      await Product.update(
+        { opportunity_id: newDeal.opportunity_id },
+        { where: { product_id: product.value } }
+      );
+    }
     return res.json({
       message: "Deal created successfully",
       statusCode: 200,
@@ -301,11 +312,11 @@ exports.createAddressOrg = async (req, res) => {
   }
 };
 
-
 exports.getAllAddressOrg = async (req, res) => {
   try {
-
-    const addressOrgs = await AddressOrg.findAll({ where: { organization_id: null } });
+    const addressOrgs = await AddressOrg.findAll({
+      where: { organization_id: null },
+    });
     return res.json({
       message: "Address organizations retrieved successfully",
       statusCode: 200,
@@ -320,7 +331,9 @@ exports.getAllAddressOrg = async (req, res) => {
 exports.getAllAddressContact = async (req, res) => {
   console.log(req.body);
   try {
-    const addressContacts = await AddressContact.findAll({where:{status:false,user_id:req.user}});
+    const addressContacts = await AddressContact.findAll({
+      where: { status: false, user_id: req.user },
+    });
     return res.json({
       message: "Address contacts retrieved successfully",
       statusCode: 200,
@@ -331,3 +344,87 @@ exports.getAllAddressContact = async (req, res) => {
     return res.json({ message: error.message, statusCode: 400 });
   }
 };
+
+exports.create_extra_contact = async (req, res) => {
+  try {
+    const { contact_id, opportunity_id } = req.body;
+    const find_contact = await Contact.findOne({
+      where: { contact_id: contact_id },
+    });
+    if (!contact_id) {
+      return res.json({ message: "contact not found", statusCode: 400 });
+    }
+    const find_opportunity = await Opportunity.findOne({
+      where: { opportunity_id: opportunity_id },
+    });
+    if (!find_opportunity) {
+      return res.json({ message: "opportunity not found", statusCode: 400 });
+    }
+
+    const find_both_exist = await ContactMapping.findOne({
+      where: { contact_id: contact_id, opportunity_id: opportunity_id },
+    });
+    if (find_both_exist) {
+      return res.json({
+        message: "already contact added for this opportunity",
+        statusCode: 400,
+      });
+    }
+
+    const create_ = await ContactMapping.create({
+      contact_id: contact_id,
+      opportunity_id: opportunity_id,
+    });
+    if (create_) {
+      return res.json({
+        message: "contact added to the opportunity",
+        statusCode: 200,
+      });
+    } else {
+      return res.json({ message: create_, statusCode: 400 });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+exports.find_extra_contacts = async (req, res) => {
+  try {
+    const opportunities = req.query.id;
+    const find_opportunity = await Opportunity.findOne({
+      where: { opportunity_id: opportunities },
+    });
+    if (!find_opportunity) {
+      return res.json({ message: " opportunity not found", statusCode: 200 });
+    }
+
+    const find_mapp_ = await ContactMapping.findAll({
+      where: { opportunity_id: opportunities },
+      include: {
+        model:Contact,
+        as:'contact'
+      }
+    });
+    return res.json({message:'founded',statusCode:200,data:find_mapp_ || []})
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+
+exports.handle_remove_extra_contact =async(req,res)=>{
+  try {
+    const contact_mapping_id =req.query.id
+    const find_ = await ContactMapping.findOne({where:{contact_mapping_id:contact_mapping_id}})
+    if(!find_){
+      return res.json({message:'cannot get contact was connected to this opportunity',statusCode:400})
+    }
+    const destroy = await ContactMapping.destroy({where:{contact_mapping_id:contact_mapping_id}})
+    return res.json({message:'contact removed from this opportunity',statusCode:200})
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+}
