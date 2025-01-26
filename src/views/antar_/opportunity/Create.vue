@@ -9,6 +9,7 @@ import {
   create_deal,
   get_all_organization,
   get_all_contact,
+  get_all_product
 } from "@/api/userApi.js";
 
 import "@/assets/toast.css";
@@ -53,12 +54,14 @@ const fetch = async () => {
     users_res,
     organization_res,
     contact_res,
+    product_res
   ] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
     get_all_organization(),
     get_all_contact(),
+    get_all_product()
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -95,6 +98,12 @@ const fetch = async () => {
       label: val.first_name,
       value: val.contact_id,
     }));
+  }
+  if(product_res.statusCode==200){
+    product_list.value = product_res.data.map((val)=>({
+      label:val.product_name,
+      value:val.product_id
+    }))
   }
 };
 const show_error = (res) => {

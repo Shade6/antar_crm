@@ -637,3 +637,28 @@ export const delete_product = async (data) => {
     )
   ).data;
 };
+export const create_extra_contact = async (data) => {
+  return (
+    await axiosInstance.post(
+      `create_extra_contact?mdl=${switchStore().pageId}`,
+      data
+    )
+  ).data;
+};
+
+
+export const find_extra_contact = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_extra_contacts?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+export const handle_remove_extra_contact = async (data) => {
+  return (
+    await axiosInstance.delete(
+      `handle_remove_extra_contact?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
