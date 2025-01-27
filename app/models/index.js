@@ -72,17 +72,52 @@ db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 db.address_contact = require("./opportunity/AddressContact.js")(sequelize,Sequelize)
 db.address_org = require("./opportunity/AddressOrg.js")(sequelize,Sequelize)
 db.product = require("./Product.js")(sequelize,Sequelize)
-db.product_mapping = require('./opportunity/ContactMapping.js')(sequelize,Sequelize)
+db.contact_mapping = require('./opportunity/ContactMapping.js')(sequelize,Sequelize)
+db.estimate = require("./opportunity/Estimate.js")(sequelize,Sequelize)
+db.estimate_type = require("./opportunity/EstimateItem.js")(sequelize,Sequelize)
+db.product_mapping= require("./ProductMapping.js")(sequelize,Sequelize)
+
+
+//-------------------
+db.product.hasMany(db.product_mapping, { //---this is the reference 
+  foreignKey: 'product_id',
+  as: 'product'      
+});
+db.product_mapping.belongsTo(db.product, { //---this is the original table
+  foreignKey: 'product_id', 
+  targetKey: 'product_id',         
+  as: 'product' // Changed alias to avoid naming collision
+});
+//----------------------------------
+db.opportunity.hasMany(db.product, { //---this is the reference 
+  foreignKey: 'opportunity_id',
+  as: 'opportunity'      
+});
+db.product.belongsTo(db.opportunity, { //---this is the original table
+  foreignKey: 'opportunity_id', 
+  targetKey: 'opportunity_id',         
+  as: 'opportunity' // Changed alias to avoid naming collision
+});
+
 
 //---------------------
-db.contacts.hasMany(db.product_mapping, { //---this is the reference 
+db.contacts.hasMany(db.contact_mapping, { //---this is the reference 
   foreignKey: 'contact_id',
   as: 'contacts'      
 });
-db.product_mapping.belongsTo(db.contacts, { //---this is the original table
+db.contact_mapping.belongsTo(db.contacts, { //---this is the original table
   foreignKey: 'contact_id', 
   targetKey: 'contact_id',         
   as: 'contact' // Changed alias to avoid naming collision
+});
+db.opportunity.hasMany(db.contact_mapping, { //---this is the reference 
+  foreignKey: 'opportunity_id',
+  as: 'contact_map'      
+});
+db.contact_mapping.belongsTo(db.opportunity, { //---this is the original table
+  foreignKey: 'opportunity_id', 
+  targetKey: 'opportunity_id',         
+  as: 'opportunity' // Changed alias to avoid naming collision
 });
 //------------------------------------
 db.address_contact.hasMany(db.contacts, { //---this is the reference 

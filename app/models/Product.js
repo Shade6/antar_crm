@@ -7,9 +7,6 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: Sequelize.UUIDV4,
         },
-        opportunity_id: {
-            type: Sequelize.UUID,
-        },
         product_image:{
             type: Sequelize.STRING,
         },

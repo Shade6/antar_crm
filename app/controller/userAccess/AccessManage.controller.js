@@ -49,7 +49,7 @@ exports.get_user_menu = async (req, res) => {
             include: {
                 model: Module,
                 as: 'module',
-                attributes: ['module_name', 'module_id','docs_type'] 
+                attributes: ['module_name', 'module_id','docs_type','icon'] 
             },
             attributes: ['read', 'create', 'delete', 'amend'] 
         });

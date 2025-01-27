@@ -9,7 +9,8 @@ const AddressContact = db.address_contact;
 const AddressOrg = db.address_org;
 const User = db.users;
 const Product = db.product;
-const ContactMapping = db.product_mapping;
+const ContactMapping = db.contact_mapping;
+const ProductMapping = db.product_mapping
 exports.createDeal = async (req, res) => {
   try {
     const {
@@ -114,11 +115,15 @@ exports.createDeal = async (req, res) => {
       created_on: new Date(), // Adding the current date as the creation date
     };
     const newDeal = await Opportunity.create(complete_details);
-    if (product) {
-      await Product.update(
-        { opportunity_id: newDeal.opportunity_id },
-        { where: { product_id: product.value } }
-      );
+    if (product.length >0) {
+      for(let product_data of product){
+        let details_product ={
+          opportunity_id:newDeal.opportunity_id,
+          product_id:product_data.value
+        }
+        await ProductMapping.create(details_product)
+      }
+   
     }
     return res.json({
       message: "Deal created successfully",

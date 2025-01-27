@@ -7,7 +7,11 @@ const Industry = db.industry;
 const Contact = db.contacts;
 const Address = db.address;
 const AddressOrg = db.address_org;
-
+const ContactMapping = db.contact_mapping;
+const Estimate = db.estimate;
+const EstimateType = db.estimate_type;
+const ProductMapping = db.product_mapping;
+const Product = db.product;
 exports.createOrganization = async (req, res) => {
   try {
     const {
@@ -18,7 +22,7 @@ exports.createOrganization = async (req, res) => {
       industry,
       territory,
       address,
-      image
+      image,
     } = req.body;
 
     console.log(req.body);
@@ -36,13 +40,13 @@ exports.createOrganization = async (req, res) => {
       territory_id: territory?.value || null, // Assuming you want the value from the object
       website: website,
       created_by: req.user,
-      image:image || '',
+      image: image || "",
       created_on: new Date(),
     };
     console.log(organizationData);
     const newOrganization = await Organization.create(organizationData);
     for (let address_data of address) {
-      console.log(address_data ,'--------');
+      console.log(address_data, "--------");
       await AddressOrg.update(
         { organization_id: newOrganization.organization_id },
         { where: { address_org_id: address_data.value } }
@@ -121,11 +125,22 @@ exports.deleteOrganization = async (req, res) => {
   if (!find_organization) {
     return res.json({ message: "Organization not found", statusCode: 400 });
   }
-  const find_address = await AddressOrg.findAll({where:{organization_id:organizationId}});
-  for(let address of find_address){
-    await AddressOrg.update({organization_id:null},{where:{address_org_id:address.address_org_id}})
+  const find_address = await AddressOrg.findAll({
+    where: { organization_id: organizationId },
+  });
+  for (let address of find_address) {
+    await AddressOrg.update(
+      { organization_id: null },
+      { where: { address_org_id: address.address_org_id } }
+    );
   }
-
+  const find_opportunity = await Opportunity.findOne({
+    where: { organization_id: find_organization.organization_id },
+  });
+  if (find_organization) {
+    find_opportunity.organization_id = null;
+    find_opportunity.save();
+  }
 
   const deleted = await Organization.destroy({
     where: { organization_id: organizationId },
@@ -146,16 +161,33 @@ exports.getOrganizationById = async (req, res) => {
     const organization = await Organization.findOne({
       where: { organization_id: organizationId },
     });
-
+    let contact = [];
     if (organization) {
       const opportunities = await Opportunity.findAll({
         where: { organization_id: organizationId },
         include: [{ model: Contact, as: "contact" }],
       });
+      const map_ids = opportunities.map((val) => val.opportunity_id);
+      const find_extra_contacts = await ContactMapping.findAll({
+        where: { opportunity_id: map_ids },
+        include: {
+          model: Contact,
+          as: "contact",
+        },
+      });
+      if (find_extra_contacts.length > 0) {
+        contact = [
+          ...opportunities.map((val) => val.contact),
+          ...find_extra_contacts.map((val) => val.contact),
+        ];
+      } else {
+        contact = [...opportunities.map((val) => val.contact)];
+      }
       return res.json({
         data: {
           organization: organization ?? "not found",
           opportunities: opportunities,
+          contact: contact ?? [],
         },
         message: "organization fetched ",
         statusCode: 200,
@@ -178,12 +210,14 @@ exports.get_only_organization_by_id = async (req, res) => {
         { model: Industry, as: "industry" },
       ],
     });
-    const find_address = await AddressOrg.findAll({where:{organization_id:organizationId}});
+    const find_address = await AddressOrg.findAll({
+      where: { organization_id: organizationId },
+    });
     if (!organization) {
       return res.json({ message: "Organization not found", statusCode: 400 });
     }
     return res.json({
-      data: {organization:organization,address:find_address},
+      data: { organization: organization, address: find_address },
       statusCode: 200,
       message: "Organization fetched successfully",
     });
@@ -203,7 +237,7 @@ exports.updateOrganization = async (req, res) => {
       industry,
       territory,
       address,
-      image
+      image,
     } = req.body;
     console.log(req.body);
     const organization = await Organization.findOne({
@@ -212,10 +246,15 @@ exports.updateOrganization = async (req, res) => {
     if (!organization) {
       return res.json({ message: "Organization not found", statusCode: 400 });
     }
-   const find_address = await AddressOrg.findAll({where:{organization_id:organization_id}});
-   for(let address of find_address){
-    await AddressOrg.update({organization_id:null},{where:{address_org_id:address.address_org_id}})
-   }
+    const find_address = await AddressOrg.findAll({
+      where: { organization_id: organization_id },
+    });
+    for (let address of find_address) {
+      await AddressOrg.update(
+        { organization_id: null },
+        { where: { address_org_id: address.address_org_id } }
+      );
+    }
     await Organization.update(
       {
         organization_name: organization_name,
@@ -224,14 +263,17 @@ exports.updateOrganization = async (req, res) => {
         no_of_employees: no_of_employee.value,
         industry_id: industry.value,
         territory_id: territory.value,
-        image:image || organization.image 
+        image: image || organization.image,
       },
       {
         where: { organization_id: organization_id },
       }
     );
-    for(let address_data of address){
-      await AddressOrg.update({organization_id:organization_id},{where:{address_org_id:address_data.value}})
+    for (let address_data of address) {
+      await AddressOrg.update(
+        { organization_id: organization_id },
+        { where: { address_org_id: address_data.value } }
+      );
     }
     return res.json({
       message: "Organization updated successfully",
@@ -241,3 +283,145 @@ exports.updateOrganization = async (req, res) => {
     return res.json({ message: error.message, statusCode: 400 });
   }
 };
+
+exports.create_estimate = async (req, res) => {
+  try {
+    console.log(req.body, "---");
+    const opportunity_id = req.body.opportunity_id;
+    let contact = [];
+    let products = [];
+    let organizations = [];
+    let opportunities = {}
+
+    
+    opportunities = await Opportunity.findOne({
+      where: { opportunity_id: opportunity_id },
+      include: [
+        {
+          model: Contact,
+          as: "contact",
+        },
+        {
+          model: Organization,
+          as: "organization",
+        },
+      ],
+    });
+
+    if(!opportunities){
+      return res.json({message:'opportunity not found',statusCode:400})
+    }
+    const find_contact = await ContactMapping.findAll({
+      where: { opportunity_id: opportunity_id },
+      include: {
+        model: Contact,
+        as: "contact",
+      },
+    });
+    if (find_contact.length > 0) {
+      contact = [
+        ...opportunities.contact,
+        ...find_contact.map((val) => val.contact),
+      ];
+    } else {
+      contact = opportunities.contact
+    }
+    const find_products = await ProductMapping.findAll({
+      where: { opportunity_id: opportunity_id },
+      include: {
+        model: Product,
+        as: "product",
+      },
+    });
+
+    const find_organization = await Organization.findOne({
+      where: { organization_id: opportunities.organization_id },
+    });
+    organizations=find_organization
+  
+    if (find_products.length > 0) {
+      products = find_products
+    }else{
+      return res.json({message:'product not found please add product',statusCode:400})
+    }
+
+    if(products.length == 0){
+      return res.json({message:'product not found',statusCode:400})
+    }
+
+    if(contact.length == 0){
+      return res.json({message:'contact not found',statusCode:400})
+    }
+
+    if(!organizations){
+      return res.json({message:'organaization not found',statusCode:400})
+    }
+    // console.log(products,'this is the product');
+    // console.log(contact,'this is the contact');
+    // console.log(organizations,'this is the organaization');
+    // console.log(opportunities,'this is the oppertunity');
+   let sub_total=null
+   let discount_total = null;
+   let total_tax=null;
+   let grand_total=null
+
+
+   for (let product_ of products){
+     sub_total = sub_total+product_.product.unit_price
+     let result = (product_.product.tax_rate / 100) * product_.product.unit_price;
+     total_tax = total_tax+result
+
+   }
+   grand_total = sub_total+total_tax
+   function generateRandomSixDigitNumber() {
+    return Math.floor(100000 + Math.random() * 900000);
+  }
+   const estimate_details = {
+    organization_id:find_organization.organization_id,
+    customer_id: opportunities.contact.contact_id,
+    estimate_number: generateRandomSixDigitNumber(),
+    status: false,
+    issue_date: new Date(),
+    sub_total:sub_total,
+    discount_total:0,
+    tax_total:total_tax,
+    grand_total:grand_total,
+    currency:"",
+    notes: "",
+    file_path:""
+   }
+
+   const create_estimate = await Estimate.create(estimate_details)
+  if(!create_estimate){
+    return res.json({message:create_estimate,statusCode:400})
+  }
+
+  for (let product_ of products){
+   let math_count = (product_.product.tax_rate / 100) * product_.product.unit_price 
+     
+    
+    let d = {
+      estimate_id:create_estimate.estimate_id,
+      product_id:product_.product.product_id,
+      quantity:1,
+      unit_price:product_.product.unit_price,
+      tax_rate:product_.product.tax_rate,
+      line_total: math_count+product_.product.unit_price 
+    }
+   await EstimateType.create(d) 
+  }
+   return res.json({message:'estimate and product details stored and created',statusCode:200})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
+
+
+exports.find_all_estimate=async(req,res)=>{
+  try {
+    const find_all_ = await Estimate.findAll()
+    return res.json({message:'estimate finded',statusCode:200,data:find_all_ ?? []})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+}

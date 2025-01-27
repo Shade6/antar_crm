@@ -10,6 +10,7 @@ module.exports = (app) => {
     router.get("/get_all_product", Authenticator.user, AccessChecker.access_create, controller.getAllProducts);
     router.delete("/delete_product", Authenticator.user, AccessChecker.access_create, controller.deleteProduct);
     router.put("/update_product", Authenticator.user, AccessChecker.access_create, controller.updateProduct);
+    router.get("/get_single_product",Authenticator.user, AccessChecker.access_create, controller.SingleProduct)
     router.get("/delete_image",controller.d_product_image)
 
     app.use("/api/v1", router);

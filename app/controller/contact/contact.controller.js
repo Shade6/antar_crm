@@ -1,6 +1,7 @@
 const db = require("../../models");
 const Contact = db.contacts;
 const Opportunity = db.opportunity;
+const ContactMapping = db.contact_mapping;
 const Address = db.address;
 const AddressContact = db.address_contact;
 exports.createContact = async (req, res) => {
@@ -16,10 +17,10 @@ exports.createContact = async (req, res) => {
       company_name,
       address,
     } = req.body;
-console.log(req.body,'opopo')
+    console.log(req.body, "opopo");
     // Create a new contact entry
-     if(!address?.value){ 
-        return res.json({message:"Address is required",statusCode:400})
+    if (!address?.value) {
+      return res.json({ message: "Address is required", statusCode: 400 });
     }
     const details = {
       salutation: salutation.value || null,
@@ -84,6 +85,13 @@ exports.deleteContact = async (req, res) => {
     { status: false },
     { where: { address_id: find_contact.address_id } }
   );
+  const find_opportunity = await Opportunity.findOne({
+    where: { contact_id: find_contact.contact_id },
+  });
+  if(find_organization){
+    find_opportunity.contact_id= null
+    find_opportunity.save()
+  }
   const deleted = await Contact.destroy({ where: { contact_id: contactId } });
   if (deleted) {
     return res.json({
@@ -97,26 +105,64 @@ exports.deleteContact = async (req, res) => {
 exports.contact_details_by_id = async (req, res) => {
   try {
     const contactId = req.query.id;
-    console.log(contactId);
 
-    const contact = await Contact.findOne({ where: { contact_id: contactId } });
-
-    if (contact) {
-      const opportunities = await Opportunity.findAll({
-        where: { contact_id: contactId },
-      });
-      return res.json({
-        data: { contact: contact, opportunities: opportunities },
-        message: "Contact and opportunities fetched successfully",
-        statusCode: 200,
+    if (!contactId) {
+      return res.status(200).json({
+        message: "Contact ID is required",
+        statusCode: 400,
       });
     }
 
-    return res.json({ message: "Contact not found", statusCode: 400 });
+    // Fetch contact by ID
+    const contact = await Contact.findOne({ where: { contact_id: contactId } });
+
+    if (!contact) {
+      return res.status(200).json({
+        message: "Contact not found",
+        statusCode: 404,
+      });
+    }
+
+    // Fetch opportunities directly linked to the contact
+    const opportunities = await Opportunity.findAll({
+      where: { contact_id: contactId },
+    });
+
+    // Fetch additional opportunities via contact mappings
+    const extraContacts = await ContactMapping.findAll({
+      where: { contact_id: contactId },
+      include: {
+        model: Opportunity,
+        as: "opportunity",
+      },
+    });
+
+    // Extract and merge opportunities from mappings
+    const mappedOpportunities = extraContacts
+      .map((mapping) => mapping.opportunity)
+      .filter((opportunity) => opportunity); // Exclude null values, if any
+
+    const allOpportunities = [...opportunities, ...mappedOpportunities];
+
+    // Response
+    return res.json({
+      data: {
+        contact,
+        opportunities: allOpportunities,
+      },
+      message: "Contact and opportunities fetched successfully",
+      statusCode: 200,
+    });
   } catch (error) {
-    return res.json({ message: error.message, statusCode: 400 });
+    console.error("Error fetching contact details:", error.message);
+    return res.status(200).json({
+      message: "An error occurred while fetching contact details",
+      error: error.message,
+      statusCode: 500,
+    });
   }
 };
+
 
 exports.get_contact_by_id = async (req, res) => {
   try {
@@ -148,8 +194,10 @@ exports.update_contact = async (req, res) => {
       company_name,
       address,
     } = req.body;
-    console.log(req.body,'opopo')
-    const contact = await Contact.findOne({ where: { contact_id: contact_id } });
+    console.log(req.body, "opopo");
+    const contact = await Contact.findOne({
+      where: { contact_id: contact_id },
+    });
     if (!contact) {
       return res.json({ message: "Contact not found", statusCode: 400 });
     }
@@ -157,7 +205,7 @@ exports.update_contact = async (req, res) => {
       { status: false },
       { where: { address_contact_id: contact.address_contact_id } }
     );
-     await Contact.update(
+    await Contact.update(
       {
         salutation: salutation.value || null,
         first_name,
@@ -175,7 +223,11 @@ exports.update_contact = async (req, res) => {
       { status: true },
       { where: { address_contact_id: address?.value } }
     );
-    return res.json({ data: contact, statusCode: 200 ,message:"Contact updated successfully"});
+    return res.json({
+      data: contact,
+      statusCode: 200,
+      message: "Contact updated successfully",
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }
