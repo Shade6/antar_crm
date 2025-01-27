@@ -215,6 +215,36 @@ const router = createRouter({
             },
           ],
         },
+        {
+          path: "/antar_/estimate",
+          children: [
+            {
+              path: "",
+              name: "estimate-list", // Unique name for this route
+              component: () => import("../views/antar_/estimate/List.vue"),
+            },
+            {
+              path: "create",
+              name: "estimate-create", // Consistent naming convention
+              component: () => import("../views/antar_/estimate/Create.vue"),
+            },
+            {
+              path: ":id",
+              name: "estimate-details", // Consistent naming convention
+              component: () => import("../views/antar_/estimate/Single.vue"),
+            },
+            {
+              path: "edit",
+              name: "estimate-edit", // Consistent naming convention
+              component: () => import("../views/antar_/estimate/Update.vue"),
+            },
+            {
+              path: "kanban",
+              name: "kanban-estimate-view", // More descriptive name
+              component: Kanban,
+            },
+          ],
+        },
       ],
     },
   ],

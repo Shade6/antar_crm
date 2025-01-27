@@ -102,20 +102,7 @@ const fetch = async () => {
     contact_details.value.company_name = res.data?.contact?.company_name || "";
 
     opportunity.value = res.data;
-    toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "white",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid green",
-      },
-    });
+
 
     const res_2 = await find_extra_contact(res.data?.opportunity_id)
     if(res_2.statusCode == 200){
@@ -287,6 +274,7 @@ onMounted(() => {
     <span class="text-gray-700 text-center text-2xl">{{ opportunityId }}</span>
   </div>
   <div class="h-[80%] overflow-y-scroll">
+    <span class="my-2 text-gray-500">Contact details</span>
     <div>
       <div class="flex justify-between items-center py-5">
         <button @click="side_bar.contact = !side_bar.contact">
@@ -324,8 +312,8 @@ onMounted(() => {
       </Dropdown>
       </div>
       <div class="w-full" v-if="selected_contact_list.length !=0">
-        
-        <div class="my-2 py-2 border-t-2" v-for="contact_value in selected_contact_list ">
+    
+        <div class="my-0 py-2 " v-for="contact_value in selected_contact_list ">
             <span>{{ contact_value?.contact?.first_name+" "+ contact_value?.contact?.last_name}}<span class="mx-2 px-2 bg-blue-300 rounded-md">added</span>  </span>
             <button @click="router.push(`/antar_/contacts/${contact_value.contact_id}`)">
                 <FeatherIcon class="w-4 h-4" name="arrow-up-right" />
@@ -333,7 +321,9 @@ onMounted(() => {
             <button @click="handle_remove_extra(contact_value.contact_mapping_id)" class="text-xs bg-red-400 px-2 py-1 rounded-md ml-12">Remove</button>
           </div>
       </div>
-    
+      <hr  />
+      <hr />
+      <span class="my-2 text-gray-500">Organization details</span>
       <div v-if="false">
         <span class="py-1 mx-2 text-gray-700">salutation</span>
 
@@ -415,8 +405,7 @@ onMounted(() => {
           />
         </div>
       </div>
-      <hr />
-      <hr />
+  
     </div>
 
     <div class="">
@@ -495,8 +484,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <hr />
-    <hr class="mb-5" />
+   
     <span class="py-1 mx-2 text-gray-700">opportunity name</span>
     <div class="p-2">
       <TextInput

@@ -134,15 +134,8 @@ const go_to_settings = () => {
         class="nav-item flex my-2"
       >
         <div class="nav-item__icon">
-          <LeadsIcon v-if="menu.module.module_name == 'leads'" />
-          <DealsIcon v-else-if="menu.module.module_name == 'opportunities'" />
-          <PhoneIcon v-else-if="menu.module.module_name == 'call-logs'" />
-          <ContactsIcon v-else-if="menu.module.module_name == 'contacts'" />
-          <TaskIcon v-else-if="menu.module.module_name == 'task'" />
-          <FileTextIcon v-else-if="menu.module.module_name == 'notes'" />
-          <OrganizationsIcon v-else-if="menu.module.module_name == 'organizations'" />
-          <Email2Icon v-else-if="menu.module.module_name == 'email-template'" />
-          <ERPNextIcon v-else-if="menu.module.module_name == 'product-services'" />
+    
+          <FeatherIcon :name="menu?.module?.icon" class="w-4 h-4"/>
         </div>
         <div class="nav-item__text m-0 text-sm mx-2">
           {{ menu.module.module_name }}

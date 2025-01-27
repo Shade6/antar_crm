@@ -149,7 +149,7 @@ const handle_delete = async () => {
 
   <hr />
   <div class="p-3">
-    <h1 class="text-gray-700 font-medium text-xl my-1">Deals</h1>
+    <h1 class="text-gray-700 font-medium text-xl my-1">Opportunities</h1>
   </div>
   <hr />
   <div>

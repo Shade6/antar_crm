@@ -467,8 +467,9 @@ onMounted(fetch);
           <span class="text-gray-500 font-medium text-sm my-1">Product/Service</span>
           <Autocomplete
             :options="product_list"
-            v-model="form_details.product"
-            placeholder="Select product/service"
+              v-model="form_details.product"
+              placeholder="Select product/service"
+            :multiple="true"
           />
         </div>
       </div>

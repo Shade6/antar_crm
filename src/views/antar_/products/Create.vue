@@ -89,6 +89,24 @@ const handleFileChange = async (event) => {
 
 const handle_save = async () => {
   product_details.value.product_image = uploadedImages.value || "";
+
+
+  if(product_details.value.tax_rate >= 10){
+     return     toast.success('tax cannot be above 10%', {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
   const res = await create_product(product_details.value);
   if (res.statusCode == 200) {
     toast.success(res.message, {
@@ -252,7 +270,7 @@ const deleteImage = () => {
 
       <div class="flex justify-between">
         <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Tax Rate</span>
+          <span class="text-gray-500 font-medium text-sm my-1">Tax Rate in percentage (%) </span>
           <TextInput
             :type="'number'"
             :ref_for="true"

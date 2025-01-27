@@ -3,7 +3,7 @@ import Nav from "./nav/Nav.vue";
 import { ref, onMounted } from "vue";
 import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
 
-import { get_single_organization,delete_organization } from "@/api/userApi.js"; // Import the API function
+import { get_single_organization,delete_organization,create_estimate } from "@/api/userApi.js"; // Import the API function
 import { useRoute, useRouter } from "vue-router"; // Import useRoute to access route parameters
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -40,29 +40,15 @@ const fetchOrganizationData = async () => {
       status: val.status || "not set",
       created_at: new Date(val.changed_on).toLocaleDateString() || "not set",
     }));
-    contacts_list.value = res.data.opportunities.map((val) => ({
-      id: val.contact_id,
-      contact_name:
-        val.contact.first_name + " " + val.contact.last_name || "not set",
-      contact_email: val.contact.email_id || "not set",
-      contact_phone: val.contact.phone || "not set",
-      created_on: new Date(val.created_on).toLocaleDateString() || "not set",
-    }));
+    contacts_list.value = res.data.contact.map((val)=>({
+      id:val.contact_id,
+      contact_name:val.first_name+" "+val.last_name,
+      contact_email:val.email_id,
+      contact_phone:val.phone,
+      created_on:  val.create_on ?new Date(val.create_on).toLocaleDateString : 'no date'
+    }))
 
-    toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "white",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid green",
-      },
-    });
+
   } else {
     toast.success(res.message, {
       position: "top-right",
@@ -130,10 +116,48 @@ state.value.contacts = [
   { id: 1, name: "John Doe", email: "john@example.com" },
   { id: 2, name: "Jane Doe", email: "jane@example.com" },
 ];
+
+const handle_item = async(data)=>{
+  const res = await create_estimate({opportunity_id:data})
+if(res.statusCode == 200){
+  toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+    fetchOrganizationData()
+}else{
+  toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+}
+
+}
 </script>
 
 <template>
   <Nav></Nav>
+ 
   <div class="m-3">
     <div class="flex">
       <img class="rounded-full mx-3" v-if="state?.organization?.image" width="150px" height="150px" :src="state?.organization?.image" alt="">
@@ -256,7 +280,7 @@ state.value.contacts = [
           Contacts
           <span
             class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
-            >{{ state.opportunities.length }}</span
+            >{{ contacts_list.length }}</span
           >
         </button>
         <button
@@ -264,7 +288,7 @@ state.value.contacts = [
           class="hs-tab-active:font-semibold hs-tab-active:border-black hs-tab-active:text-black py-4 px-1 inline-flex items-center gap-x-2 border-b-2 border-transparent text-xl whitespace-nowrap text-gray-500 hover:text-black focus:outline-none focus:text-black disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500"
           @click="tab = 1"
         >
-   <AppsIcon/>
+          <AppsIcon/>
           Estimates
           <span
             class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
@@ -306,6 +330,10 @@ state.value.contacts = [
                 label: 'Created On',
                 key: 'created_at',
               },
+              {
+                label: 'Estimate Create',
+                key: 'create_estimate',
+              },
             ]"
             :rows="opportunities_list"
             :options="{
@@ -326,6 +354,24 @@ state.value.contacts = [
             <template #cell="{ item, row, column }">
               <span class="font-medium text-ink-gray-7">
                 {{ item }}
+    
+                <div class="p-1" v-if="column.key == 'create_estimate'">
+                <Button
+
+                  :variant="'solid'"
+                  :ref_for="true"
+                  theme="gray"
+                  size="sm"
+                  label="Button"
+                  :loading="false"
+                  :loadingText="null"
+                  :disabled="false"
+                  :link="null"
+                  @click="handle_item(row.id)"
+                >
+                  Create Estimate
+                </Button>
+              </div>
               </span>
             </template>
           </ListView>
@@ -371,7 +417,8 @@ state.value.contacts = [
           >
             <template #cell="{ item, row, column }">
               <span class="font-medium text-ink-gray-7">
-                {{ item }}
+                {{ item }} 
+             
               </span>
             </template>
           </ListView>
