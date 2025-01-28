@@ -284,10 +284,10 @@ exports.updateOrganization = async (req, res) => {
   }
 };
 
-exports.create_estimate = async (req, res) => {
+exports.get_existing_org_estimate = async (req, res) => {
   try {
     console.log(req.body, "---");
-    const opportunity_id = req.body.opportunity_id;
+    const opportunity_id = req.query.id;
     let contact = [];
     let products = [];
     let organizations = [];
@@ -311,6 +311,8 @@ exports.create_estimate = async (req, res) => {
     if(!opportunities){
       return res.json({message:'opportunity not found',statusCode:400})
     }
+
+
     const find_contact = await ContactMapping.findAll({
       where: { opportunity_id: opportunity_id },
       include: {
@@ -326,6 +328,9 @@ exports.create_estimate = async (req, res) => {
     } else {
       contact = opportunities.contact
     }
+
+
+
     const find_products = await ProductMapping.findAll({
       where: { opportunity_id: opportunity_id },
       include: {
@@ -376,41 +381,18 @@ exports.create_estimate = async (req, res) => {
    function generateRandomSixDigitNumber() {
     return Math.floor(100000 + Math.random() * 900000);
   }
-   const estimate_details = {
-    organization_id:find_organization.organization_id,
-    customer_id: opportunities.contact.contact_id,
-    estimate_number: generateRandomSixDigitNumber(),
-    status: false,
-    issue_date: new Date(),
-    sub_total:sub_total,
-    discount_total:0,
-    tax_total:total_tax,
-    grand_total:grand_total,
-    currency:"",
-    notes: "",
-    file_path:""
-   }
-
-   const create_estimate = await Estimate.create(estimate_details)
-  if(!create_estimate){
-    return res.json({message:create_estimate,statusCode:400})
+  const complete_details = {
+     contact :contact,
+     products :products,
+     organizations:organizations,
+     opportunities:opportunities,
+     sub_total:sub_total,
+     discount_total:0,
+     total_tax:total_tax,
+     grand_total:grand_total,
+     estimate_code:generateRandomSixDigitNumber()
   }
-
-  for (let product_ of products){
-   let math_count = (product_.product.tax_rate / 100) * product_.product.unit_price 
-     
-    
-    let d = {
-      estimate_id:create_estimate.estimate_id,
-      product_id:product_.product.product_id,
-      quantity:1,
-      unit_price:product_.product.unit_price,
-      tax_rate:product_.product.tax_rate,
-      line_total: math_count+product_.product.unit_price 
-    }
-   await EstimateType.create(d) 
-  }
-   return res.json({message:'estimate and product details stored and created',statusCode:200})
+  return res.json({message:'get details',statusCode:200,data:complete_details})
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }

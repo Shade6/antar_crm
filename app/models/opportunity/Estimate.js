@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       organization_id: {
         type: Sequelize.UUID,
       },
-      customer_id: {
+      tenant_id: {
         type: Sequelize.UUID,
       },
       estimate_number: {

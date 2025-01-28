@@ -10,7 +10,7 @@ module.exports = (app) => {
     router.delete("/delete_organization", Authenticator.user, AccessChecker.access_create,controller.deleteOrganization);
     router.get("/get_only_organization_by_id", Authenticator.user, AccessChecker.access_create,controller.get_only_organization_by_id);
     router.put("/update_organization", Authenticator.user, AccessChecker.access_create,controller.updateOrganization);
-    router.post("/create_estimate", Authenticator.user, AccessChecker.access_create,controller.create_estimate);
+    router.get("/get_existing_org_estimate", Authenticator.user, AccessChecker.access_create,controller.get_existing_org_estimate);
     
     router.get("/find_all_estimate", Authenticator.user, AccessChecker.access_create,controller.find_all_estimate);
 
