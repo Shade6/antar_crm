@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
       },
       unit_price: {
-        type: Sequelize.DATE,
+        type: Sequelize.INTEGER,
       },
       tax_rate:{
         type:Sequelize.INTEGER

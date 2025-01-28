@@ -42,9 +42,6 @@ module.exports = (sequelize, Sequelize) => {
       notes: {
         type: Sequelize.STRING,
       },
-      file_path:{
-        type:Sequelize.STRING
-      },
       created_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,

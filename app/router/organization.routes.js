@@ -13,6 +13,8 @@ module.exports = (app) => {
     router.get("/get_existing_org_estimate", Authenticator.user, AccessChecker.access_create,controller.get_existing_org_estimate);
     
     router.get("/find_all_estimate", Authenticator.user, AccessChecker.access_create,controller.find_all_estimate);
+    
+    router.post("/create_estimate", Authenticator.user, AccessChecker.access_create,controller.create_estimate);
 
     app.use("/api/v1/", router);
   };

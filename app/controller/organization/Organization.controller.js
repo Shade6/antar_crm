@@ -361,10 +361,7 @@ exports.get_existing_org_estimate = async (req, res) => {
     if(!organizations){
       return res.json({message:'organaization not found',statusCode:400})
     }
-    // console.log(products,'this is the product');
-    // console.log(contact,'this is the contact');
-    // console.log(organizations,'this is the organaization');
-    // console.log(opportunities,'this is the oppertunity');
+ 
    let sub_total=null
    let discount_total = null;
    let total_tax=null;
@@ -403,6 +400,73 @@ exports.find_all_estimate=async(req,res)=>{
   try {
     const find_all_ = await Estimate.findAll()
     return res.json({message:'estimate finded',statusCode:200,data:find_all_ ?? []})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+}
+
+
+exports.create_estimate=async(req,res)=>{
+  try {
+    console.log(req.body)
+    const {
+      organization,
+      estimate_number,
+      issue_date,
+      notes,
+      products,
+      discount_total,
+      tax_total,
+      sub_total,
+      grand_total,
+    } = req.body
+  const find_org = await Organization.findOne({where:{organization_id:organization.value}})
+  if(!find_org){
+    return res.json({ message:'No organization found',statusCode:400})
+  }
+  if(!estimate_number){
+    return res.json({ message:'please enter estimate number',statusCode:400})
+  }
+  if(!issue_date){
+    return res.json({ message:'please enter issue date',statusCode:400})
+  }
+
+  if(products.length == 0){
+    return res.json({ message:'product seems empty please add one',statusCode:400})
+  }
+
+  if(!discount_total){
+    return res.json({ message:'discount total seems empty',statusCode:400})
+  }
+  
+
+  const create_estimate = await Estimate.create({
+    organization_id:find_org.organization_id,
+    estimate_number:estimate_number,
+    issue_date:issue_date,
+    sub_total:sub_total,
+    discount_total:discount_total,
+    tax_total:tax_total,
+    grand_total:grand_total,
+    notes:notes || "",
+  })
+
+   if(create_estimate){
+     for(let pro of products){
+         await EstimateType.create({
+          estimate_id:create_estimate.estimate_id,
+          product_id:pro.id,
+          quantity:pro.quantity,
+          unit_price:pro.unit_price,
+          tax_rate:pro.tax_rate,
+          line_total:pro.unit_price*pro.quantity,
+         })
+     }
+     return res.json({message:'estimate created ',statusCode:200})
+   }else{
+    return res.json({message:'estimate not been created',statusCode:400})
+   }
+
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }
