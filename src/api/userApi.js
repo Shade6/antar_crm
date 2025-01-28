@@ -682,3 +682,15 @@ export const find_all_estimate = async () => {
     )
   ).data;
 };
+
+
+
+
+export const create_estimate = async (data) => {
+  return (
+    await axiosInstance.post(
+      `create_estimate?mdl=${switchStore().pageId}`,
+      data
+    )
+  ).data;
+};
