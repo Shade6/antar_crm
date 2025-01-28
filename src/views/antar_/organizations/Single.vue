@@ -3,7 +3,7 @@ import Nav from "./nav/Nav.vue";
 import { ref, onMounted } from "vue";
 import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
 
-import { get_single_organization,delete_organization,create_estimate } from "@/api/userApi.js"; // Import the API function
+import { get_single_organization,delete_organization } from "@/api/userApi.js"; // Import the API function
 import { useRoute, useRouter } from "vue-router"; // Import useRoute to access route parameters
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -118,39 +118,40 @@ state.value.contacts = [
 ];
 
 const handle_item = async(data)=>{
-  const res = await create_estimate({opportunity_id:data})
-if(res.statusCode == 200){
-  toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "white",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid green",
-      },
-    });
-    fetchOrganizationData()
-}else{
-  toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "#FFF5F5",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid red",
-      },
-    });
-}
+  router.push(`/antar_/estimate/create#${data}`);
+//   const res = await create_estimate({opportunity_id:data})
+// if(res.statusCode == 200){
+//   toast.success(res.message, {
+//       position: "top-right",
+//       duration: 3000,
+//       dismissible: true,
+//       style: {
+//         background: "white",
+//         color: "black",
+//         padding: "4px 20px",
+//         borderRadius: "8px",
+//         fontSize: "16px",
+//         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+//         borderLeft: "5px solid green",
+//       },
+//     });
+//     fetchOrganizationData()
+// }else{
+//   toast.success(res.message, {
+//       position: "top-right",
+//       duration: 3000,
+//       dismissible: true,
+//       style: {
+//         background: "#FFF5F5",
+//         color: "black",
+//         padding: "4px 20px",
+//         borderRadius: "8px",
+//         fontSize: "16px",
+//         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+//         borderLeft: "5px solid red",
+//       },
+//     });
+// }
 
 }
 </script>

@@ -665,11 +665,10 @@ export const handle_remove_extra_contact = async (data) => {
   ).data;
 };
 
-export const create_estimate = async (data) => {
+export const get_existing_org_estimate = async (data) => {
   return (
-    await axiosInstance.post(
-      `create_estimate?mdl=${switchStore().pageId}`,
-      data
+    await axiosInstance.get(
+      `get_existing_org_estimate?mdl=${switchStore().pageId}&&id=${data}`,
     )
   ).data;
 };
