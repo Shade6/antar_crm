@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
       organization_id: {
         type: Sequelize.UUID,
       },
+      opportunity_id:{
+        type: Sequelize.UUID,
+      },
       tenant_id: {
         type: Sequelize.UUID,
       },
@@ -40,6 +43,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       notes: {
+        type: Sequelize.STRING,
+      },
+      pdf:{
         type: Sequelize.STRING,
       },
       created_at: {

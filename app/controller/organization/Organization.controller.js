@@ -7,6 +7,7 @@ const Industry = db.industry;
 const Contact = db.contacts;
 const Address = db.address;
 const AddressOrg = db.address_org;
+const AddressContact = db.address_contact
 const ContactMapping = db.contact_mapping;
 const Estimate = db.estimate;
 const EstimateType = db.estimate_type;
@@ -291,9 +292,8 @@ exports.get_existing_org_estimate = async (req, res) => {
     let contact = [];
     let products = [];
     let organizations = [];
-    let opportunities = {}
+    let opportunities = {};
 
-    
     opportunities = await Opportunity.findOne({
       where: { opportunity_id: opportunity_id },
       include: [
@@ -308,10 +308,9 @@ exports.get_existing_org_estimate = async (req, res) => {
       ],
     });
 
-    if(!opportunities){
-      return res.json({message:'opportunity not found',statusCode:400})
+    if (!opportunities) {
+      return res.json({ message: "opportunity not found", statusCode: 400 });
     }
-
 
     const find_contact = await ContactMapping.findAll({
       where: { opportunity_id: opportunity_id },
@@ -326,10 +325,8 @@ exports.get_existing_org_estimate = async (req, res) => {
         ...find_contact.map((val) => val.contact),
       ];
     } else {
-      contact = opportunities.contact
+      contact = opportunities.contact;
     }
-
-
 
     const find_products = await ProductMapping.findAll({
       where: { opportunity_id: opportunity_id },
@@ -342,130 +339,299 @@ exports.get_existing_org_estimate = async (req, res) => {
     const find_organization = await Organization.findOne({
       where: { organization_id: opportunities.organization_id },
     });
-    organizations=find_organization
-  
+    organizations = find_organization;
+
     if (find_products.length > 0) {
-      products = find_products
-    }else{
-      return res.json({message:'product not found please add product',statusCode:400})
+      products = find_products;
+    } else {
+      return res.json({
+        message: "product not found please add product",
+        statusCode: 400,
+      });
     }
 
-    if(products.length == 0){
-      return res.json({message:'product not found',statusCode:400})
+    if (products.length == 0) {
+      return res.json({ message: "product not found", statusCode: 400 });
     }
 
-    if(contact.length == 0){
-      return res.json({message:'contact not found',statusCode:400})
+    if (contact.length == 0) {
+      return res.json({ message: "contact not found", statusCode: 400 });
     }
 
-    if(!organizations){
-      return res.json({message:'organaization not found',statusCode:400})
+    if (!organizations) {
+      return res.json({ message: "organaization not found", statusCode: 400 });
     }
- 
-   let sub_total=null
-   let discount_total = null;
-   let total_tax=null;
-   let grand_total=null
 
+    let sub_total = null;
+    let discount_total = null;
+    let total_tax = null;
+    let grand_total = null;
 
-   for (let product_ of products){
-     sub_total = sub_total+product_.product.unit_price
-     let result = (product_.product.tax_rate / 100) * product_.product.unit_price;
-     total_tax = total_tax+result
-
-   }
-   grand_total = sub_total+total_tax
-   function generateRandomSixDigitNumber() {
-    return Math.floor(100000 + Math.random() * 900000);
-  }
-  const complete_details = {
-     contact :contact,
-     products :products,
-     organizations:organizations,
-     opportunities:opportunities,
-     sub_total:sub_total,
-     discount_total:0,
-     total_tax:total_tax,
-     grand_total:grand_total,
-     estimate_code:generateRandomSixDigitNumber()
-  }
-  return res.json({message:'get details',statusCode:200,data:complete_details})
+    for (let product_ of products) {
+      sub_total = sub_total + product_.product.unit_price;
+      let result =
+        (product_.product.tax_rate / 100) * product_.product.unit_price;
+      total_tax = total_tax + result;
+    }
+    grand_total = sub_total + total_tax;
+    function generateRandomSixDigitNumber() {
+      return Math.floor(100000 + Math.random() * 900000);
+    }
+    const complete_details = {
+      contact: contact,
+      products: products,
+      organizations: organizations,
+      opportunities: opportunities,
+      sub_total: sub_total,
+      discount_total: 0,
+      total_tax: total_tax,
+      grand_total: grand_total,
+      estimate_code: generateRandomSixDigitNumber(),
+    };
+    return res.json({
+      message: "get details",
+      statusCode: 200,
+      data: complete_details,
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }
 };
 
-
-exports.find_all_estimate=async(req,res)=>{
+exports.find_all_estimate = async (req, res) => {
   try {
-    const find_all_ = await Estimate.findAll()
-    return res.json({message:'estimate finded',statusCode:200,data:find_all_ ?? []})
+    const find_all_ = await Estimate.findAll();
+    return res.json({
+      message: "estimate finded",
+      statusCode: 200,
+      data: find_all_ ?? [],
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }
-}
+};
 
-
-exports.create_estimate=async(req,res)=>{
+exports.create_estimate = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const {
       organization,
       estimate_number,
-      issue_date,
+      issue_data,
       notes,
       products,
       discount_total,
       tax_total,
       sub_total,
       grand_total,
-    } = req.body
-  const find_org = await Organization.findOne({where:{organization_id:organization.value}})
-  if(!find_org){
-    return res.json({ message:'No organization found',statusCode:400})
-  }
-  if(!estimate_number){
-    return res.json({ message:'please enter estimate number',statusCode:400})
-  }
-  if(!issue_date){
-    return res.json({ message:'please enter issue date',statusCode:400})
-  }
+      opportunity_id
+    } = req.body;
 
-  if(products.length == 0){
-    return res.json({ message:'product seems empty please add one',statusCode:400})
+    const find_opportunity = await Opportunity.findOne({where:{opportunity_id:opportunity_id}})
+
+    if(!find_opportunity){
+      return res.json({message:'cannot find opportunity',statusCode: 404});
+    }
+    console.log(req.body);
+    const find_org = await Organization.findOne({
+      where: { organization_id: organization.value },
+    });
+    if (!find_org) {
+      return res.json({ message: "No organization found", statusCode: 400 });
+    }
+
+    if (!issue_data) {
+      return res.json({ message: "please enter issue date", statusCode: 400 });
+    }
+
+    if (products.length == 0) {
+      return res.json({
+        message: "product seems empty please add one",
+        statusCode: 400,
+      });
+    }
+
+    if (!discount_total) {
+      return res.json({
+        message: "discount total seems empty",
+        statusCode: 400,
+      });
+    }
+
+    if (!sub_total) {
+      return res.json({ message: "sub total seems empty", statusCode: 400 });
+    }
+
+    if (!tax_total) {
+      return res.json({ message: "tax total seems empty", statusCode: 400 });
+    }
+
+    if (!grand_total) {
+      return res.json({ message: "grand total seems empty", statusCode: 400 });
+    }
+    function generateRandomSixDigitNumber() {
+      return Math.floor(100000 + Math.random() * 900000);
+    }
+
+    const create_estimate = await Estimate.create({
+      organization_id: find_org.organization_id,
+      estimate_number: "EST" + generateRandomSixDigitNumber(),
+      issue_date: issue_data,
+      sub_total: parseInt(sub_total),
+      discount_total: discount_total,
+      tax_total: parseInt(tax_total),
+      grand_total: parseInt(grand_total),
+      opportunity_id:opportunity_id,
+      notes: notes || "",
+    });
+
+    if (create_estimate) {
+      for (let pro of products) {
+        await EstimateType.create({
+          estimate_id: create_estimate.estimate_id,
+          product_id: pro.id,
+          quantity: parseInt(pro.quantity),
+          unit_price: parseInt(pro.unit_price),
+          tax_rate: parseInt(pro.tax_rate),
+          line_total: parseInt(pro.sub_total),
+          description: pro.description || "",
+        });
+      }
+      return res.json({
+        message: "estimate created ",
+        statusCode: 200,
+        data: create_estimate.estimate_id,
+      });
+    } else {
+      return res.json({
+        message: "estimate not been created",
+        statusCode: 400,
+      });
+    }
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
   }
+};
 
-  if(!discount_total){
-    return res.json({ message:'discount total seems empty',statusCode:400})
+exports.pdf_estimate_details = async (req, res) => {
+  try {
+    const estimate_id = req.query.id;
+    const opportunity_id = req.query.opportunity_id;
+    console.log(req.query);
+    if (!opportunity_id) {
+      return res.json({ message: "opportunity not found", statusCode: 400 });
+    }
+
+    const find_opportunity = await Opportunity.findOne({
+      where: { opportunity_id: opportunity_id },
+      include:{
+        model:Contact,
+        as:'contact',
+        include:{
+          model:AddressContact,
+          as:'address_contact'
+        }
+      }
+    });
+
+    const find_estimate_ = await Estimate.findOne({
+      where: { estimate_id: estimate_id },
+    });
+    if (!find_estimate_) {
+      return res.json({
+        message: "estimate not found please check estimate is saved ",
+        statusCode: 400,
+      });
+    }
+
+    const find_estimate_type = await EstimateType.findAll({
+      where: { estimate_id: estimate_id },
+      include: {
+        model: Product,
+        as: "product",
+      },
+    });
+    if (!find_estimate_type) {
+      return res.json({
+        message: "product not found please check  ",
+        statusCode: 400,
+      });
+    }
+
+    const find_organization = await Organization.findOne({
+      where: { organization_id: find_estimate_.organization_id },
+    });
+    if (!find_organization) {
+      return res.json({
+        message: "organization not found please check  ",
+        statusCode: 400,
+      });
+    }
+
+    const find_address = await AddressOrg.findOne({
+      where: { organization_id: find_estimate_.organization_id },
+    });
+    if (!find_address) {
+      return res.json({
+        message: "address not found please check  ",
+        statusCode: 400,
+      });
+    }
+
+    const details = {
+      organization: find_organization,
+      address: {
+        line_one: find_address.address_line_1,
+        line_two: find_address.address_line_2,
+        city: find_address.city,
+        state: find_address.state,
+        country: find_address.country,
+        code: find_address.zip_code,
+      },
+      contact:find_opportunity.contact,
+      estimate_number: find_estimate_.estimate_number,
+      issue_date: find_estimate_.issue_date,
+      notes: find_estimate_.note || "",
+      products: find_estimate_type,
+      discount_total: find_estimate_.discount_total,
+      tax_total: find_estimate_.tax_total,
+      sub_total: find_estimate_.sub_total,
+      grand_total: find_estimate_.grand_total,
+      estimate_created: find_estimate_.created_at,
+    };
+    return res.json({
+      message: "details founded",
+      statusCode: 200,
+      data: details,
+    });
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
   }
-  
+};
 
-  const create_estimate = await Estimate.create({
-    organization_id:find_org.organization_id,
-    estimate_number:estimate_number,
-    issue_date:issue_date,
-    sub_total:sub_total,
-    discount_total:discount_total,
-    tax_total:tax_total,
-    grand_total:grand_total,
-    notes:notes || "",
-  })
 
-   if(create_estimate){
-     for(let pro of products){
-         await EstimateType.create({
-          estimate_id:create_estimate.estimate_id,
-          product_id:pro.id,
-          quantity:pro.quantity,
-          unit_price:pro.unit_price,
-          tax_rate:pro.tax_rate,
-          line_total:pro.unit_price*pro.quantity,
-         })
-     }
-     return res.json({message:'estimate created ',statusCode:200})
-   }else{
-    return res.json({message:'estimate not been created',statusCode:400})
-   }
+exports.find_pdf=async(req,res)=>{
+  try {
+    const id = req.query.id;
+    let file = null;
+    const find_estimate_ = await Estimate.findOne({where:{estimate_id:id}})
+    if(find_estimate_){
+        file = find_estimate_.pdf
+    }
+
+    
+    const find_opportunity = await Opportunity.findOne({where:{opportunity_id:id}})
+
+    if(find_opportunity){
+       file = find_opportunity.pdf
+    }
+
+
+    if(file == null){
+      return res.json({message:'file not found',statusCode:400})
+    }
+      res.json({message:'file retrieved',statusCode:200,data:file})
+
 
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });

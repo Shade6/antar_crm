@@ -15,7 +15,10 @@ module.exports = (app) => {
     router.get("/find_all_estimate", Authenticator.user, AccessChecker.access_create,controller.find_all_estimate);
     
     router.post("/create_estimate", Authenticator.user, AccessChecker.access_create,controller.create_estimate);
+    router.get("/pdf_estimate_details",Authenticator.user, AccessChecker.access_create,controller.pdf_estimate_details)
+    router.get("/find_pdf",Authenticator.user, AccessChecker.access_create,controller.find_pdf)
 
+    
     app.use("/api/v1/", router);
   };
   

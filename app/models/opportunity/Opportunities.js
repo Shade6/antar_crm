@@ -68,6 +68,9 @@ module.exports = (sequelize, Sequelize) => {
     changed_by: {
       type: Sequelize.INTEGER,
     },
+    pdf:{
+       type:Sequelize.STRING
+    },
     changed_on: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.NOW,

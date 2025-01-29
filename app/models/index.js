@@ -77,7 +77,17 @@ db.estimate = require("./opportunity/Estimate.js")(sequelize,Sequelize)
 db.estimate_type = require("./opportunity/EstimateItem.js")(sequelize,Sequelize)
 db.product_mapping= require("./ProductMapping.js")(sequelize,Sequelize)
 
-
+//-------------------
+db.product.hasMany(db.estimate_type, { //---this is the reference 
+  foreignKey: 'product_id',
+  as: 'estimate_type'      
+});
+db.estimate_type.belongsTo(db.product, { //---this is the original table
+  foreignKey: 'product_id', 
+  targetKey: 'product_id',         
+  as: 'product' // Changed alias to avoid naming collision
+});
+//----------------------------------
 //-------------------
 db.product.hasMany(db.product_mapping, { //---this is the reference 
   foreignKey: 'product_id',
