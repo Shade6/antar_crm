@@ -3,7 +3,7 @@ import Nav from "./nav/Nav.vue";
 import { ref, onMounted } from "vue";
 import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
 
-import { get_single_organization,delete_organization } from "@/api/userApi.js"; // Import the API function
+import { get_single_organization,delete_organization ,find_pdf} from "@/api/userApi.js"; // Import the API function
 import { useRoute, useRouter } from "vue-router"; // Import useRoute to access route parameters
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -39,6 +39,7 @@ const fetchOrganizationData = async () => {
       probability: val.probability || "not set",
       status: val.status || "not set",
       created_at: new Date(val.changed_on).toLocaleDateString() || "not set",
+      pdf:val.pdf || null,
     }));
     contacts_list.value = res.data.contact.map((val)=>({
       id:val.contact_id,
@@ -153,6 +154,27 @@ const handle_item = async(data)=>{
 //     });
 // }
 
+}
+const view_estimate = async(data)=>{
+  const res = await find_pdf(data)
+  if(res.statusCode == 200){
+    window.open(res.data, "_blank");
+  }else{
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
 }
 </script>
 
@@ -287,13 +309,13 @@ const handle_item = async(data)=>{
         <button
           type="button"
           class="hs-tab-active:font-semibold hs-tab-active:border-black hs-tab-active:text-black py-4 px-1 inline-flex items-center gap-x-2 border-b-2 border-transparent text-xl whitespace-nowrap text-gray-500 hover:text-black focus:outline-none focus:text-black disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500"
-          @click="tab = 1"
+          @click="tab = 3"
         >
           <AppsIcon/>
           Estimates
           <span
             class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
-            >{{ state.opportunities.length }}</span
+            >0</span
           >
         </button>
       </nav>
@@ -358,7 +380,7 @@ const handle_item = async(data)=>{
     
                 <div class="p-1" v-if="column.key == 'create_estimate'">
                 <Button
-
+                  v-if="row.pdf == null"
                   :variant="'solid'"
                   :ref_for="true"
                   theme="gray"
@@ -372,13 +394,28 @@ const handle_item = async(data)=>{
                 >
                   Create Estimate
                 </Button>
+                <Button
+                  v-else
+                  :variant="'subtle'"
+                  :ref_for="true"
+                  theme="gray"
+                  size="sm"
+                  label="Button"
+                  :loading="false"
+                  :loadingText="null"
+                  :disabled="false"
+                  :link="null"
+                  @click="view_estimate(row.id)"
+                >
+                  View Estimate
+                </Button>
               </div>
               </span>
             </template>
           </ListView>
         </div>
       </div>
-      <div v-else>
+      <div v-else-if="tab == 1">
         <div>
           <ListView
             class="h-[250px]"
@@ -424,6 +461,9 @@ const handle_item = async(data)=>{
             </template>
           </ListView>
         </div>
+      </div>
+      <div v-else>
+        nothing
       </div>
     </div>
   </div>

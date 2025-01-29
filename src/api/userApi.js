@@ -23,7 +23,20 @@ export const create_images= async (data) => {
     )
   ).data;
 };
-
+export const create_file_pdf= async (data,id,estimate_id) => {
+  return (
+    await axios.post(
+      `${USER_API}create_file_pdf?mdl=${switchStore().pageId}&&id=${id}&&estimate_id=${estimate_id}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      }
+    )
+  ).data;
+};
 
 
 export const userLogin = async (data) => {
@@ -691,6 +704,26 @@ export const create_estimate = async (data) => {
     await axiosInstance.post(
       `create_estimate?mdl=${switchStore().pageId}`,
       data
+    )
+  ).data;
+};
+
+
+export const pdf_estimate_details = async (data,id) => {
+  return (
+    await axiosInstance.get(
+      `pdf_estimate_details?mdl=${switchStore().pageId}&&id=${data}&&opportunity_id=${id}`
+    )
+  ).data;
+};
+
+
+
+
+export const find_pdf = async (data,id) => {
+  return (
+    await axiosInstance.get(
+      `find_pdf?mdl=${switchStore().pageId}&&id=${data}`
     )
   ).data;
 };
