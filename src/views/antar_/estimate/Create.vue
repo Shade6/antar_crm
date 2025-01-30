@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref, reactive, computed, onMounted } from "vue";
+
 import { useToast } from "vue-toast-notification";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -22,7 +23,7 @@ import {
   Textarea,
   ListView,
   FeatherIcon,
-  Spinner
+  Spinner,
 } from "frappe-ui";
 import "@/assets/toast.css";
 
@@ -101,6 +102,7 @@ async function fetch() {
         ).toFixed(2),
         sub_total: val.product.unit_price * 1,
         description: "",
+        discount: val.product.unit_price,
         quantity: 1,
       }));
     }
@@ -109,6 +111,10 @@ async function fetch() {
 
 // Handle product selection
 async function handle_select_product(data) {
+  form_details.discount_total = 0;
+  setTimeout(handle_add_discount, 300)
+  // handle_add_discount();
+
   const res = await get_single_product(data);
 
   if (res.statusCode === 200) {
@@ -130,6 +136,7 @@ async function handle_select_product(data) {
         tax_total: ((res.data.tax_rate / 100) * res.data.unit_price).toFixed(2),
         sub_total: res.data.unit_price * 1,
         description: "",
+        discount: 0,
         quantity: 1,
       });
     }
@@ -157,7 +164,9 @@ function handle_click_d(data) {
 
 // Handle row update
 function handel_update_q() {
-  console.log(row_details, "----------------------------");
+  form_details.discount_total = 0;
+  setTimeout(handle_add_discount, 300)
+  // handle_add_discount();
   const existingProductIndex = product_list.value.findIndex(
     (product) => product.id === row_details.id
   );
@@ -182,49 +191,71 @@ function deleteRow() {
 
   showModal.value = false;
 }
+const triggerUpdate = ref(0);
 
 // Calculate totals
 const calculate = computed(() => {
+  triggerUpdate.value; // Ensure reactivity
+
+  // Calculate subtotal with discount applied
   const sub_total = product_list.value.reduce(
-    (sum, product) => sum + product.unit_price * product.quantity,
+    (sum, product) =>
+      sum + (product.unit_price || product.unit_price) * product.quantity,
     0
   );
+
+  const discount_total_value = product_list.value.reduce(
+    (sum, product) =>
+      sum + (product.sub_total || product.unit_price) * product.quantity,
+    0
+  );
+  // Calculate tax total with discount applied
   const tax_total = product_list.value.reduce(
     (sum, product) =>
-      sum + (product.tax_rate / 100) * product.unit_price * product.quantity,
+      sum +
+      (product.tax_rate / 100) *
+        (product.sub_total || product.unit_price) *
+        product.quantity,
     0
   );
-  const grand_total = sub_total + tax_total;
+
+  // Calculate grand total with discount applied
+  const grand_total = discount_total_value + tax_total;
+
+  // Get the discount total from the form
+  const discount_total = form_details.discount_total || 0;
 
   return {
     sub_total: sub_total.toFixed(2),
     tax_total: tax_total.toFixed(2),
     grand_total: grand_total.toFixed(2),
+    discount_total: discount_total_value, // Use the discount total from the form
   };
 });
 
 // Save estimate
 async function handle_save_estimate() {
-  if(!product_id){
-    return toast.success('opportunity not found please add opportunity', {
-        position: "top-right",
-        duration: 3000,
-        dismissible: true,
-        style: {
-          background: "#FFF5F5",
-          color: "black",
-          padding: "4px 20px",
-          borderRadius: "8px",
-          fontSize: "16px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-          borderLeft: "5px solid red",
-        },
-      });
+  if (!product_id) {
+    return toast.success("opportunity not found please add opportunity", {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
   }
   const complete_details = {
     ...form_details,
     products: product_list.value,
-    opportunity_id:product_id,
+    opportunity_id: product_id,
+    discount:calculate.discount_total,
     ...calculate.value,
   };
 
@@ -245,7 +276,7 @@ const estimateData = ref(null);
 import { nextTick } from "vue";
 
 async function downloadEstimate(estimate_id_for_pdf) {
-  const res = await pdf_estimate_details(estimate_id_for_pdf,product_id);
+  const res = await pdf_estimate_details(estimate_id_for_pdf, product_id);
   if (res.statusCode !== 200) {
     return toast.success(res.message, {
       position: "top-right",
@@ -275,13 +306,32 @@ async function downloadEstimate(estimate_id_for_pdf) {
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   let file = null;
+  const pdf = new jsPDF("p", "mm", "a4"); // Initialize PDF
+  const imgWidth = 210; // A4 width in mm
+  const pageHeight = 297; // A4 height in mm
+  let position = 0; // Track the position of the content
+
   await html2canvas(content, { scale: 2 }).then((canvas) => {
     const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    // Add the first page
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+
+    // Check if content exceeds the page height
+    if (imgHeight > pageHeight) {
+      let remainingHeight = imgHeight - pageHeight; // Calculate remaining height
+      position = -remainingHeight; // Adjust position for the next page
+
+      // Add additional pages for remaining content
+      while (remainingHeight > 0) {
+        pdf.addPage(); // Add a new page
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        remainingHeight -= pageHeight; // Reduce remaining height
+        position -= pageHeight; // Adjust position for the next page
+      }
+    }
+
     const pdfBlob = pdf.output("blob");
 
     // Create a preview URL
@@ -305,7 +355,11 @@ async function downloadEstimate(estimate_id_for_pdf) {
 
   const formData = new FormData();
   formData.append("file", file);
-  const res_create_file = await create_file_pdf(formData, product_id,estimate_id_for_pdf);
+  const res_create_file = await create_file_pdf(
+    formData,
+    product_id,
+    estimate_id_for_pdf
+  );
 
   if (res_create_file.statusCode === 200) {
     loader.value = false;
@@ -343,15 +397,54 @@ function formatDate(dateString) {
 
   return `${day}/${month}/${year}`; // Return formatted date
 }
+function calculateValidUntil(estimateCreated, issueDate) {
+  // Determine the base date (use issueDate if available, otherwise use estimateCreated)
+  const baseDate = issueDate ? new Date(issueDate) : new Date(estimateCreated);
+
+  // Add 14 days to the base date
+  const validUntilDate = new Date(baseDate);
+  validUntilDate.setDate(baseDate.getDate() + 14);
+
+  // Format the date as needed (e.g., toLocaleDateString)
+  return validUntilDate.toLocaleDateString();
+}
+
+const handle_add_discount = () => {
+  const sub_total = product_list.value.reduce(
+    (sum, product) => sum + product.unit_price * product.quantity,
+    0
+  );
+
+  if (sub_total === 0) return; // Prevent division by zero
+
+  const discount_total = form_details.discount_total || 0; // Ensure discount_total is defined
+
+  product_list.value = product_list.value.map((val) => ({
+    ...val,
+    sub_total:Math.round(( val.unit_price -
+    (discount_total * (val.unit_price * val.quantity)) / sub_total))
+     , // Proportional discount
+    tax_total:Math.round(
+      (val.tax_rate / 100) *
+      (val.unit_price -
+        (discount_total * (val.unit_price * val.quantity)) / sub_total))
+  }))
+
+  triggerUpdate.value = discount_total;
+};
 </script>
 
 <template>
-   <div v-if="loader" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="z-index:99999;">
-      <div>
-        <Spinner class="w-10 mx-auto" />
-        <span class="text-white">Creating Estimate please wait for a second</span>
-      </div>
-   </div>
+  <div
+    v-if="loader"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    style="z-index: 99999"
+  >
+    <div>
+      <Spinner class="w-10 mx-auto" />
+      <span class="text-white">Creating Estimate please wait for a second</span>
+    </div>
+  </div>
   <Nav @save="handle_save_estimate"></Nav>
   <div class="p-4">
     <div class="mx-4">
@@ -392,9 +485,10 @@ function formatDate(dateString) {
             key: 'tax_rate',
             width: '180px',
           },
-          { label: 'product Quantity', key: 'quantity', width: '180px' },
-          { label: 'tax total', key: 'tax_total', width: '120px' },
-          { label: 'sub total', key: 'sub_total', width: '120px' },
+          { label: 'Product Quantity', key: 'quantity', width: '180px' },
+
+          { label: 'Tax Total', key: 'tax_total', width: '120px' },
+          { label: 'Sub Total', key: 'sub_total', width: '120px' },
           { label: 'Product Action', key: 'action', width: '180px' },
         ]"
         :rows="product_list"
@@ -414,7 +508,10 @@ function formatDate(dateString) {
         row-key="id"
       >
         <template #cell="{ item, row, column }">
-          <span class="font-medium text-ink-gray-7">
+          <span
+            class="font-medium text-ink-gray-7"
+            :class="{ 'truncate-cell': column.key !== 'action' }"
+          >
             {{ item }}
 
             <div class="p-1" v-if="column.key == 'action'">
@@ -532,8 +629,9 @@ function formatDate(dateString) {
                         @click="handel_update_q"
                         class="ml-2"
                         variant="solid"
-                        >Update Row</Button
                       >
+                        Update Row
+                      </Button>
                       <button
                         @click="showModal = false"
                         class="px-2 py-0 mx-3 border-2 font-normal text-black rounded"
@@ -550,27 +648,14 @@ function formatDate(dateString) {
       </ListView>
       <div class="flex justify-between">
         <div class="w-1/2">
-          <Button @click="dialog2 = true"> Add Product </Button>
+          <div class="flex">
+            <Button class="w-36 my-auto mx-1" @click="dialog2 = true">
+              Add Product
+            </Button>
+          </div>
+
           <div>
             <div class="pt-5">
-              <!-- <Button
-          :variant="'subtle'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-          @click="downloadEstimate"
-          >
-            <div class="flex gap-2">
-              <FeatherIcon class="w-4" name="file-text" />
-              <span> Download Estimate Model</span>
-            </div>
-          </Button> -->
-
               <div>
                 <span class="text-sm text-red-500"
                   >(default organization address will consider)</span
@@ -638,50 +723,78 @@ function formatDate(dateString) {
           </Dialog>
         </div>
 
-        <div class="flex flex-col">
-          <div class="p-2 w-full">
-            <span class="text-gray-500 font-medium text-sm my-1"
-              >Discount total</span
-            >
-            <TextInput
-              class="text-gray-500 font-medium text-sm my-1"
-              :type="'number'"
-              :ref_for="true"
-              size="sm"
-              variant="subtle"
-              placeholder="enter discount total"
-              :disabled="false"
-              :modelValue="form_details.discount_total"
-              v-model="form_details.discount_total"
-            />
-          </div>
-          <span class="font-semibold text-gray-600 my-auto mx-4"
-            >tax total:
-            <span class="font-bold text-black">{{ calculate.tax_total }}</span>
-          </span>
-
-          <span class="font-semibold text-gray-600 my-auto mx-4"
-            >sub total:
+        <div
+          class="flex flex-col justify-between w-80 border p-4 rounded-lg shadow-sm mr-20"
+        >
+          <!-- Subtotal -->
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-gray-600">Subtotal:</span>
             <span class="font-bold text-black">{{ calculate.sub_total }}</span>
-          </span>
+          </div>
 
-          <span class="font-semibold text-gray-600 my-auto"
-            >Grand total:
+          <!-- Discount Input and Button -->
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-gray-600">Discount:</span>
+            <div class="flex items-center gap-2 mt-2">
+              <TextInput
+                class="text-gray-500 font-medium text-sm w-20"
+                :type="'number'"
+                :ref_for="true"
+                size="sm"
+                variant="subtle"
+                placeholder="Enter discount"
+                :disabled="false"
+                :modelValue="form_details.discount_total"
+                v-model="form_details.discount_total"
+              />
+              <Button
+                :variant="'solid'"
+                :ref_for="true"
+                theme="gray"
+                size="sm"
+                label="Add"
+                :loading="false"
+                :loadingText="null"
+                :disabled="false"
+                :link="null"
+                @click="handle_add_discount"
+              />
+            </div>
+          </div>
+          <!-- Discount Total -->
+          <div class="flex justify-between items-center mt-2">
+            <span class="font-semibold text-gray-600">Discount Total:</span>
+            <span class="font-bold text-black">{{
+              calculate.discount_total.toFixed(2)
+            }}</span>
+          </div>
+
+          <!-- Tax Total -->
+          <div class="flex justify-between items-center mt-2">
+            <span class="font-semibold text-gray-600">Tax Total:</span>
+            <span class="font-bold text-black">{{ calculate.tax_total }}</span>
+          </div>
+
+          <!-- Grand Total -->
+          <div class="flex justify-between items-center mt-2 border-t-2 pt-1">
+            <span class="font-semibold text-gray-600">Grand Total:</span>
             <span class="font-bold text-black">{{
               calculate.grand_total
             }}</span>
-          </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div ref="estimateContent" style="width: fit-content; display: none">
+  <div
+    ref="estimateContent"
+    style="width: fit-content; line-height: 12px; display: none"
+  >
     <div
       style="
         font-family: Arial, sans-serif;
         padding: 20px;
-        border: 1px solid #ccc;
         max-width: 800px;
         margin: 0 auto;
       "
@@ -691,14 +804,14 @@ function formatDate(dateString) {
         style="
           display: flex;
           justify-content: space-between;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
         "
       >
         <div style="text-align: left; width: 50%">
-          <h2 style="margin: 0; font-size: 24px; color: #333">
+          <h2 style="margin-bottom: 10px; font-size: 20px; color: #333">
             {{ estimateData?.organization?.organization_name }}
           </h2>
-          <p style="margin: 5px 0; color: #666">
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
             {{ estimateData?.address?.line_one }},
             {{ estimateData?.address?.line_two }},
             {{ estimateData?.address?.city }},
@@ -706,7 +819,7 @@ function formatDate(dateString) {
             {{ estimateData?.address?.country }} -
             {{ estimateData?.address?.code }}
           </p>
-          <p style="margin: 5px 0; color: #666">
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
             Website: {{ estimateData?.organization?.website || "N/A" }}
           </p>
         </div>
@@ -715,14 +828,14 @@ function formatDate(dateString) {
         <div
           style="display: flex; justify-content: right; flex-direction: column"
         >
-          <h3 style="margin: 0; font-size: 28px; color: #333">ESTIMATE</h3>
-          <img
-            width="100"
-            height="100"
-            style="border-radius: 50%; border: 1px solid #ccc; margin-top: 10px"
-            :src="estimateData?.organization?.image"
-            alt="Company Logo"
-          />
+          <h3 style="margin: 0; font-size: 24px; color: #333">ESTIMATE</h3>
+          <!-- <img
+          width="80"
+          height="80"
+          style="border-radius: 50%; border: 1px solid #ccc; margin-top: 5px;"
+          :src="estimateData?.organization?.image"
+          alt="Company Logo"
+        /> -->
         </div>
       </div>
 
@@ -731,42 +844,52 @@ function formatDate(dateString) {
         style="
           display: flex;
           justify-content: space-between;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
         "
       >
         <div style="width: 50%">
-          <h4 style="margin: 0; font-size: 18px; color: #333">BILL TO:</h4>
-          <p style="margin: 5px 0; color: #666">
+          <h4 style="margin: 0; font-size: 14px; color: #333">BILL TO:</h4>
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
             <strong>Contact Name:</strong>
             {{ estimateData?.contact?.company_name }}
           </p>
-          <p style="margin: 5px 0; color: #666">
-            <strong>Address:</strong> {{ estimateData?.contact?.address_contact?.address_line_1 }},
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
+            <strong>Address:</strong>
+            {{ estimateData?.contact?.address_contact?.address_line_1 }},
             {{ estimateData?.contact?.address_contact?.address_line_2 }},
             {{ estimateData?.contact?.address_contact?.city }}
             {{ estimateData?.contact?.address_contact?.state }}
           </p>
-          <p style="margin: 5px 0; color: #666">
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
             <strong>Phone:</strong>
             {{ estimateData?.contact?.phone || "N/A" }}
           </p>
-          <p style="margin: 5px 0; color: #666">
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
             <strong>Email:</strong>
             {{ estimateData?.contact?.email_id || "N/A" }}
           </p>
         </div>
 
         <div style="width: 50%; text-align: right">
-          <h4 style="margin: 0; font-size: 18px; color: #333">
+          <h4 style="margin: 0; font-size: 14px; color: #333">
             Estimate No: {{ estimateData?.estimate_number }}
           </h4>
-          <p style="margin: 5px 0; color: #666">
-            Estimate created: {{ formatDate(estimateData?.estimate_created) }}
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
+            Created: {{ formatDate(estimateData?.estimate_created) }}
           </p>
-          <p style="margin: 5px 0; color: #666">
-            Date: {{ new Date(estimateData?.issue_date).toLocaleDateString() }}
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
+            Issue Date:
+            {{ new Date(estimateData?.issue_date).toLocaleDateString() }}
           </p>
-          <p style="margin: 5px 0; color: #666">Valid For: 14 Days</p>
+          <p style="margin: 3px 0; font-size: 12px; color: #666">
+            Valid for:
+            {{
+              calculateValidUntil(
+                estimateData?.estimate_created,
+                estimateData?.issue_date
+              )
+            }}
+          </p>
         </div>
       </div>
 
@@ -775,27 +898,49 @@ function formatDate(dateString) {
         style="
           width: 100%;
           border-collapse: collapse;
-          margin-top: 20px;
+          margin-top: 10px;
           border: 1px solid #ccc;
         "
       >
         <thead>
           <tr style="background-color: #f9f9f9">
-            <th style="border: 1px solid #ccc; padding: 10px; text-align: left">
+            <th
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: left;
+              "
+            >
               Product
             </th>
             <th
-              style="border: 1px solid #ccc; padding: 10px; text-align: center"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: center;
+              "
             >
               QTY
             </th>
             <th
-              style="border: 1px solid #ccc; padding: 10px; text-align: right"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: right;
+              "
             >
               UNIT PRICE
             </th>
             <th
-              style="border: 1px solid #ccc; padding: 10px; text-align: right"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: right;
+              "
             >
               TOTAL
             </th>
@@ -806,21 +951,43 @@ function formatDate(dateString) {
             v-for="product in estimateData?.products"
             :key="product.estimate_item_id"
           >
-            <td style="border: 1px solid #ccc; padding: 10px; text-align: left">
+            <td
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: left;
+              "
+            >
               {{ product?.product?.product_name }}
             </td>
             <td
-              style="border: 1px solid #ccc; padding: 10px; text-align: center"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: center;
+              "
             >
               {{ product?.quantity }}
             </td>
             <td
-              style="border: 1px solid #ccc; padding: 10px; text-align: right"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: right;
+              "
             >
               ₹{{ product?.unit_price?.toFixed(2) }}
             </td>
             <td
-              style="border: 1px solid #ccc; padding: 10px; text-align: right"
+              style="
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 12px;
+                text-align: right;
+              "
             >
               ₹{{ (product?.unit_price * product?.quantity).toFixed(2) }}
             </td>
@@ -830,53 +997,89 @@ function formatDate(dateString) {
 
       <!-- Totals -->
       <div style="margin-top: 20px; text-align: right">
-        <p style="margin: 5px 0; color: #333">
-          <strong>SUBTOTAL:</strong> ₹{{ estimateData?.sub_total?.toFixed(2) }}
-        </p>
-        <p style="margin: 5px 0; color: #333">
-          <strong>DISCOUNT:</strong> ₹{{
-            estimateData?.discount_total?.toFixed(2)
-          }}
-        </p>
-        <p style="margin: 5px 0; color: #333">
-          <strong>SUBTOTAL LESS DISCOUNT:</strong> ₹{{
-            (estimateData?.sub_total - estimateData?.discount_total).toFixed(2)
-          }}
-        </p>
-        <p style="margin: 5px 0; color: #333">
-          <strong>TAX RATE:</strong> {{ estimateData?.tax_total?.toFixed(2) }}%
-        </p>
-        <p style="margin: 5px 0; color: #333">
-          <strong>TOTAL TAX:</strong> ₹{{ estimateData?.tax_total?.toFixed(2) }}
-        </p>
-        <p style="margin: 5px 0; color: #333">
-          <strong>SHIPPING/HANDLING:</strong> ₹0.00
-        </p>
-        <p style="margin: 5px 0; font-size: 18px; color: #333">
-          <strong>Grand Total:</strong> ₹{{
-            estimateData?.grand_total?.toFixed(2)
-          }}
-        </p>
+        <div
+          style="
+            border: 1px solid #ddd;
+            padding: 15px;
+            max-width: 300px;
+            margin-left: auto;
+            font-family: Arial, sans-serif;
+          "
+        >
+          <!-- Subtotal -->
+          <div
+            style="display: flex; justify-content: space-between; margin: 3px 0"
+          >
+            <span style="font-size: 12px; color: #333"
+              ><strong>SUBTOTAL:</strong></span
+            >
+            <span style="font-size: 12px; color: #333"
+              >₹{{ estimateData?.sub_total?.toFixed(2) }}</span
+            >
+          </div>
+          <!-- Discount -->
+          <div
+            style="display: flex; justify-content: space-between; margin: 3px 0"
+          >
+            <span style="font-size: 12px; color: #333"
+              ><strong> DISCOUNT TOTAL:</strong></span
+            >
+            <span style="font-size: 12px; color: #333"
+              >₹{{ estimateData?.discount_total?.toFixed(2) }}</span
+            >
+          </div>
+        
+         
+          <!-- Tax Rate -->
+          <div
+            style="display: flex; justify-content: space-between; margin: 3px 0"
+          >
+            <span style="font-size: 12px; color: #333"
+              ><strong>TOTAL TAX:</strong></span
+            >
+            <span style="font-size: 12px; color: #333"
+              >₹{{ estimateData?.tax_total?.toFixed(2) }}</span
+            >
+          </div>
+          <!-- Shipping/Handling -->
+          <div
+            style="display: flex; justify-content: space-between; margin: 3px 0"
+          >
+            <span style="font-size: 12px; color: #333"
+              ><strong>SHIPPING/HANDLING:</strong></span
+            >
+            <span style="font-size: 12px; color: #333">₹0.00</span>
+          </div>
+          <!-- Grand Total -->
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              margin-top: 10px;
+              border-top: 1px solid #ddd;
+              padding-top: 5px;
+            "
+          >
+            <span style="font-size: 14px; color: #333"
+              ><strong>Grand Total:</strong></span
+            >
+            <span style="font-size: 14px; color: #333"
+              >₹{{ estimateData?.grand_total?.toFixed(2) }}</span
+            >
+          </div>
+        </div>
       </div>
 
       <!-- Terms and Instructions -->
-      <div style="margin-top: 30px">
-        <h4 style="margin: 0; font-size: 18px; color: #333">
-          Terms & Instructions
-        </h4>
-        <p style="margin: 5px 0; color: #666">
-          Add payment requirements here, for example deposit amount and payment
-          method.
+      <div style="margin-top: 20px">
+        <p style="margin: 0; font-size: 12px; color: #666">
+          {{ estimateData?.notes }}
         </p>
-        <p style="margin: 5px 0; color: #666">
-          Add terms here, e.g: warranty, returns policy...
-        </p>
-        <p style="margin: 5px 0; color: #666">Include project timeline.</p>
       </div>
 
       <!-- Thank You Message -->
-      <div style="margin-top: 40px; text-align: center">
-        <p style="margin: 0; font-size: 16px; color: #666">
+      <div style="margin-top: 30px; text-align: center">
+        <p style="margin: 0; font-size: 12px; color: #666">
           Thank you for your business!
         </p>
       </div>
@@ -884,4 +1087,12 @@ function formatDate(dateString) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.truncate-cell {
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow */
+  display: inline-block; /* Ensure the span behaves like a block */
+  max-width: 100%; /* Ensure it respects the column width */
+}
+</style>

@@ -89,7 +89,7 @@ const handleDelete = async(id)=>{
   <div class="p-4">
     <div>
       <ListView
-        class="h-[150px]"
+        class="h-[550px]"
         :columns="[
           {
             label: 'Product Name',

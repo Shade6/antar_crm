@@ -154,7 +154,7 @@ const handle_delete = async () => {
   <hr />
   <div>
     <ListView
-      class="h-[250px]"
+      class="h-[250px] p-4"
       :columns="[
         {
           label: 'opportunities name',

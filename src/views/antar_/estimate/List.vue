@@ -23,9 +23,10 @@ const fetch = async () => {
   estimate_list.value = res.data.map((val) => ({
     id: val.estimate_id,
     estimate_number: val.estimate_number,
-    sub_total: val.sub_total,
-    tax_total: val.tax_total,
+    organization_name: val?.organization?.organization_name,
     grand_total: val.grand_total,
+    created_at:new Date(val.created_at).toLocaleDateString(),
+    due_date:new Date(val.issue_date).toLocaleDateString(),
   }));
 };
 
@@ -65,15 +66,17 @@ key: 'grand_total', width: '180px' }, { label:'download Estimate'
       class="h-[250px]"
       :columns="[
         {
-          label: 'Estimate code ',
+          label: 'Estimate Code ',
           key: 'estimate_number',
           icon: 'user',
           width: '180px',
         },
-        { label: 'sub total', key: 'sub_total', width: '180px' },
-        { label: 'tax total', key: 'tax_total', width: '150px' },
-        { label: 'grand total', key: 'grand_total', width: '180px' },
-        { label: 'view Estimate', key: 'download', width: '180px' },
+        { label: 'Organization Name', key: 'organization_name', width: '180px' },
+      
+        { label: 'Grand Total', key: 'grand_total', width: '180px' },
+        { label: 'Created Date', key: 'created_at', width: '180px' },
+        { label: 'Due Date', key: 'due_date', width: '180px' },
+        { label: 'View Estimate', key: 'download', width: '180px' },
       ]"
       :rows="estimate_list"
       :options="{

@@ -727,3 +727,13 @@ export const find_pdf = async (data,id) => {
     )
   ).data;
 };
+
+
+
+export const fetch_org_estimate = async (data) => {
+  return (
+    await axiosInstance.get(
+      `fetch_org_estimate?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};

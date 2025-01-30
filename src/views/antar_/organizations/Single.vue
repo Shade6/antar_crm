@@ -3,7 +3,7 @@ import Nav from "./nav/Nav.vue";
 import { ref, onMounted } from "vue";
 import { FeatherIcon, Button, Tabs, ListView } from "frappe-ui";
 
-import { get_single_organization,delete_organization ,find_pdf} from "@/api/userApi.js"; // Import the API function
+import { get_single_organization,delete_organization ,find_pdf , fetch_org_estimate} from "@/api/userApi.js"; // Import the API function
 import { useRoute, useRouter } from "vue-router"; // Import useRoute to access route parameters
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -25,7 +25,7 @@ const state = ref({
 
 const opportunities_list = ref([]);
 const contacts_list = ref([]);
-
+const estimate_list = ref([])
 // Fetch organization data on mount
 const fetchOrganizationData = async () => {
   const res = await get_single_organization(organizationId); // Fetch organization data using the ID
@@ -68,7 +68,23 @@ const fetchOrganizationData = async () => {
   }
 };
 
+const fetch_estimate_=async()=>{
+  const res = await fetch_org_estimate(organizationId)
+  if(res.statusCode == 200){
+    estimate_list.value = res.data.map((val)=>({
+      id:val.estimate_id,
+      estimate_number:val.estimate_number,
+      organization_name:val.organization.organization_name,
+      grand_total:val.grand_total,
+      issue_date:new Date(val.issue_date).toLocaleDateString(),
+      created_at:new Date(val.created_at).toLocaleDateString()
+    }))
+  }
+}
+
+
 onMounted(() => {
+  fetch_estimate_()
   fetchOrganizationData(); // Call the fetch function to get organization data
 });
 
@@ -176,6 +192,14 @@ const view_estimate = async(data)=>{
     });
   }
 }
+
+const handle_opportunity_view = (data)=>{
+  router.push(`/antar_/opportunities/${data}`);
+}
+const handle_contact_view = (data)=>{
+  router.push(`/antar_/contacts/${data}`);
+}
+
 </script>
 
 <template>
@@ -311,11 +335,12 @@ const view_estimate = async(data)=>{
           class="hs-tab-active:font-semibold hs-tab-active:border-black hs-tab-active:text-black py-4 px-1 inline-flex items-center gap-x-2 border-b-2 border-transparent text-xl whitespace-nowrap text-gray-500 hover:text-black focus:outline-none focus:text-black disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500"
           @click="tab = 3"
         >
+        
           <AppsIcon/>
           Estimates
           <span
             class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
-            >0</span
+            >{{ estimate_list.length }}</span
           >
         </button>
       </nav>
@@ -376,7 +401,10 @@ const view_estimate = async(data)=>{
           >
             <template #cell="{ item, row, column }">
               <span class="font-medium text-ink-gray-7">
-                {{ item }}
+               
+                <div @click="handle_opportunity_view(row.id)" class="p-1 h-full cursor-pointer" v-if="item">
+                  {{ item }}
+                </div>
     
                 <div class="p-1" v-if="column.key == 'create_estimate'">
                 <Button
@@ -455,7 +483,9 @@ const view_estimate = async(data)=>{
           >
             <template #cell="{ item, row, column }">
               <span class="font-medium text-ink-gray-7">
-                {{ item }} 
+                <div @click="handle_contact_view(row.id)" class="p-1 h-full cursor-pointer" v-if="item">
+                  {{ item }}
+                </div>
              
               </span>
             </template>
@@ -463,7 +493,62 @@ const view_estimate = async(data)=>{
         </div>
       </div>
       <div v-else>
-        nothing
+        <ListView
+      class="h-[250px]"
+      :columns="[
+        {
+          label: 'Estimate code ',
+          key: 'estimate_number',
+          icon: 'user',
+          width: '180px',
+        },
+        { label: 'Organization name', key: 'organization_name', width: '180px' },
+       
+        { label: 'Grand total', key: 'grand_total', width: '180px' },
+        { label: 'Created Date', key: 'created_at', width: '180px' },
+        { label: 'Due Date', key: 'issue_date', width: '180px' },
+        { label: 'View Estimate', key: 'download', width: '180px' },
+      ]"
+      :rows="estimate_list"
+      :options="{
+        selectable: true,
+        showTooltip: true,
+        resizeColumn: true,
+        emptyState: {
+          title: 'No records found',
+          description: 'Create a new record to get started',
+          button: {
+            label: 'New Record',
+            variant: 'solid',
+          },
+        },
+      }"
+      row-key="id"
+    >
+      <template #cell="{ item, row, column }">
+        <span class="font-medium text-ink-gray-7">
+          {{ item }}
+
+          <div class="p-1" v-if="column.key == 'download'">
+            <Button
+            :variant="'subtle'"
+            :ref_for="true"
+            theme="gray"
+            size="sm"
+            label="Button"
+            :loading="false"
+            :loadingText="null"
+            :disabled="false"
+            :link="null"
+
+              @click="view_estimate(row.id)"
+            >
+              View Estimate
+            </Button>
+          </div>
+        </span>
+      </template>
+    </ListView>
       </div>
     </div>
   </div>
