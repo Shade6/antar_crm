@@ -7,7 +7,7 @@ const Industry = db.industry;
 const Contact = db.contacts;
 const Address = db.address;
 const AddressOrg = db.address_org;
-const AddressContact = db.address_contact
+const AddressContact = db.address_contact;
 const ContactMapping = db.contact_mapping;
 const Estimate = db.estimate;
 const EstimateType = db.estimate_type;
@@ -113,7 +113,9 @@ exports.getAllOrganizations = async (req, res) => {
 };
 
 exports.deleteOrganization = async (req, res) => {
+  console.log('================================================')
   const organizationId = req.query.id;
+
   if (!organizationId) {
     return res.json({
       message: "Organization id is required",
@@ -123,6 +125,7 @@ exports.deleteOrganization = async (req, res) => {
   const find_organization = await Organization.findOne({
     where: { organization_id: organizationId },
   });
+ 
   if (!find_organization) {
     return res.json({ message: "Organization not found", statusCode: 400 });
   }
@@ -135,10 +138,14 @@ exports.deleteOrganization = async (req, res) => {
       { where: { address_org_id: address.address_org_id } }
     );
   }
+
   const find_opportunity = await Opportunity.findOne({
     where: { organization_id: find_organization.organization_id },
   });
-  if (find_organization) {
+
+
+  console.log(find_opportunity,'eee')
+  if (find_opportunity) {
     find_opportunity.organization_id = null;
     find_opportunity.save();
   }
@@ -400,7 +407,10 @@ exports.get_existing_org_estimate = async (req, res) => {
 
 exports.find_all_estimate = async (req, res) => {
   try {
-    const find_all_ = await Estimate.findAll();
+    const find_all_ = await Estimate.findAll({include:{
+      model:Organization,
+      as:'organization'
+    }});
     return res.json({
       message: "estimate finded",
       statusCode: 200,
@@ -424,13 +434,20 @@ exports.create_estimate = async (req, res) => {
       tax_total,
       sub_total,
       grand_total,
-      opportunity_id
+      opportunity_id,
+      discount
     } = req.body;
+      console.log(req.body)
+    if(!discount_total){
+       return res.json({message:'discount not provided', statusCode:400})
+    }
 
-    const find_opportunity = await Opportunity.findOne({where:{opportunity_id:opportunity_id}})
+    const find_opportunity = await Opportunity.findOne({
+      where: { opportunity_id: opportunity_id },
+    });
 
-    if(!find_opportunity){
-      return res.json({message:'cannot find opportunity',statusCode: 404});
+    if (!find_opportunity) {
+      return res.json({ message: "cannot find opportunity", statusCode: 404 });
     }
     console.log(req.body);
     const find_org = await Organization.findOne({
@@ -473,6 +490,12 @@ exports.create_estimate = async (req, res) => {
       return Math.floor(100000 + Math.random() * 900000);
     }
 
+   const find_address = await AddressOrg.findOne({where:{organization_id:organization.value}})
+    if(!find_address){
+      return res.json({ message: "no address found for this organization",statusCode:400})
+    }
+
+
     const create_estimate = await Estimate.create({
       organization_id: find_org.organization_id,
       estimate_number: "EST" + generateRandomSixDigitNumber(),
@@ -481,7 +504,7 @@ exports.create_estimate = async (req, res) => {
       discount_total: discount_total,
       tax_total: parseInt(tax_total),
       grand_total: parseInt(grand_total),
-      opportunity_id:opportunity_id,
+      opportunity_id: opportunity_id,
       notes: notes || "",
     });
 
@@ -524,14 +547,14 @@ exports.pdf_estimate_details = async (req, res) => {
 
     const find_opportunity = await Opportunity.findOne({
       where: { opportunity_id: opportunity_id },
-      include:{
-        model:Contact,
-        as:'contact',
-        include:{
-          model:AddressContact,
-          as:'address_contact'
-        }
-      }
+      include: {
+        model: Contact,
+        as: "contact",
+        include: {
+          model: AddressContact,
+          as: "address_contact",
+        },
+      },
     });
 
     const find_estimate_ = await Estimate.findOne({
@@ -588,7 +611,7 @@ exports.pdf_estimate_details = async (req, res) => {
         country: find_address.country,
         code: find_address.zip_code,
       },
-      contact:find_opportunity.contact,
+      contact: find_opportunity.contact,
       estimate_number: find_estimate_.estimate_number,
       issue_date: find_estimate_.issue_date,
       notes: find_estimate_.note || "",
@@ -598,6 +621,7 @@ exports.pdf_estimate_details = async (req, res) => {
       sub_total: find_estimate_.sub_total,
       grand_total: find_estimate_.grand_total,
       estimate_created: find_estimate_.created_at,
+     
     };
     return res.json({
       message: "details founded",
@@ -609,31 +633,55 @@ exports.pdf_estimate_details = async (req, res) => {
   }
 };
 
-
-exports.find_pdf=async(req,res)=>{
+exports.find_pdf = async (req, res) => {
   try {
     const id = req.query.id;
+    console.log(id,'==')
     let file = null;
-    const find_estimate_ = await Estimate.findOne({where:{estimate_id:id}})
-    if(find_estimate_){
-        file = find_estimate_.pdf
+    const find_estimate_ = await Estimate.findOne({
+      where: { estimate_id: id },
+    });
+    if (find_estimate_) {
+      file = find_estimate_.pdf;
     }
 
-    
-    const find_opportunity = await Opportunity.findOne({where:{opportunity_id:id}})
+    const find_opportunity = await Opportunity.findOne({
+      where: { opportunity_id: id },
+    });
 
-    if(find_opportunity){
-       file = find_opportunity.pdf
+    if (find_opportunity) {
+      file = find_opportunity.pdf;
     }
 
-
-    if(file == null){
-      return res.json({message:'file not found',statusCode:400})
+    if (file == null) {
+      return res.json({ message: "file not found", statusCode: 400 });
     }
-      res.json({message:'file retrieved',statusCode:200,data:file})
-
-
+    res.json({ message: "file retrieved", statusCode: 200, data: file });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 400 });
   }
-}
+};
+
+exports.fetch_org_estimate = async (req, res) => {
+  try {
+    const organization_id = req.query.id;
+    const find_org = await Organization.findOne({
+      where: { organization_id: organization_id },
+    });
+    if (!find_org) {
+      return res.json({ message: "org not found", statusCode: 400 });
+    }
+
+    const find_estimate = await Estimate.findAll({
+      where: { organization_id: find_org.organization_id },
+      include:{
+        model:Organization,
+        as:'organization'
+      }
+    });
+
+   return res.json({message:'founded',statusCode:200,data:find_estimate || []})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};

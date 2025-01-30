@@ -52,7 +52,7 @@ exports.createProduct = async (req, res) => {
       product_image: product_image,
       unit_price,
       unit_of_measure,
-      currency,
+      currency:currency?.value || '',
       tax_rate,
       discountable,
       status,
