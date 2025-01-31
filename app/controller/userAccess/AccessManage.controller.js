@@ -32,6 +32,8 @@ exports.get_user_page_access = async(req,res)=>{
     }
 }
 
+
+
 exports.get_user_menu = async (req, res) => {
     try {
         const role_id = req.query.role_id;
@@ -40,30 +42,35 @@ exports.get_user_menu = async (req, res) => {
             return res.json({ message: 'role_id is required', statusCode: 400 });
         }
 
-        const find_role = await Role.findOne({ where: { role_id: role_id } });
+        const find_role = await Role.findOne({ where: { role_id } });
         if (!find_role) {
             return res.json({ message: 'Cannot find role', statusCode: 400 });
         }
+
         const find_permissions = await ModulePermission.findAll({
-            where: { role_id: role_id },
+            where: { role_id },
             include: {
                 model: Module,
                 as: 'module',
-                attributes: ['module_name', 'module_id','docs_type','icon'] 
+                attributes: ['module_name', 'module_id', 'docs_type', 'icon', 'order'] // Ensure 'order' is selected
             },
-            attributes: ['read', 'create', 'delete', 'amend'] 
+            attributes: ['read', 'create', 'delete', 'amend']
         });
 
         if (!find_permissions.length) {
             return res.json({ message: 'No permissions assigned for this role', statusCode: 400 });
         }
 
+        // Sorting permissions based on module order
+        const sortedPermissions = find_permissions.sort((a, b) => a.module.dataValues.order - b.module.dataValues.order);
+
+        // console.log(sortedPermissions.map(val => val.module.dataValues));
+
         const encryptedData = CryptoJS.AES.encrypt(
-            JSON.stringify(find_permissions),
+            JSON.stringify(sortedPermissions),
             'your-secret-key'
         ).toString();
 
-        // Send encrypted response
         return res.json({
             message: 'Navbar fetched successfully',
             statusCode: 200,
@@ -71,7 +78,6 @@ exports.get_user_menu = async (req, res) => {
         });
 
     } catch (error) {
-        // Handle server errors
         return res.json({ message: error.message, statusCode: 500 });
     }
 };

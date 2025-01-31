@@ -101,6 +101,7 @@ exports.login = async (req, res) => {
         user_id: find_user_with_email.user_id,
         role_id: find_user_with_email.role_id,
         token: token,
+        landing:'dashboard'
       });
     } else {
       return res.send({
