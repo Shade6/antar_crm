@@ -109,7 +109,7 @@ const login_handler = async () => {
       switchStore.AddMenu(decryptedData);
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.role_id);
-      router.push("/antar_");
+      router.push(`/antar_/${res.landing}`);
     } else {
       toast.success(res.message, {
         position: "top-right",

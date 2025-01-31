@@ -44,7 +44,7 @@ const router = createRouter({
       redirect: "/antar_",
       children: [
         {
-          path: "/antar_/",
+          path: "/antar_/dashboard",
           name: "dashboard_home",
           component: () => import("../views/antar_/home.vue"),
         },
