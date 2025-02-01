@@ -65,6 +65,7 @@ require("./app/router/contact.routes")(app)
 require("./app/router/userAccess/address.routes")(app)
 require("./app/router/products.routes")(app)
 require("./app/router/Image.routes")(app)
+require("./app/router/userAccess/Dashboard.routes.js")(app)
 
 const PORT =  8088;
 app.listen(PORT, () => {
