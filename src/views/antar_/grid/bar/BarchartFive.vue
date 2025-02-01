@@ -1,4 +1,4 @@
-<script setup >
+<script setup>
 import {
   Chart as ChartJS,
   Title,
@@ -6,45 +6,83 @@ import {
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
-} from 'chart.js'
-import { Bar } from 'vue-chartjs'
+  LinearScale,
+} from "chart.js";
+import { Bar } from "vue-chartjs";
+import { Dropdown } from "frappe-ui";
 // import * as chartConfig from './chartConfig.js'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
- const chartData = {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+
+const chartData = {
   labels: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ],
   datasets: [
     {
-      label: 'Data One',
-      backgroundColor: '#c0392b ',
-      data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
-    }
-  ]
-}
+      label: "Data One",
+      backgroundColor: "#c0392b ",
+      data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
+    },
+  ],
+};
 </script>
 
 <template>
- <div class="bg-gray-300 h-full w-full">
-        <span class="font-bold"><u>Revenue Chart</u> </span>
-        <Bar :data="chartData" />
+  <div class="bg-gray-300 h-full w-full p-3">
+    <div class="flex justify-between px-3 py-2">
+      <span class="font-bold"><u>Revenue Chart</u> </span>
+      <Dropdown
+        class=""
+        :options="[
+          {
+            label: 'last 24 hours',
+            onClick: () => {},
+          },
+          {
+            label: 'last 7 days',
+            onClick: () => {},
+          },
+          {
+            label: 'last month',
+            onClick: () => {},
+          },
+          {
+            label: 'last 6 month',
+            onClick: () => {},
+          },
+          {
+            label: 'last year',
+            onClick: () => {},
+          },
+        ]"
+        :button="{
+          label: 'filter',
+        }"
+      />
     </div>
-  
+
+    <Bar :data="chartData" />
+  </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

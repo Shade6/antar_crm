@@ -737,3 +737,13 @@ export const fetch_org_estimate = async (data) => {
     )
   ).data;
 };
+
+
+
+export const find_dashboard = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};

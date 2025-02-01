@@ -1,5 +1,5 @@
 <template>
-    <button @click="addNewWidget()">Add Widget</button> {{ info }}
+
   
     <section class="grid-stack bg-red-400">
       <div 
@@ -47,6 +47,7 @@
   import PiChartTwo from './grid/pi/PiChartTwo.vue';
   import PiChartThree from './grid/pi/PiChartThree.vue';
 
+  import {find_dashboard} from '@/api/userApi.js'
 
 
 
@@ -83,6 +84,16 @@
         BarChartThree: {
           name: "BarChartThree", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
+        
+        PiChartOne: {
+          name: "PiChartOne", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
+        },
+        PiChartTwo: {
+          name: "PiChartTwo", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
+        },
+        PiChartThree: {
+          name: "PiChartThree", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
+        },
         BarChartFour: {
           name: "BarChartFour", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
@@ -94,15 +105,6 @@
         },
         BarChartSeven: {
           name: "BarChartSeven", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
-        },
-        PiChartOne: {
-          name: "PiChartOne", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
-        },
-        PiChartTwo: {
-          name: "PiChartTwo", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
-        },
-        PiChartThree: {
-          name: "PiChartThree", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         }
       });
   

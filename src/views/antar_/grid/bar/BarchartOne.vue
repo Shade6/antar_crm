@@ -12,6 +12,8 @@ import {
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 // import * as chartConfig from './chartConfig.js'
+import { Dropdown } from "frappe-ui";
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
  const chartData = {
@@ -41,7 +43,38 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 <template>
  <div class="bg-gray-300 h-full w-full">
-    <span class="font-bold"><u>New Lead Created</u> </span>
+ 
+    <div class="flex justify-between px-3 py-2">
+      <span class="font-bold"><u>New Lead Created</u> </span>
+      <Dropdown
+        class=""
+        :options="[
+          {
+            label: 'last 24 hours',
+            onClick: () => {},
+          },
+          {
+            label: 'last 7 days',
+            onClick: () => {},
+          },
+          {
+            label: 'last month',
+            onClick: () => {},
+          },
+          {
+            label: 'last 6 month',
+            onClick: () => {},
+          },
+          {
+            label: 'last year',
+            onClick: () => {},
+          },
+        ]"
+        :button="{
+          label: 'filter',
+        }"
+      />
+    </div>
         <Bar :data="chartData" />
     </div>
   
