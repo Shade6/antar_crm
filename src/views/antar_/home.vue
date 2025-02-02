@@ -21,13 +21,14 @@
   </template>
   
   <script>
-  import { ref, onMounted, reactive, nextTick } from 'vue';
+  import { ref, onMounted, reactive, nextTick, resolveDirective } from 'vue';
   import 'gridstack/dist/gridstack.min.css';
   import { GridStack } from 'gridstack';
+
   import ChartOne from './grid/ChartOne.vue';
   import ChartTwo from './grid/ChartTwo.vue';
   import ChartThree from './grid/ChartThree.vue';
-
+ 
 
   import BarChartOne from './grid/bar/BarChartOne.vue';
   import BarChartTwo from './grid/bar/BarChartTwo.vue';
@@ -47,7 +48,7 @@
   import PiChartTwo from './grid/pi/PiChartTwo.vue';
   import PiChartThree from './grid/pi/PiChartThree.vue';
 
-  import {find_dashboard} from '@/api/userApi.js'
+  import {find_dashboard,dashboard_header} from '@/api/userApi.js'
 
 
 
@@ -55,25 +56,31 @@
   
   export default {
     name: "WidgetGrid",
+     
     setup() {
       let info = ref("");
       let grid = null;
-  
+      const dashboardData = reactive({
+      leads: 0,
+      opportunity: 0,
+      closed: 0,
+      open: 0
+    });
       let components = reactive({
         BoxOne: {
-          name: "BoxOne", props: {}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxOne",props: { total: dashboardData.leads },  gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxTwo: {
-          name: "BoxTwo", props: {}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxTwo", props: {total:dashboardData.opportunity}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxThree: {
-          name: "BoxThree", props: {}, gridPos: { x: 0, y: 1,w: 2, h: 2}
+          name: "BoxThree", props: {total:dashboardData.closed }, gridPos: { x: 0, y: 1,w: 2, h: 2}
         },
         BoxFour: {
-          name: "BoxFour", props: {}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxFour", props: {total:dashboardData.open }, gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxFive: {
-          name: "BoxFive", props: {}, gridPos: { x: 0, y: 1, w: 2, h: 2}
+          name: "BoxFive", props: {total:''}, gridPos: { x: 0, y: 1, w: 2, h: 2}
         },
         BarChartOne: {
           name: "BarChartOne", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
@@ -107,8 +114,20 @@
           name: "BarChartSeven", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         }
       });
+      async function fetch (){
+         const res = await dashboard_header()
+         if(res.statusCode == 200){
+          Object.assign(dashboardData, {
+            leads: res.data.total_new_lead,
+            opportunity: res.data.total_new_opportunity,
+            closed: res.data.closed_opportunity,
+            open: res.data.project_revenue
+          });
+         }
+      }
   
       onMounted(() => {
+        fetch()
         grid = GridStack.init({
           float: true,
           cellHeight: "70px",
@@ -141,6 +160,7 @@
       return {
         info,
         components,
+        dashboardData
       };
     },
     components: {

@@ -747,3 +747,11 @@ export const find_dashboard = async (data) => {
     )
   ).data;
 };
+
+export const dashboard_header = async (data) => {
+  return (
+    await axiosInstance.get(
+      `dashboard_header?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
