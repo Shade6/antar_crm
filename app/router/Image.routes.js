@@ -38,6 +38,6 @@ const upload = multer({
   
     router.post("/create_image",Auth.user, upload.single('file'), controller.uploadFile);
     router.post("/create_file_pdf",Auth.user, upload.single('file'), controller.uploadPDF)
-    app.use('/api/v1/', router);
+    app.use('/api/v1/crm/', router);
   };
   

@@ -18,5 +18,5 @@ module.exports = (app) => {
   
   router.get("/find_extra_contacts", Authenticator.user, AccessChecker.access_create, controller.find_extra_contacts);
   router.delete("/handle_remove_extra_contact",Authenticator.user, AccessChecker.access_create, controller.handle_remove_extra_contact)
-  app.use("/api/v1/", router);
+  app.use("/api/v1/crm/", router);
 };

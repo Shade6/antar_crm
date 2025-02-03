@@ -10,6 +10,6 @@ module.exports = (app) => {
    router.delete("/delete_contact", Authenticator.user, AccessChecker.access_create,controller.deleteContact);
    router.get("/get_contact_by_id", Authenticator.user, AccessChecker.access_create,controller.get_contact_by_id);
    router.put("/update_contact", Authenticator.user, AccessChecker.access_create,controller.update_contact);
-   app.use("/api/v1/", router);
+   app.use("/api/v1/crm/", router);
   };
   

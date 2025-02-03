@@ -14,5 +14,5 @@ module.exports = app => {
 
 
 
-  app.use('/api/v1/', router);
+  app.use('/api/v1/crm/', router);
 };

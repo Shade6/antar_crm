@@ -4,8 +4,8 @@ module.exports = app => {
     const AccessChecker = require('../../utils/AccessChecker.js')
     var router = require("express").Router();
   
-    router.get("/find_dashboard",Authenticator.user,AccessChecker.access_create, controller.find_dashboard);
-
-    app.use('/api/v1/', router);
+    router.get("/find_dashboard",Authenticator.user,controller.find_dashboard);
+    router.get("/dashboard_header",Authenticator.user, controller.dashboard_header)
+    app.use('/api/v1/crm/', router);
   };
   

@@ -20,6 +20,6 @@ module.exports = (app) => {
     router.get("/fetch_org_estimate",Authenticator.user, AccessChecker.access_create,controller.fetch_org_estimate)
 
     
-    app.use("/api/v1/", router);
+    app.use("/api/v1/crm/", router);
   };
   

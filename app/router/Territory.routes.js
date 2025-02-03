@@ -9,9 +9,6 @@ module.exports = app => {
     router.get("/find_one_territory", controller.find_one_territories);
     router.put("/update_territory", controller.update_territory);
     // router.delete("/delete_contact", contact);
-  
-  
-  
-    app.use('/api/v1/', router);
+    app.use('/api/v1/crm/', router);
   };
   

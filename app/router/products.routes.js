@@ -13,6 +13,6 @@ module.exports = (app) => {
     router.get("/get_single_product",Authenticator.user, AccessChecker.access_create, controller.SingleProduct)
     router.get("/delete_image",controller.d_product_image)
 
-    app.use("/api/v1", router);
+    app.use("/api/v1/crm/", router);
 };
 

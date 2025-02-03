@@ -7,6 +7,6 @@ module.exports = app => {
     router.get("/menu",controller.get_user_menu)
   
   
-    app.use('/api/v1/', router);
+    app.use('/api/v1/crm/', router);
   };
   

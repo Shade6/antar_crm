@@ -199,5 +199,5 @@ module.exports = (app) => {
     AccessChecker.access_read,
     controller.get_lead_activity
   );
-  app.use("/api/v1/", router);
+  app.use("/api/v1/crm/", router);
 };
