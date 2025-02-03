@@ -1,5 +1,6 @@
-
-<script setup >
+<script setup>
+import { defineProps, watch, ref, onMounted } from "vue";
+import { Dropdown } from "frappe-ui";
 import {
   Chart as ChartJS,
   Title,
@@ -7,42 +8,69 @@ import {
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
-} from 'chart.js'
-import { Bar } from 'vue-chartjs'
-// import * as chartConfig from './chartConfig.js'
-import { Dropdown } from "frappe-ui";
+  LinearScale,
+} from "chart.js";
+import { Bar } from "vue-chartjs";
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
- const chartData = {
-  labels: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ],
+const props = defineProps({
+  total: {
+    type: Object,
+    required: true,
+  },
+});
+
+const chartData = ref({
+  labels: [],
   datasets: [
     {
-      label: 'Data One',
-      backgroundColor: '#f4d03f',
-      data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
+      data: [],
+      backgroundColor: "#dc7633",
+    },
+  ],
+});
+
+// Immediate watcher to handle initial prop data
+watch(
+  () => props.total.new_lead,
+  (newLead) => {
+    if (newLead) {
+      chartData.value = {
+        labels: newLead.labels,
+        datasets: newLead.datasets.map((dataset) => ({
+          ...dataset,
+          backgroundColor: dataset.backgroundColor || "#dc7633",
+        })),
+      };
     }
-  ]
-}
+  },
+  { immediate: true }
+);
+
+// Fallback in case prop data isn't immediately available
+onMounted(() => {
+  if (props.total.new_lead) {
+    chartData.value = {
+      labels: props.total.new_lead.labels,
+      datasets: props.total.new_lead.datasets.map((dataset) => ({
+        ...dataset,
+        backgroundColor: dataset.backgroundColor || "#dc7633",
+      })),
+    };
+  }
+});
 </script>
 
 <template>
- <div class="bg-gray-300 h-full w-full">
-  
+  <div v-if="false" class="border p-4 h-full w-full">
     <div class="flex justify-between px-3 py-2">
       <span class="font-bold"><u>Conversions</u> </span>
       <Dropdown
@@ -74,11 +102,11 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
         }"
       />
     </div>
-        <Bar :data="chartData" />
-    </div>
-  
+    <Bar :data="chartData" />
+  </div>
+  <div v-else>
+    <span class="font-bold"><u>Conversions are in maintenance</u> </span>
+  </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

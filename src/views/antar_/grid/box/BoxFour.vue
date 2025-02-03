@@ -8,10 +8,10 @@ const props = defineProps({
 </script>
 
 <template>
- <div class="bg-gray-200  border-black-2 h-full w-full flex flex-col justify-center items-center">
-      <span class="font-bold text-gray-600"> Lost Opportunity</span>
+ <div class="border   border-black-2 h-full w-full flex flex-col justify-center items-center">
+      <span class="font-bold text-gray-600"> Won Opportunity</span>
      
-       <span class="font-bold text-black">{{ total }}</span>
+       <span class="font-bold text-black">{{ total?.open }}</span>
     </div>
 </template>
 

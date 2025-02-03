@@ -1,9 +1,7 @@
+<script setup>
+import { defineProps, watch, ref, onMounted,defineEmits } from "vue";
+import { Dropdown } from "frappe-ui";
 
-
-
-
-
-<script setup >
 import {
   Chart as ChartJS,
   Title,
@@ -11,41 +9,74 @@ import {
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
-} from 'chart.js'
-import { Bar } from 'vue-chartjs'
-import { Dropdown } from "frappe-ui";
+  LinearScale,
+} from "chart.js";
+import { Bar } from "vue-chartjs";
 
-// import * as chartConfig from './chartConfig.js'
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+const Emit = defineEmits(['filter'])
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
- const chartData = {
-  labels: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ],
+const props = defineProps({
+  total: {
+    type: Object,
+    required: true,
+  },
+});
+
+const chartData = ref({
+  labels: [],
   datasets: [
     {
-      label: 'Data One',
+      data: [],
       backgroundColor: '#dc7633',
-      data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
+    },
+  ],
+});
+
+// Immediate watcher to handle initial prop data
+watch(
+  () => props.total.new_opportunity,
+  (newLead) => {
+    if (newLead) {
+      chartData.value = {
+        labels: newLead.labels,
+        datasets: newLead.datasets.map(dataset => ({
+          ...dataset,
+          backgroundColor: dataset.backgroundColor || '#dc7633',
+        })),
+      };
     }
-  ]
-}
+  },
+  { immediate: true }
+);
+
+// Fallback in case prop data isn't immediately available
+onMounted(() => {
+  if (props.total.new_lead) {
+    chartData.value = {
+      labels: props.total.new_lead.labels,
+      datasets: props.total.new_lead.datasets.map(dataset => ({
+        ...dataset,
+        backgroundColor: dataset.backgroundColor || '#dc7633',
+      })),
+    };
+  }
+});
+const handle_date_time = (data)=>[
+Emit('filter',data)
+]
 </script>
 
+
 <template>
- <div class="bg-gray-300 h-full w-full">
+ <div class="border p-4 h-full w-full">
  
     <div class="flex justify-between px-3 py-2">
       <span class="font-bold"><u>New Opportunity Created</u> </span>
@@ -54,23 +85,23 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
         :options="[
           {
             label: 'last 24 hours',
-            onClick: () => {},
+            onClick: () => {handle_date_time('24h')},
           },
           {
             label: 'last 7 days',
-            onClick: () => {},
+            onClick: () => {handle_date_time('1w')},
           },
           {
             label: 'last month',
-            onClick: () => {},
+            onClick: () => {handle_date_time('1m')},
           },
           {
             label: 'last 6 month',
-            onClick: () => {},
+            onClick: () => {handle_date_time('6m')},
           },
           {
             label: 'last year',
-            onClick: () => {},
+            onClick: () => {handle_date_time('1y')},
           },
         ]"
         :button="{

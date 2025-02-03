@@ -1,1 +1,1 @@
-export const USER_API = "http://localhost:8088/api/v1/"
+export const USER_API = "http://localhost:8088/api/v1/crm/"

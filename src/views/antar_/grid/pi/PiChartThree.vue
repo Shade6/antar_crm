@@ -1,4 +1,5 @@
 <script setup >
+import { defineProps, watch, ref, onMounted } from "vue";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'vue-chartjs'
 import { Dropdown } from "frappe-ui";
@@ -6,19 +7,56 @@ import { Dropdown } from "frappe-ui";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-const chartData = {
-  labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
+
+const props = defineProps({
+  total: {
+    type: Object,
+    required: true,
+  },
+});
+
+const chartData = ref({
+  labels: [],
   datasets: [
     {
-      backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-      data: [40, 20, 80, 10]
-    }
-  ]
-}
-</script>
+      data: [],
+      backgroundColor: '#dc7633',
+    },
+  ],
+});
 
+// Immediate watcher to handle initial prop data
+watch(
+  () => props.total.industry_classification,
+  (newLead) => {
+    if (newLead) {
+      chartData.value = {
+        labels: newLead.labels,
+        datasets: newLead.datasets.map(dataset => ({
+          ...dataset,
+          backgroundColor: dataset.backgroundColor || '#dc7633',
+        })),
+      };
+    }
+  },
+  { immediate: true }
+);
+
+// Fallback in case prop data isn't immediately available
+onMounted(() => {
+  if (props.total.industry_classification) {
+    chartData.value = {
+      labels: props.total.industry_classification.labels,
+      datasets: props.total.industry_classification.datasets.map(dataset => ({
+        ...dataset,
+        backgroundColor: dataset.backgroundColor || '#dc7633',
+      })),
+    };
+  }
+});
+</script>
 <template>
- <div class="bg-gray-300 h-full w-full">
+ <div class="border p-4 h-full w-full">
      
         <div class="flex justify-between px-3 py-2">
           <span class="font-bold"><u>Industry Classification</u> </span>

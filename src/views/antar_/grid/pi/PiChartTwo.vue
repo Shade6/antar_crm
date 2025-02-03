@@ -20,7 +20,7 @@ const chartData = {
 </script>
 
 <template>
- <div class="bg-gray-300 h-full w-full">
+ <div v-if="false" class="border p-4 h-full w-full">
   
     <div class="flex justify-between px-3 py-2">
       <span class="font-bold"><u>Engagements</u>(last year) </span>
@@ -54,6 +54,9 @@ const chartData = {
       />
     </div>
         <Pie :data="chartData"  />
+    </div>
+    <div v-else>
+      <span class="font-bold"><u>Engagements</u>(last year) on maintenance </span>
     </div>
 </template>
 

@@ -14,7 +14,7 @@
         gs-auto-position="true"
       >
         <div class="grid-stack-item-content">
-          <component :is="component.name" v-bind="component.props" />
+          <component :is="component.name" @filter="handle_filter" v-bind="component.props" />
         </div>
       </div>
     </section>
@@ -64,68 +64,106 @@
       leads: 0,
       opportunity: 0,
       closed: 0,
-      open: 0
+      open: 0,
+      revenue:0
     });
+    const dashboardCharts = reactive({
+      new_lead: null,
+      new_opportunity: null,
+      project_revenue: null,
+      activity_table: null,
+      engagements:null,
+      industry_classification:null,
+      conversions:null,
+      revenue:null,
+      top_5_sellers:null,
+      top_5_territory:null
+    });
+
+
+
       let components = reactive({
         BoxOne: {
-          name: "BoxOne",props: { total: dashboardData.leads },  gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxOne",props: { total: dashboardData },  gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxTwo: {
-          name: "BoxTwo", props: {total:dashboardData.opportunity}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxTwo", props: {total:dashboardData}, gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxThree: {
-          name: "BoxThree", props: {total:dashboardData.closed }, gridPos: { x: 0, y: 1,w: 2, h: 2}
+          name: "BoxThree", props: {total:dashboardData }, gridPos: { x: 0, y: 1,w: 2, h: 2}
         },
         BoxFour: {
-          name: "BoxFour", props: {total:dashboardData.open }, gridPos: { x: 0, y: 1, w: 2, h: 2 }
+          name: "BoxFour", props: {total:dashboardData }, gridPos: { x: 0, y: 1, w: 2, h: 2 }
         },
         BoxFive: {
-          name: "BoxFive", props: {total:''}, gridPos: { x: 0, y: 1, w: 2, h: 2}
+          name: "BoxFive", props: {total:dashboardData}, gridPos: { x: 0, y: 1, w: 2, h: 2}
         },
         BarChartOne: {
-          name: "BarChartOne", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+          name: "BarChartOne", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
         BarChartTwo: {
-          name: "BarChartTwo", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+          name: "BarChartTwo", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
         BarChartThree: {
-          name: "BarChartThree", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+          name: "BarChartThree", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
         
         PiChartOne: {
-          name: "PiChartOne", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
+          name: "PiChartOne", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
         },
-        PiChartTwo: {
-          name: "PiChartTwo", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
-        },
+       
         PiChartThree: {
-          name: "PiChartThree", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
+          name: "PiChartThree", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
         },
-        BarChartFour: {
-          name: "BarChartFour", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
-        },
+     
         BarChartFive: {
-          name: "BarChartFive", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+          name: "BarChartFive", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+        },
+       
+        BarChartSeven: {
+          name: "BarChartSeven", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+        }, PiChartTwo: {
+          name: "PiChartTwo", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 8 }
         },
         BarChartSix: {
-          name: "BarChartSix", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+          name: "BarChartSix", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
         },
-        BarChartSeven: {
-          name: "BarChartSeven", props: {}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
-        }
+        BarChartFour: {
+          name: "BarChartFour", props: {total:dashboardCharts}, gridPos: { x: 0, y: 1, w: 4, h: 5 }
+        },
       });
       async function fetch (){
+           const dash_res =  await find_dashboard()
+           if(dash_res.statusCode == 200){
+            Object.assign(dashboardCharts, {
+              new_lead: dash_res.data.new_lead,
+              new_opportunity: dash_res.data.new_opportunity,
+              project_revenue: dash_res.data.find_project_revenue,
+              activity_table: dash_res.data.activity_tab,
+              engagements:null,
+              industry_classification:dash_res.data?.industry_classification,
+              conversions:null,
+              revenue:dash_res.data.revenue_chart,
+              top_5_sellers:null,
+              top_5_territory:dash_res.data.top_5_territory
+            });
+          }
+
+
          const res = await dashboard_header()
          if(res.statusCode == 200){
           Object.assign(dashboardData, {
             leads: res.data.total_new_lead,
             opportunity: res.data.total_new_opportunity,
             closed: res.data.closed_opportunity,
-            open: res.data.project_revenue
+            open: res.data.won_opportunity,
+            revenue:res.data.project_revenue
           });
          }
       }
-  
+      function handle_filter(data){
+        console.log(data,'-----------------------')
+      }
       onMounted(() => {
         fetch()
         grid = GridStack.init({

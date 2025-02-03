@@ -1,10 +1,27 @@
 <script setup >
-
+import { defineProps, watch, ref, onMounted } from "vue";
+const props = defineProps({
+  total: {
+    type: Object,
+    required: true,
+  },
+});
+const isToday = (dateString) => {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  const today = new Date();
+  
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
 </script>
 
 
 <template>
- <div class="bg-gray-300 h-[100%] w-[100%] p-3">
+ <div class="border  h-[100%] w-[100%] p-3">
         <span class="font-bold"><u>Activity Table</u> </span>
      
 
@@ -13,90 +30,45 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
-                    Product name
+                     type
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    for
                 </th>
              
                 <th scope="col" class="px-6 py-3">
-                    Category
+                    time
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Price
+                    person
                 </th>
             </tr>
         </thead>
-        <tbody class="h-72 overflow-y-scroll">
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+        <tbody  class="h-72 overflow-y-scroll">
+            <tr v-for="test in props?.total?.activity_table" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Apple MacBook Pro 17"
+                   {{ test?.type }}
                 </th>
+                
+                <td class="px-6 py-4">
+                    
+                    {{ test?.task_status}}
+
+                </td>
               
+                <td 
+                    class="px-6 py-4"
+                    :class="{ 'bg-red-500 text-white': isToday(test?.task_date) }"
+                    >
+                    {{ new Date(test?.task_date).toLocaleDateString('en-GB')  }}
+                    {{ isToday(test?.task_date) ?' today' :''  }}
+                    </td>
+
                 <td class="px-6 py-4">
-                    Laptop
-                </td>
-                <td class="px-6 py-4">
-                    $2999
-                </td>
-            </tr>
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Microsoft Surface Pro
-                </th>
-            
-                <td class="px-6 py-4">
-                    Laptop PC
-                </td>
-                <td class="px-6 py-4">
-                    $1999
+                    {{ test?.user?.first_name }}
                 </td>
             </tr>
-            <tr class="bg-white dark:bg-gray-800">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Magic Mouse 2
-                </th>
-              
-                <td class="px-6 py-4">
-                    Accessories
-                </td>
-                <td class="px-6 py-4">
-                    $99
-                </td>
-            </tr>
-            <tr class="bg-white dark:bg-gray-800">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Magic Mouse 2
-                </th>
-              
-                <td class="px-6 py-4">
-                    Accessories
-                </td>
-                <td class="px-6 py-4">
-                    $99
-                </td>
-            </tr>
-            <tr class="bg-white dark:bg-gray-800">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Magic Mouse 2
-                </th>
-              
-                <td class="px-6 py-4">
-                    Accessories
-                </td>
-                <td class="px-6 py-4">
-                    $99
-                </td>
-            </tr>
-            <tr class="bg-white dark:bg-gray-800">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Magic Mouse 2
-                </th>
-              
-                <td class="px-6 py-4">
-                    Accessories
-                </td>
-                <td class="px-6 py-4">
-                    $99
-                </td>
-            </tr>
+           
         </tbody>
     </table>
 </div>
