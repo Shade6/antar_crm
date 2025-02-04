@@ -743,7 +743,7 @@ export const fetch_org_estimate = async (data) => {
 export const find_dashboard = async (data) => {
   return (
     await axiosInstance.get(
-      `find_dashboard?mdl=${switchStore().pageId}&&timeframe=${'1y'}`
+      `find_dashboard?mdl=${switchStore().pageId}&&timeframe=${'24h'}`
     )
   ).data;
 };
@@ -756,3 +756,45 @@ export const dashboard_header = async (data) => {
   ).data;
 };
 
+export const find_dashboard_new_lead = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_new_lead?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+export const find_dashboard_new_opportunity = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_new_opportunity?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+export const find_dashboard_project_revenue = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_project_revenue?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+export const find_dashboard_industry_classification = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_industry_classification?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+export const find_dashboard_revenue_ = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_revenue_?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+export const find_dashboard_top_5_territory = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_dashboard_top_5_territory?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};

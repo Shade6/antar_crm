@@ -1,6 +1,8 @@
 <script setup>
 import { defineProps, watch, ref, onMounted } from "vue";
 import { Dropdown } from "frappe-ui";
+import {find_dashboard_project_revenue} from "@/api/userApi"
+
 import {
   Chart as ChartJS,
   Title,
@@ -67,6 +69,21 @@ onMounted(() => {
     };
   }
 });
+const handle_timeFrame = async (data) => {
+  const res = await find_dashboard_project_revenue(data);
+  if (res.statusCode === 200) {
+    
+    chartData.value.labels = res.data?.labels;
+    chartData.value.datasets = res.data.datasets.map(dataset => ({
+      ...dataset,
+      backgroundColor: dataset.backgroundColor || '#dc7633',
+    }));
+  } else {
+    alert(res.message);
+  }
+};
+
+
 </script>
 <template>
  <div class="border p-4 h-full w-full">
@@ -78,23 +95,23 @@ onMounted(() => {
         :options="[
           {
             label: 'last 24 hours',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('24h')},
           },
           {
             label: 'last 7 days',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1w')},
           },
           {
             label: 'last month',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1m')},
           },
           {
             label: 'last 6 month',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('6m')},
           },
           {
             label: 'last year',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1y')},
           },
         ]"
         :button="{
@@ -102,7 +119,7 @@ onMounted(() => {
         }"
       />
     </div>
-        <Bar :data="chartData" />
+        <Bar :data="chartData" :key="chartData.labels.join('')"/>
     </div>
   
 </template>

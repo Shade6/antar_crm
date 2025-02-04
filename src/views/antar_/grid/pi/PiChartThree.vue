@@ -3,6 +3,7 @@ import { defineProps, watch, ref, onMounted } from "vue";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'vue-chartjs'
 import { Dropdown } from "frappe-ui";
+import {find_dashboard_industry_classification} from "@/api/userApi"
 
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -54,34 +55,51 @@ onMounted(() => {
     };
   }
 });
+
+
+const handle_timeFrame = async (data) => {
+  const res = await find_dashboard_industry_classification(data);
+  if (res.statusCode === 200) {
+    
+    chartData.value.labels = res.data?.labels;
+    chartData.value.datasets = res.data.datasets.map(dataset => ({
+      ...dataset,
+      backgroundColor: dataset.backgroundColor || '#dc7633',
+    }));
+  } else {
+    alert(res.message);
+  }
+};
+
+
 </script>
 <template>
  <div class="border p-4 h-full w-full">
      
         <div class="flex justify-between px-3 py-2">
           <span class="font-bold"><u>Industry Classification</u> </span>
-      <Dropdown
+          <Dropdown
         class=""
         :options="[
           {
             label: 'last 24 hours',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('24h')},
           },
           {
             label: 'last 7 days',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1w')},
           },
           {
             label: 'last month',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1m')},
           },
           {
             label: 'last 6 month',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('6m')},
           },
           {
             label: 'last year',
-            onClick: () => {},
+            onClick: () => {handle_timeFrame('1y')},
           },
         ]"
         :button="{
@@ -89,7 +107,7 @@ onMounted(() => {
         }"
       />
     </div>
-        <Pie :data="chartData"  />
+        <Pie :data="chartData" :key="chartData.labels.join('')" />
     </div>
 </template>
 

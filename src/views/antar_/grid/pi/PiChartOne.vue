@@ -30,17 +30,17 @@ const isToday = (dateString) => {
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
-                     type
+                     Status
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    for
+                    For
                 </th>
              
                 <th scope="col" class="px-6 py-3">
-                    time
+                    Time
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    person
+                    Person
                 </th>
             </tr>
         </thead>

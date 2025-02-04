@@ -1,6 +1,7 @@
 <script setup>
 import { defineProps, watch, ref, onMounted,defineEmits } from "vue";
 import { Dropdown } from "frappe-ui";
+import {find_dashboard_new_opportunity} from "@/api/userApi"
 
 import {
   Chart as ChartJS,
@@ -72,6 +73,22 @@ onMounted(() => {
 const handle_date_time = (data)=>[
 Emit('filter',data)
 ]
+
+const handle_timeFrame = async (data) => {
+  const res = await find_dashboard_new_opportunity(data);
+  if (res.statusCode === 200) {
+    
+    chartData.value.labels = res.data?.labels;
+    chartData.value.datasets = res.data.datasets.map(dataset => ({
+      ...dataset,
+      backgroundColor: dataset.backgroundColor || '#dc7633',
+    }));
+  } else {
+    alert(res.message);
+  }
+};
+
+
 </script>
 
 
@@ -85,23 +102,23 @@ Emit('filter',data)
         :options="[
           {
             label: 'last 24 hours',
-            onClick: () => {handle_date_time('24h')},
+            onClick: () => {handle_timeFrame('24h')},
           },
           {
             label: 'last 7 days',
-            onClick: () => {handle_date_time('1w')},
+            onClick: () => {handle_timeFrame('1w')},
           },
           {
             label: 'last month',
-            onClick: () => {handle_date_time('1m')},
+            onClick: () => {handle_timeFrame('1m')},
           },
           {
             label: 'last 6 month',
-            onClick: () => {handle_date_time('6m')},
+            onClick: () => {handle_timeFrame('6m')},
           },
           {
             label: 'last year',
-            onClick: () => {handle_date_time('1y')},
+            onClick: () => {handle_timeFrame('1y')},
           },
         ]"
         :button="{
@@ -109,7 +126,7 @@ Emit('filter',data)
         }"
       />
     </div>
-        <Bar :data="chartData" />
+        <Bar :data="chartData" :key="chartData.labels.join('')"/>
     </div>
   
 </template>
