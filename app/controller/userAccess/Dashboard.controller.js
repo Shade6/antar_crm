@@ -19,10 +19,10 @@ const getTimeIntervals = (timeframe) => {
     case '24h':
       intervals = [
         { start: new Date(now - 2 * 3600 * 1000), end: now, label: 'last 2 hours' },
-        { start: new Date(now - 4 * 3600 * 1000), end: new Date(now - 2 * 3600 * 1000), label: 'last 4 hours' },
-        { start: new Date(now - 8 * 3600 * 1000), end: new Date(now - 4 * 3600 * 1000), label: 'last 8 hours' },
-        { start: new Date(now - 16 * 3600 * 1000), end: new Date(now - 8 * 3600 * 1000), label: 'last 16 hours' },
-        { start: new Date(now - 24 * 3600 * 1000), end: new Date(now - 16 * 3600 * 1000), label: 'last 24 hours' },
+        { start: new Date(now - 4 * 3600 * 1000), end: now, label: 'last 4 hours' },
+        { start: new Date(now - 8 * 3600 * 1000), end: now, label: 'last 8 hours' },
+        { start: new Date(now - 16 * 3600 * 1000), end: now, label: 'last 16 hours' },
+        { start: new Date(now - 24 * 3600 * 1000), end: now, label: 'last 24 hours' },
       ];
       break;
     case '1d':
@@ -467,3 +467,107 @@ exports.dashboard_header = async (req, res) => {
     });
   }
 };
+
+exports.find_dashboard_new_lead=async(req,res)=>{
+  try {
+    const data = req.query
+    const new_lead = await find_new_lead_(data);
+    return res.json({message:'data found',statusCode:200,data:new_lead})
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}
+exports.find_dashboard_new_opportunity=async(req,res)=>{
+  try {
+    const data = req.query
+    const new_opportunity_ = await new_opportunity(data);
+    if(new_opportunity_){
+      return res.json({message:'data found',statusCode:200,data:new_opportunity_})
+    }else{
+      return res.json({message:new_opportunity_,statusCode:400})
+    }
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}
+exports.find_dashboard_project_revenue=async(req,res)=>{
+  try {
+    const data = req.query
+    const find_project_revenue_ = await find_project_revenue(data);
+    if(find_project_revenue_){
+       return res.json({message:'data found',statusCode:200,data:find_project_revenue_})
+    }else{
+      return res.json({message:find_project_revenue_,statusCode:400})
+    }
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}
+exports.find_dashboard_industry_classification=async(req,res)=>{
+  try {
+    const data = req.query
+      const industry_classification_ = await industry_classification(data);
+
+      if(industry_classification_){
+        return res.json({message:'data fetched',statusCode:200,data:industry_classification_})
+      }else{
+        return res.json({message:industry_classification_,statusCode:400})
+      }
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}
+exports.find_dashboard_revenue_=async(req,res)=>{
+  try {
+    const data = req.query
+    console.log(data,'dddddddddddddddddddddddddddddddddddddfdfdf-------------')
+         const revenue_chart_ = await revenue_chart(data);
+         console.log(revenue_chart_)
+         if(revenue_chart_){
+             return res.json({message:'data fetched',statusCode:200,data:revenue_chart_})
+         }else{
+          return res.json({message:revenue_chart_,statusCode:400})
+         }
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}
+exports.find_dashboard_top_5_territory=async(req,res)=>{
+  try {
+       // const top_5_sellers_ = await top_5_sellers(data);
+       const data = req.query
+       const top_5_territory_ = await top_5_territory(data);
+       if(top_5_territory_){
+        return res.json({message:'Data fetched',statusCode:200,data:top_5_territory_})
+       }else{
+        return res.json({message:top_5_territory_,statusCode:400})
+       }
+
+  } catch (error) {
+    res.status(200).json({ 
+      statusCode: 500,
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+}

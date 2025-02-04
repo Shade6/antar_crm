@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
     cors({
-      origin: ["http://localhost:5173"],
+      origin: ["http://localhost:5173","http://localhost:3000"],
       credentials: true,
     })
   );
@@ -36,9 +36,8 @@ app.use('/image',express.static('public'))
   db.sequelize
   .sync()
   .then(() => {
-    console.log(
-      "----------------------DB connected successfully.-------------------------"
-    );
+    console.log("----------------------DB connected successfully.-------------------------");
+
   })
   .catch((err) => {
     console.log("Failed to connect db: " + err.message);
@@ -66,6 +65,7 @@ require("./app/router/userAccess/address.routes")(app)
 require("./app/router/products.routes")(app)
 require("./app/router/Image.routes")(app)
 require("./app/router/userAccess/Dashboard.routes.js")(app)
+require("./app/router/subscription/subscription.routes.js")(app)
 
 const PORT =  8088;
 app.listen(PORT, () => {

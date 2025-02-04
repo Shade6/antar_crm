@@ -77,6 +77,12 @@ db.estimate = require("./opportunity/Estimate.js")(sequelize,Sequelize)
 db.estimate_type = require("./opportunity/EstimateItem.js")(sequelize,Sequelize)
 db.product_mapping= require("./ProductMapping.js")(sequelize,Sequelize)
 
+db.invoice = require('./subscription/invoice.js')(sequelize,Sequelize)
+db.payment = require('./subscription/payment.js')(sequelize,Sequelize)
+db.plan = require('./subscription/plan.js')(sequelize,Sequelize)
+db.subscription = require('./subscription/subscription.js')(sequelize,Sequelize)
+db.tenant= require('./subscription/tenant.js')(sequelize,Sequelize)
+
 
 //-------------------
 db.organization.hasMany(db.estimate, { //---this is the reference 
