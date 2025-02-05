@@ -11,11 +11,11 @@ exports.create_user = async (req, res) => {
   try {
     const { email, password, role_id, first_name, last_name, enabled } =
       req.body;
-
-    const validation = field_checker.checkNullValues({
-      email: email,
-      role: role_id,
-    });
+      const tenant_id = req.tenant
+      const validation = field_checker.checkNullValues({
+        email: email,
+        role: role_id,
+      });
 
     if (!validation.isValid) {
       return res.json({
@@ -30,7 +30,7 @@ exports.create_user = async (req, res) => {
         statusCode: 400,
       });
     }
-    const find_user_exist = await Users.findOne({ where: { email: email } });
+    const find_user_exist = await Users.findOne({ where: { email: email ,tenant_id:tenant_id } });
     if (find_user_exist) {
       return res.json({
         message: "user email already exist choose another email !",
@@ -44,6 +44,7 @@ exports.create_user = async (req, res) => {
       last_name: last_name ?? "",
       email: email ?? "",
       role_id: role_id,
+      tenant_id:tenant_id,
       // password:hashedPassword,
       created_by: 1,
       created_at: new Date(),
@@ -72,7 +73,7 @@ exports.login = async (req, res) => {
       });
     }
     const find_user_with_email = await Users.findOne({
-      where: { email: email },
+      where: { email: email  },
     });
     if (!find_user_with_email) {
       return res.json({ message: "Email is invalid !", statusCode: 400 });
@@ -82,12 +83,15 @@ exports.login = async (req, res) => {
       password,
       find_user_with_email.password
     );
-
+   if(!find_user_with_email?.tenant_id){
+    return res.json({message:'not registered to subscription',statusCode:400})
+   }
     if (isMatch) {
       const token = jwt.sign(
         {
           user_id: find_user_with_email.user_id,
           role_id: find_user_with_email.role_id,
+          tenant_id: find_user_with_email.tenant_id
         },
         process.env.JWT_SECRET_KEY,
         {
@@ -124,12 +128,13 @@ exports.update_user = async (req, res) => {
 exports.get_user = async (req, res) => {
   try {
     const user_id = req.query.u_id;
+    const tenant_id = req.tenant
     if (!user_id) {
       return res.json({ message: "user not found", statusCode: 400 });
     }
 
     const find_user = await Users.findOne({
-      where: { user_id: user_id },
+      where: { user_id: user_id,tenant_id:tenant_id },
       include: {
         model: Role,
         as: "role",
@@ -145,8 +150,11 @@ exports.get_user = async (req, res) => {
 };
 
 exports.find_all_user = async (req, res) => {
+  const tenant_id = req.tenant
   try {
-    const find_users = await Users.findAll({
+    const find_users = await Users.findAll({where:{
+      tenant_id:tenant_id
+    },
       attributes: [
         "user_id",
         "first_name",

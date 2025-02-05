@@ -7,6 +7,9 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: Sequelize.UUIDV4,
         },
+        tenant_id:{
+            type:Sequelize.UUID,
+          },
         product_image:{
             type: Sequelize.STRING,
         },

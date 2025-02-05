@@ -24,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       role_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
       },
       enabled: {
         type: Sequelize.BOOLEAN,

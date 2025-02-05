@@ -19,7 +19,7 @@ exports.createProduct = async (req, res) => {
       discountable,
       status,
     } = req.body;
-
+    const tenant_id = req.tenant
     if (
       !product_name ||
       !product_type ||
@@ -36,7 +36,7 @@ exports.createProduct = async (req, res) => {
 
     // Check if a product with the same name already exists
     const existingProduct = await Product.findOne({
-      where: { product_name: product_name },
+      where: { product_name: product_name,tenant_id:tenant_id },
     });
     if (existingProduct) {
       return res.json({
@@ -50,6 +50,7 @@ exports.createProduct = async (req, res) => {
       product_type: product_type.value,
       description: product_description,
       product_image: product_image,
+      tenant_id:tenant_id,
       unit_price,
       unit_of_measure,
       currency:currency?.value || '',
@@ -70,12 +71,12 @@ exports.createProduct = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.query;
-
+    const tenant_id = req.tenant
     if (!id) {
       return res.json({ message: "Product ID is required", statusCode: 400 });
     }
 
-    const product = await Product.findOne({ where: { id } });
+    const product = await Product.findOne({ where: { id ,tenant_id:tenant_id} });
 
     if (!product) {
       return res.json({ message: "Product not found", statusCode: 404 });
@@ -93,7 +94,12 @@ exports.getProductById = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll();
+    const tenant_id = req.tenant
+    const products = await Product.findAll({
+      where:{
+        tenant_id:tenant_id
+      },
+    });
     return res.json({
       message: "Products fetched successfully",
       statusCode: 200,
@@ -107,19 +113,20 @@ exports.getAllProducts = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.query;
+    const tenant_id = req.tenant
     console.log(id, "-------------");
 
     if (!id) {
       return res.json({ message: "Product ID is required", statusCode: 400 });
     }
 
-    const product = await Product.findOne({ where: { product_id: id } });
+    const product = await Product.findOne({ where: { product_id: id,tenant_id:tenant_id } });
     console.log(product);
     if (!product) {
       return res.json({ message: "Product not found", statusCode: 404 });
     }
 
-    await Product.destroy({ where: { product_id: id } });
+    await Product.destroy({ where: { product_id: id ,tenant_id:tenant_id} });
     return res.json({
       message: "Product deleted successfully",
       statusCode: 200,
@@ -143,7 +150,7 @@ exports.updateProduct = async (req, res) => {
       discountable,
       status,
     } = req.body;
-   
+    const tenant_id = req.tenant
 
     const details = {
       product_name: product_name,
@@ -155,6 +162,7 @@ exports.updateProduct = async (req, res) => {
       tax_rate: tax_rate,
       discountable: discountable,
       status: status,
+      tenant_id:tenant_id
     }
     for (const [key, value] of Object.entries(details)) {
       if (value === null || value === undefined) {
@@ -169,7 +177,7 @@ exports.updateProduct = async (req, res) => {
 
     const update_product = await Product.update(
       details,
-      { where: { product_id: product_id } }
+      { where: { product_id: product_id ,tenant_id:tenant_id} }
     );
     return res.json({
       message: "Product updated successfully",
@@ -194,8 +202,9 @@ exports.d_product_image = async (req, res) => {
 exports.SingleProduct = async (req, res) => {
   try {
     const id = req.query.id;
+    const tenant_id = req.tenant
     const find_product = await Product.findOne({
-      where: { product_id: id },
+      where: { product_id: id ,tenant_id:tenant_id},
       include: {
         model: Opportunities,
         as: "opportunity",

@@ -11,6 +11,9 @@ module.exports = (sequelize, Sequelize) => {
       role_name: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       role_type:{
         type:Sequelize.STRING
       },
@@ -31,10 +34,10 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue:false,
       },
       created_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
       },
       changed_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
       },
       created_at:{
         type:Sequelize.DATE

@@ -12,6 +12,7 @@ exports.user=async(req,res,next)=>{
             const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
             req.user = verify.user_id;
             req.role = verify.role_id;
+            req.tenant = verify.tenant_id;
             next();
         } catch (error) {
             if (error.name === 'TokenExpiredError') {

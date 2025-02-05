@@ -114,7 +114,7 @@ const getOverallStartEnd = (timeframe) => {
 };
 
 // New Leads
-const find_new_lead_ = async(data) => {
+const find_new_lead_ = async(data,tenant_id) => {
   const timeframe = data.timeframe || '24h';
   const intervals = getTimeIntervals(timeframe);
   const dataPoints = [];
@@ -123,6 +123,7 @@ const find_new_lead_ = async(data) => {
     const count = await Leads.count({
       where: {
         created_at: { [Op.between]: [interval.start, interval.end] }
+        ,tenant_id:tenant_id
       }
     });
     dataPoints.push(count);
@@ -139,14 +140,14 @@ const find_new_lead_ = async(data) => {
 };
 
 // New Opportunities
-const new_opportunity = async(data) => {
+const new_opportunity = async(data,tenant_id) => {
   const timeframe = data.timeframe || '24h';
   const intervals = getTimeIntervals(timeframe);
   const dataPoints = [];
   
   for (const interval of intervals) {
     const count = await Opportunity.count({
-      where: { created_on: { [Op.between]: [interval.start, interval.end] } }
+      where: { created_on: { [Op.between]: [interval.start, interval.end] } ,tenant_id:tenant_id}
     });
     dataPoints.push(count);
   }
@@ -162,7 +163,7 @@ const new_opportunity = async(data) => {
 };
 
 // Project Revenue
-const find_project_revenue = async (data) => {
+const find_project_revenue = async (data,tenant_id) => {
   const timeframe = data.timeframe || '24h';
   const intervals = getTimeIntervals(timeframe);
   const dataPoints = [];
@@ -171,7 +172,7 @@ const find_project_revenue = async (data) => {
   for (const interval of intervals) {
     const result = await Estimate.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('grand_total')), 'total']],
-      where: { created_at: { [Op.between]: [interval.start, interval.end] } },
+      where: { created_at: { [Op.between]: [interval.start, interval.end] },tenant_id:tenant_id },
       raw: true
     });
 
@@ -180,6 +181,9 @@ const find_project_revenue = async (data) => {
 
   // Fetch total sum of all estimates
   const totalSumResult = await Estimate.findOne({
+    where:{
+      tenant_id:tenant_id
+    },
     attributes: [[Sequelize.fn('sum', Sequelize.col('grand_total')), 'total']],
     raw: true
   });
@@ -218,8 +222,8 @@ const conversion = async(data) => {
 };
 
 // Revenue Chart
-const revenue_chart = async(data) => {
-  return await find_project_revenue(data);
+const revenue_chart = async(data,tenant_id) => {
+  return await find_project_revenue(data,tenant_id);
 };
 
 // Top 5 Sellers
@@ -231,7 +235,7 @@ const top_5_sellers = async(data) => {
       'opportunity_owner_id',
       [Sequelize.fn('COUNT', Sequelize.col('opportunity_id')), 'count']
     ],
-    where: { created_on: { [Op.between]: [start, end] } },
+    where: { created_on: { [Op.between]: [start, end] } ,tenant_id:tenant_id},
     group: ['opportunity_owner_id'],
     order: [[Sequelize.literal('count'), 'DESC']],
     limit: 5,
@@ -249,7 +253,7 @@ const top_5_sellers = async(data) => {
 };
 
 // Top 5 Territories
-const top_5_territory= async(data) => {
+const top_5_territory= async(data,tenant_id) => {
   const timeframe = data.timeframe || '24h';
   const { start, end } = getOverallStartEnd(timeframe);
   const territories = await Organization.findAll({
@@ -257,7 +261,7 @@ const top_5_territory= async(data) => {
       'territory_id',
       [Sequelize.fn('COUNT', Sequelize.col('organization_id')), 'count']
     ],
-    where: { created_on: { [Op.between]: [start, end] } },
+    where: { created_on: { [Op.between]: [start, end] },tenant_id:tenant_id },
     group: ['territory_id'],
     order: [[Sequelize.literal('count'), 'DESC']],
     limit: 5,
@@ -284,7 +288,8 @@ const engagement = async(data) => {
     const count = await Leads.count({
       where: {
         created_at: { [Op.between]: [interval.start, interval.end] },
-        status: 'Qualified'
+        status: 'Qualified',
+        tenant_id:tenant_id
       }
     });
     dataPoints.push(count);
@@ -301,7 +306,7 @@ const engagement = async(data) => {
 };
 
 // Industry Classification
-const industry_classification = async (data) => {
+const industry_classification = async (data,tenant_id) => {
   const timeframe = data.timeframe || '24h';
   const { start, end } = getOverallStartEnd(timeframe);
 
@@ -310,7 +315,7 @@ const industry_classification = async (data) => {
       'industry_id', 
       [Sequelize.fn('COUNT', Sequelize.col('lead_id')), 'total']
     ],
-    where: { created_at: { [Op.between]: [start, end] } },
+    where: { created_at: { [Op.between]: [start, end] } ,tenant_id:tenant_id},
     include: {
       model: Industry,
       as: 'industry',
@@ -341,8 +346,11 @@ const industry_classification = async (data) => {
 
 
 // Activity Tab (Placeholder)
-const activity_tab = async () => {
+const activity_tab = async (data,tenant_id) => {
   const find_table = await Lead_activity.findAll({
+    where:{
+      tenant_id:tenant_id
+    },
     order: [
       [Sequelize.literal("task_date >= CURDATE()"), "DESC"], // Upcoming dates first
       ["task_date", "ASC"] // Then sort by earliest date
@@ -361,16 +369,17 @@ const activity_tab = async () => {
 exports.find_dashboard = async (req, res) => {
   try {
       const data = req.query;
-      const new_lead = await find_new_lead_(data);
-      const new_opportunity_ = await new_opportunity(data);
-      const find_project_revenue_ = await find_project_revenue(data);
+      const tenant_id = req.tenant
+      const new_lead = await find_new_lead_(data,tenant_id);
+      const new_opportunity_ = await new_opportunity(data,tenant_id);
+      const find_project_revenue_ = await find_project_revenue(data,tenant_id);
       // const conversion_ = await conversion(data);
-      const revenue_chart_ = await revenue_chart(data);
+      const revenue_chart_ = await revenue_chart(data,tenant_id);
       // const top_5_sellers_ = await top_5_sellers(data);
-      const top_5_territory_ = await top_5_territory(data);
-      const activity_tab_ = await activity_tab(data);
+      const top_5_territory_ = await top_5_territory(data,tenant_id);
+      const activity_tab_ = await activity_tab(data,tenant_id);
       // const engagement_  = await engagement(data);
-      const industry_classification_ = await industry_classification(data);
+      const industry_classification_ = await industry_classification(data,tenant_id);
 
       res.json({
         message: 'Dashboard data fetched',
@@ -399,7 +408,7 @@ exports.find_dashboard = async (req, res) => {
 exports.dashboard_header = async (req, res) => {
   try {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
+    const tenant_id = req.tenant
     // Execute all queries in parallel
     const [
       new_leads,
@@ -410,23 +419,27 @@ exports.dashboard_header = async (req, res) => {
       Leads.findAll({
         where: {
           created_at: { [Op.gte]: twentyFourHoursAgo }
+          ,tenant_id:tenant_id
         }
       }),
       Opportunity.findAll({
         where: {
           changed_on: { [Op.gte]: twentyFourHoursAgo }
+          ,tenant_id:tenant_id
         }
       }),
       Opportunity.findAll({
         where: {
           status: "UnQualified",
           changed_on: { [Op.gte]: twentyFourHoursAgo }
+          ,tenant_id:tenant_id
         }
       }),
       Opportunity.findAll({
         where: {
           status: "Qualified",
           changed_on: { [Op.gte]: twentyFourHoursAgo }
+          ,tenant_id:tenant_id
         }
       })
     ]);
@@ -440,6 +453,7 @@ exports.dashboard_header = async (req, res) => {
         opportunity_id: {
           [Op.in]: wonOpportunityIds.length ? wonOpportunityIds : [null]
         }
+        ,tenant_id:tenant_id
       }
     });
 
@@ -471,7 +485,8 @@ exports.dashboard_header = async (req, res) => {
 exports.find_dashboard_new_lead=async(req,res)=>{
   try {
     const data = req.query
-    const new_lead = await find_new_lead_(data);
+    const tenant_id = req.tenant
+    const new_lead = await find_new_lead_(data,tenant_id);
     return res.json({message:'data found',statusCode:200,data:new_lead})
   } catch (error) {
     res.status(200).json({ 
@@ -484,7 +499,8 @@ exports.find_dashboard_new_lead=async(req,res)=>{
 exports.find_dashboard_new_opportunity=async(req,res)=>{
   try {
     const data = req.query
-    const new_opportunity_ = await new_opportunity(data);
+    const tenant_id = req.tenant
+    const new_opportunity_ = await new_opportunity(data,tenant_id);
     if(new_opportunity_){
       return res.json({message:'data found',statusCode:200,data:new_opportunity_})
     }else{
@@ -501,7 +517,8 @@ exports.find_dashboard_new_opportunity=async(req,res)=>{
 exports.find_dashboard_project_revenue=async(req,res)=>{
   try {
     const data = req.query
-    const find_project_revenue_ = await find_project_revenue(data);
+    const tenant_id = req.tenant
+    const find_project_revenue_ = await find_project_revenue(data,tenant_id);
     if(find_project_revenue_){
        return res.json({message:'data found',statusCode:200,data:find_project_revenue_})
     }else{
@@ -518,7 +535,8 @@ exports.find_dashboard_project_revenue=async(req,res)=>{
 exports.find_dashboard_industry_classification=async(req,res)=>{
   try {
     const data = req.query
-      const industry_classification_ = await industry_classification(data);
+    const tenant_id = req.tenant
+      const industry_classification_ = await industry_classification(data,tenant_id);
 
       if(industry_classification_){
         return res.json({message:'data fetched',statusCode:200,data:industry_classification_})
@@ -536,8 +554,9 @@ exports.find_dashboard_industry_classification=async(req,res)=>{
 exports.find_dashboard_revenue_=async(req,res)=>{
   try {
     const data = req.query
-    console.log(data,'dddddddddddddddddddddddddddddddddddddfdfdf-------------')
-         const revenue_chart_ = await revenue_chart(data);
+    const tenant_id = req.tenant
+
+         const revenue_chart_ = await revenue_chart(data,tenant_id);
          console.log(revenue_chart_)
          if(revenue_chart_){
              return res.json({message:'data fetched',statusCode:200,data:revenue_chart_})
@@ -556,7 +575,8 @@ exports.find_dashboard_top_5_territory=async(req,res)=>{
   try {
        // const top_5_sellers_ = await top_5_sellers(data);
        const data = req.query
-       const top_5_territory_ = await top_5_territory(data);
+       const tenant_id = req.tenant
+       const top_5_territory_ = await top_5_territory(data,tenant_id);
        if(top_5_territory_){
         return res.json({message:'Data fetched',statusCode:200,data:top_5_territory_})
        }else{

@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
       module_perm_name: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       module_status: {
         type: Sequelize.BOOLEAN,
       },
@@ -25,10 +28,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       role_id:{
-        type:Sequelize.STRING,
+        type:Sequelize.UUID,
       },
       module_id:{
-        type:Sequelize.STRING
+        type:Sequelize.UUID
       },
       read: {
         type: Sequelize.BOOLEAN,
@@ -49,10 +52,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
       },
       created_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
       },
       changed_by: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
       },
       created_at:{
         type:Sequelize.DATE

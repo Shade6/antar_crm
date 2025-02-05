@@ -27,6 +27,7 @@ exports.create_lead = async (req, res) => {
       status,
       owner_id,
     } = req.body;
+    const tenant_id = req.tenant
     console.log("start ---------");
     const validation = field_checker.checkNullValues({
       salutation: salutation.value,
@@ -45,7 +46,7 @@ exports.create_lead = async (req, res) => {
     }
 
     const find_owner = await Users.findOne({
-      where: { user_id: owner_id.value },
+      where: { user_id: owner_id.value ,tenant_id:tenant_id},
     });
 
     if (!find_owner) {
@@ -138,6 +139,7 @@ exports.create_lead = async (req, res) => {
         changed_by: req.user,
         created_at: new Date(),
         updated_at: new Date(),
+        tenant_id:tenant_id
       },
       {
         tracker_id: req.tracker_id, // Pass extra ID through options
@@ -165,11 +167,17 @@ exports.create_lead = async (req, res) => {
 exports.getLeads = async (req, res) => {
   try {
     const user = req.user;
+    const tenant_id = req.tenant
+
     const find_assignees = await LeadAssignee.findAll({
       where: { user_id: user },
     });
+    console.log(find_assignees.length)
+    if(find_assignees.length == 0){
+      return res.json({message:'lead assignee not found',statusCode:400})
+    }
     const find_all = await Leads.findAll({
-      where: { lead_id: find_assignees.map((val) => val.lead_id) },
+      where: { lead_id: find_assignees.map((val) => val.lead_id) ,tenant_id:tenant_id},
     });
     return res.json({
       message: "leads found",
@@ -184,6 +192,7 @@ exports.getLeads = async (req, res) => {
 exports.find_single_lead = async (req, res) => {
   try {
     const lead_id = req.query.id;
+    const tenant_id = req.tenant
     if (!lead_id) {
       return res.json({
         message: "lead requirement not found",
@@ -191,7 +200,7 @@ exports.find_single_lead = async (req, res) => {
       });
     }
     const find_all = await Leads.findOne({
-      where: { lead_id: lead_id },
+      where: { lead_id: lead_id ,tenant_id:tenant_id},
       include: [
         {
           model: Territory,
@@ -220,6 +229,7 @@ exports.find_single_lead = async (req, res) => {
 exports.find_assignees = async (req, res) => {
   try {
     const lead_id = req.query.id;
+    
     if (!lead_id) {
       return res.json({
         message: "lead requirement not found",
@@ -257,8 +267,9 @@ exports.find_assignees = async (req, res) => {
 exports.update_lead_assignee = async (req, res) => {
   try {
     const { lead_id, users } = req.body;
+    const tenant_id = req.tenant
     console.log(req.body);
-    const find_lead = await Leads.findOne({ where: { lead_id: lead_id } });
+    const find_lead = await Leads.findOne({ where: { lead_id: lead_id,tenant_id:tenant_id } });
     if (!find_lead) {
       return res.json({ message: "lead not found", statusCode: 400 });
     }
@@ -468,7 +479,7 @@ exports.get_lead_scoring_rules = async (req, res) => {
 exports.delete_lead_scoring_rules = async (req, res) => {
   try {
     const lead_ids = req.query.id;
-
+    const tenant_id = req.tenant
     const ids = lead_ids.split(",");
     console.log(ids);
     if (ids.length == 0) {
@@ -476,10 +487,10 @@ exports.delete_lead_scoring_rules = async (req, res) => {
     }
     let count = 0;
     for (let id of ids) {
-      const find_lead_score = await Leads.findOne({ where: { lead_id: id } });
+      const find_lead_score = await Leads.findOne({ where: { lead_id: id ,tenant_id:tenant_id} });
       if (find_lead_score) {
         await Leads.destroy(
-          { where: { lead_id: id } },
+          { where: { lead_id: id ,tenant_id:tenant_id} },
           {
             tracker_id: req.tracker_id, // Pass extra ID through options
           }
@@ -501,6 +512,7 @@ exports.update_lead = async (req, res) => {
     let score = 0;
     let lead_value;
     console.log(req.body);
+    const tenant_id = req.tenant
     const find_lead_score = await LeadScore.findOne();
     if (find_lead_score) {
       const territory_in_score = find_lead_score.territory;
@@ -569,7 +581,7 @@ exports.update_lead = async (req, res) => {
     const update_lead = await Leads.update(
       { ...req.body, lead_score: score, lead_value: lead_value },
       {
-        where: { lead_id: lead_id },
+        where: { lead_id: lead_id ,tenant_id:tenant_id},
       },
       {
         tracker_id: req.tracker_id, // Pass extra ID through options
@@ -590,6 +602,7 @@ exports.remove_lead_assignee = async (req, res) => {
     console.log(req.body);
     const lead_id = req.query.lead_id;
     const user_id = req.query.id;
+    
     const find_lead_assignee = await LeadAssignee.findOne({
       where: { lead_id: lead_id, user_id: user_id },
     });

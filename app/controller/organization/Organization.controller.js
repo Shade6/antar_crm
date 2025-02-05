@@ -25,7 +25,7 @@ exports.createOrganization = async (req, res) => {
       address,
       image,
     } = req.body;
-
+    const tenant_id = req.tenant
     console.log(req.body);
     if (address?.length == 0) {
       return res
@@ -43,6 +43,7 @@ exports.createOrganization = async (req, res) => {
       created_by: req.user,
       image: image || "",
       created_on: new Date(),
+      tenant_id:tenant_id
     };
     console.log(organizationData);
     const newOrganization = await Organization.create(organizationData);
@@ -68,12 +69,13 @@ exports.updateOrganization = async (req, res) => {
   try {
     const { id } = req.params;
     const organizationData = req.body;
+    const tenant_id = req.tenant
     const [updated] = await Organization.update(organizationData, {
-      where: { org_id: id },
+      where: { org_id: id ,tenant_id:tenant_id},
     });
     if (updated) {
       const updatedOrganization = await Organization.findOne({
-        where: { org_id: id },
+        where: { org_id: id ,tenant_id:tenant_id},
       });
       return res.status(200).json({
         message: "Organization updated successfully",
@@ -89,7 +91,8 @@ exports.updateOrganization = async (req, res) => {
 exports.getOrganization = async (req, res) => {
   try {
     const { id } = req.params;
-    const organization = await Organization.findOne({ where: { org_id: id } });
+    const tenant_id = req.tenant
+    const organization = await Organization.findOne({ where: { org_id: id ,tenant_id:tenant_id} });
     if (organization) {
       return res.status(200).json({ data: organization });
     }
@@ -101,7 +104,12 @@ exports.getOrganization = async (req, res) => {
 
 exports.getAllOrganizations = async (req, res) => {
   try {
-    const organizations = await Organization.findAll();
+    const tenant_id = req.tenant
+    const organizations = await Organization.findAll({
+      where:{
+        tenant_id:tenant_id
+      },
+    });
     return res.status(200).json({
       data: organizations,
       statusCode: 200,
@@ -115,7 +123,7 @@ exports.getAllOrganizations = async (req, res) => {
 exports.deleteOrganization = async (req, res) => {
   console.log('================================================')
   const organizationId = req.query.id;
-
+  const tenant_id = req.tenant
   if (!organizationId) {
     return res.json({
       message: "Organization id is required",
@@ -123,7 +131,7 @@ exports.deleteOrganization = async (req, res) => {
     });
   }
   const find_organization = await Organization.findOne({
-    where: { organization_id: organizationId },
+    where: { organization_id: organizationId ,tenant_id:tenant_id},
   });
  
   if (!find_organization) {
@@ -140,7 +148,7 @@ exports.deleteOrganization = async (req, res) => {
   }
 
   const find_opportunity = await Opportunity.findOne({
-    where: { organization_id: find_organization.organization_id },
+    where: { organization_id: find_organization.organization_id ,tenant_id:tenant_id},
   });
 
 
@@ -151,7 +159,7 @@ exports.deleteOrganization = async (req, res) => {
   }
 
   const deleted = await Organization.destroy({
-    where: { organization_id: organizationId },
+    where: { organization_id: organizationId ,tenant_id:tenant_id},
   });
   if (deleted) {
     return res.json({
@@ -165,14 +173,15 @@ exports.deleteOrganization = async (req, res) => {
 exports.getOrganizationById = async (req, res) => {
   try {
     const organizationId = req.query.id;
+    const tenant_id = req.tenant
     console.log(organizationId);
     const organization = await Organization.findOne({
-      where: { organization_id: organizationId },
+      where: { organization_id: organizationId ,tenant_id:tenant_id},
     });
     let contact = [];
     if (organization) {
       const opportunities = await Opportunity.findAll({
-        where: { organization_id: organizationId },
+        where: { organization_id: organizationId,tenant_id:tenant_id },
         include: [{ model: Contact, as: "contact" }],
       });
       const map_ids = opportunities.map((val) => val.opportunity_id);
@@ -210,9 +219,9 @@ exports.getOrganizationById = async (req, res) => {
 exports.get_only_organization_by_id = async (req, res) => {
   try {
     const organizationId = req.query.id;
-
+    const tenant_id = req.tenant
     const organization = await Organization.findOne({
-      where: { organization_id: organizationId },
+      where: { organization_id: organizationId,tenant_id:tenant_id },
       include: [
         { model: Territory, as: "territory" },
         { model: Industry, as: "industry" },
@@ -248,8 +257,9 @@ exports.updateOrganization = async (req, res) => {
       image,
     } = req.body;
     console.log(req.body);
+    const tenant_id = req.tenant
     const organization = await Organization.findOne({
-      where: { organization_id: organization_id },
+      where: { organization_id: organization_id ,tenant_id:tenant_id},
     });
     if (!organization) {
       return res.json({ message: "Organization not found", statusCode: 400 });
@@ -272,9 +282,10 @@ exports.updateOrganization = async (req, res) => {
         industry_id: industry.value,
         territory_id: territory.value,
         image: image || organization.image,
+        tenant_id:tenant_id
       },
       {
-        where: { organization_id: organization_id },
+        where: { organization_id: organization_id,tenant_id:tenant_id },
       }
     );
     for (let address_data of address) {
@@ -300,9 +311,9 @@ exports.get_existing_org_estimate = async (req, res) => {
     let products = [];
     let organizations = [];
     let opportunities = {};
-
+    const tenant_id = req.tenant
     opportunities = await Opportunity.findOne({
-      where: { opportunity_id: opportunity_id },
+      where: { opportunity_id: opportunity_id ,tenant_id:tenant_id},
       include: [
         {
           model: Contact,
@@ -344,7 +355,7 @@ exports.get_existing_org_estimate = async (req, res) => {
     });
 
     const find_organization = await Organization.findOne({
-      where: { organization_id: opportunities.organization_id },
+      where: { organization_id: opportunities.organization_id,tenant_id:tenant_id },
     });
     organizations = find_organization;
 
@@ -407,10 +418,15 @@ exports.get_existing_org_estimate = async (req, res) => {
 
 exports.find_all_estimate = async (req, res) => {
   try {
+    const tenant_id = req.tenant
     const find_all_ = await Estimate.findAll({include:{
       model:Organization,
       as:'organization'
-    }});
+    },
+    where:{
+      tenant_id:tenant_id
+    },
+  });
     return res.json({
       message: "estimate finded",
       statusCode: 200,
@@ -424,6 +440,7 @@ exports.find_all_estimate = async (req, res) => {
 exports.create_estimate = async (req, res) => {
   try {
     console.log(req.body);
+    const tenant_id = req.tenant
     const {
       organization,
       estimate_number,
@@ -443,7 +460,7 @@ exports.create_estimate = async (req, res) => {
     }
 
     const find_opportunity = await Opportunity.findOne({
-      where: { opportunity_id: opportunity_id },
+      where: { opportunity_id: opportunity_id,tenant_id:tenant_id },
     });
 
     if (!find_opportunity) {
@@ -451,7 +468,7 @@ exports.create_estimate = async (req, res) => {
     }
     console.log(req.body);
     const find_org = await Organization.findOne({
-      where: { organization_id: organization.value },
+      where: { organization_id: organization.value ,tenant_id:tenant_id},
     });
     if (!find_org) {
       return res.json({ message: "No organization found", statusCode: 400 });
@@ -506,6 +523,7 @@ exports.create_estimate = async (req, res) => {
       grand_total: parseInt(grand_total),
       opportunity_id: opportunity_id,
       notes: notes || "",
+      tenant_id:tenant_id
     });
 
     if (create_estimate) {
@@ -540,13 +558,14 @@ exports.pdf_estimate_details = async (req, res) => {
   try {
     const estimate_id = req.query.id;
     const opportunity_id = req.query.opportunity_id;
+    const tenant_id = req.tenant
     console.log(req.query);
     if (!opportunity_id) {
       return res.json({ message: "opportunity not found", statusCode: 400 });
     }
 
     const find_opportunity = await Opportunity.findOne({
-      where: { opportunity_id: opportunity_id },
+      where: { opportunity_id: opportunity_id,tenant_id:tenant_id },
       include: {
         model: Contact,
         as: "contact",
@@ -558,7 +577,7 @@ exports.pdf_estimate_details = async (req, res) => {
     });
 
     const find_estimate_ = await Estimate.findOne({
-      where: { estimate_id: estimate_id },
+      where: { estimate_id: estimate_id ,tenant_id:tenant_id},
     });
     if (!find_estimate_) {
       return res.json({
@@ -582,7 +601,7 @@ exports.pdf_estimate_details = async (req, res) => {
     }
 
     const find_organization = await Organization.findOne({
-      where: { organization_id: find_estimate_.organization_id },
+      where: { organization_id: find_estimate_.organization_id ,tenant_id:tenant_id},
     });
     if (!find_organization) {
       return res.json({
@@ -636,17 +655,18 @@ exports.pdf_estimate_details = async (req, res) => {
 exports.find_pdf = async (req, res) => {
   try {
     const id = req.query.id;
+    const tenant_id = req.tenant
     console.log(id,'==')
     let file = null;
     const find_estimate_ = await Estimate.findOne({
-      where: { estimate_id: id },
+      where: { estimate_id: id ,tenant_id:tenant_id},
     });
     if (find_estimate_) {
       file = find_estimate_.pdf;
     }
 
     const find_opportunity = await Opportunity.findOne({
-      where: { opportunity_id: id },
+      where: { opportunity_id: id,tenant_id:tenant_id },
     });
 
     if (find_opportunity) {
@@ -665,15 +685,16 @@ exports.find_pdf = async (req, res) => {
 exports.fetch_org_estimate = async (req, res) => {
   try {
     const organization_id = req.query.id;
+    const tenant_id = req.tenant
     const find_org = await Organization.findOne({
-      where: { organization_id: organization_id },
+      where: { organization_id: organization_id ,tenant_id:tenant_id},
     });
     if (!find_org) {
       return res.json({ message: "org not found", statusCode: 400 });
     }
 
     const find_estimate = await Estimate.findAll({
-      where: { organization_id: find_org.organization_id },
+      where: { organization_id: find_org.organization_id ,tenant_id:tenant_id},
       include:{
         model:Organization,
         as:'organization'

@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       first_name: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       middle_name: {
         type: Sequelize.STRING,
       },

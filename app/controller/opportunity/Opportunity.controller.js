@@ -30,7 +30,7 @@ exports.createDeal = async (req, res) => {
       owner_id,
       product,
     } = req.body;
-    console.log(req.body, "000");
+    const tenant_id = req.tenant
 
     let organization_data = {
       organization_name: organization,
@@ -39,6 +39,7 @@ exports.createDeal = async (req, res) => {
       website: website,
       territory_id: territory_id?.value,
       industry_id: industry_id?.value,
+      tenant_id:tenant_id
     };
     let contact_data = {
       first_name: first_name,
@@ -47,6 +48,7 @@ exports.createDeal = async (req, res) => {
       phone: mobile,
       gender: gender?.value,
       salutation: salutation?.value,
+      tenant_id:tenant_id
     };
 
     let organization_created_id = null;
@@ -56,7 +58,7 @@ exports.createDeal = async (req, res) => {
     //-------------------------FIND ORGANIZATION----------------------------------
     if (req.body.organization_id) {
       const find_organization = await Organization.findOne({
-        where: { organization_id: req.body.organization_id.value },
+        where: { organization_id: req.body.organization_id.value ,tenant_id:tenant_id},
       });
       if (!find_organization) {
         return res.json({ message: "Organization not found", statusCode: 400 });
@@ -76,7 +78,7 @@ exports.createDeal = async (req, res) => {
     if (req.body.contact_id) {
       console.log("find contact");
       const find_contact = await Contact.findOne({
-        where: { contact_id: req.body.contact_id.value },
+        where: { contact_id: req.body.contact_id.value,tenant_id:tenant_id },
       });
       if (!find_contact) {
         return res.json({ message: "Contact not found", statusCode: 400 });
@@ -113,6 +115,7 @@ exports.createDeal = async (req, res) => {
       opportunity_value: req.body.opportunity_value,
       created_by: req.user.id, // Assuming req.user.id contains the ID of the user creating the deal
       created_on: new Date(), // Adding the current date as the creation date
+      tenant_id:tenant_id
     };
     const newDeal = await Opportunity.create(complete_details);
     if (product.length >0) {
@@ -139,7 +142,11 @@ exports.createDeal = async (req, res) => {
 // Get all deals by assignee id
 exports.getAllOpportunity = async (req, res) => {
   try {
+    const tenant_id = req.tenant
     const deals = await Opportunity.findAll({
+      where:{
+        tenant_id:tenant_id
+      },
       include: [
         { model: Organization, as: "organization" },
         { model: Contact, as: "contact" },
@@ -160,12 +167,13 @@ exports.updateDeal = async (req, res) => {
   try {
     const dealId = req.params.dealId;
     const updatedData = req.body;
+    const tenant_id = req.tenant
     const [updated] = await Opportunity.update(updatedData, {
-      where: { opportunity_id: dealId },
+      where: { opportunity_id: dealId,tenant_id:tenant_id },
     });
     if (updated) {
       const updatedDeal = await Opportunity.findOne({
-        where: { opportunity_id: dealId },
+        where: { opportunity_id: dealId ,tenant_id:tenant_id},
       });
       return res.json({
         message: "Deal updated successfully",
@@ -183,12 +191,12 @@ exports.updateDeal = async (req, res) => {
 exports.deleteDeal = async (req, res) => {
   try {
     const dealId = req.query.id;
-
+    const tenant_id = req.tenant
     if (!dealId) {
       return res.json({ message: "Deal id is required", statusCode: 400 });
     }
     const deleted = await Opportunity.destroy({
-      where: { opportunity_id: dealId },
+      where: { opportunity_id: dealId ,tenant_id:tenant_id},
     });
     if (deleted) {
       return res.json({
@@ -206,6 +214,7 @@ exports.deleteDeal = async (req, res) => {
 exports.getOpportunityById = async (req, res) => {
   try {
     const opportunityId = req.query.id;
+    const tenant_id = req.tenant
     if (!opportunityId) {
       return res.json({
         message: "Opportunity id is required",
@@ -213,7 +222,7 @@ exports.getOpportunityById = async (req, res) => {
       });
     }
     const opportunity = await Opportunity.findOne({
-      where: { opportunity_id: opportunityId },
+      where: { opportunity_id: opportunityId ,tenant_id:tenant_id},
       include: [
         {
           model: Organization,
@@ -353,14 +362,15 @@ exports.getAllAddressContact = async (req, res) => {
 exports.create_extra_contact = async (req, res) => {
   try {
     const { contact_id, opportunity_id } = req.body;
+    const tenant_id = req.tenant
     const find_contact = await Contact.findOne({
-      where: { contact_id: contact_id },
+      where: { contact_id: contact_id ,tenant_id:tenant_id},
     });
     if (!contact_id) {
       return res.json({ message: "contact not found", statusCode: 400 });
     }
     const find_opportunity = await Opportunity.findOne({
-      where: { opportunity_id: opportunity_id },
+      where: { opportunity_id: opportunity_id ,tenant_id:tenant_id},
     });
     if (!find_opportunity) {
       return res.json({ message: "opportunity not found", statusCode: 400 });
@@ -397,8 +407,9 @@ exports.create_extra_contact = async (req, res) => {
 exports.find_extra_contacts = async (req, res) => {
   try {
     const opportunities = req.query.id;
+    const tenant_id = req.tenant
     const find_opportunity = await Opportunity.findOne({
-      where: { opportunity_id: opportunities },
+      where: { opportunity_id: opportunities ,tenant_id:tenant_id},
     });
     if (!find_opportunity) {
       return res.json({ message: " opportunity not found", statusCode: 200 });

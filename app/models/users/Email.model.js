@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
       email_address: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       service: {
         type: Sequelize.STRING,
       },

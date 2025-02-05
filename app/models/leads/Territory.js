@@ -8,6 +8,9 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       territory_name: {
         type: Sequelize.STRING,
       },

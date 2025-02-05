@@ -25,6 +25,9 @@ module.exports = (sequelize, Sequelize) => {
       website: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       territory_id: {
         type: Sequelize.UUID,
       },

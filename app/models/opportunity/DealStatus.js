@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       deal_status: {
         type: Sequelize.STRING,
       },
+      tenant_id:{
+        type:Sequelize.UUID,
+      },
       color: {
         type: Sequelize.STRING,
       },

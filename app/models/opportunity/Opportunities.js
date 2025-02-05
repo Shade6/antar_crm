@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
     organization_id: {
       type: Sequelize.UUID,
     },
+    tenant_id:{
+      type:Sequelize.UUID,
+    },
     opportunity_name: {
       type: Sequelize.STRING,
     },

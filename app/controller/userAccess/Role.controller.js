@@ -7,7 +7,7 @@ exports.create_role=async(req,res)=>{
     try {
         const { role_name, role_type, page_status, page, owner, is_active } = req.body;
         const requiredFields = ['role_name', 'role_type'];
-
+        const tenant_id = req.tenant
         const validation = field_checker.checkNullValues({role_name,role_type}, requiredFields);
         if (!validation.isValid) {
             return res.json({ 
@@ -24,6 +24,7 @@ exports.create_role=async(req,res)=>{
         role_name:role_name,
         role_type:role_type ?? '',
         page_status:page_status ?? false,
+        tenant_id:tenant_id,
         page:page ?? '',
         owner:owner ?? false,
         is_active:is_active ?? true,
@@ -56,7 +57,12 @@ exports.get_role = async(req,res)=>{
 
 exports.find_all_role= async(req,res)=>{
     try {
-        const find_all_role = await Role.findAll()
+        const tenant_id = req.tenant
+        const find_all_role = await Role.findAll({
+            where:{
+                tenant_id:tenant_id
+              }
+        })
         res.json({ message: 'roles find successful', statusCode: 200 ,data:find_all_role??[]});
     } catch (error) {
         res.json({ message: error.message, statusCode: 500 });

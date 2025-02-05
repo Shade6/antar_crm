@@ -6,12 +6,12 @@ const UserEmail = db.user_email;
 exports.create_industry = async (req, res) => {
   try {
     const { industry_name } = req.body;
-
+    const tenant_id = req.tenant
     if (!industry_name) {
       return res.json({ message: "industry name cannot be empty" });
     }
     const find_name_exist = await Industry.findOne({
-      where: { industry_name: industry_name },
+      where: { industry_name: industry_name,tenant_id:tenant_id },
     });
     if (find_name_exist) {
       return res.json({
@@ -25,6 +25,7 @@ exports.create_industry = async (req, res) => {
         industry_name: industry_name,
         created_by: req.user,
         created_at: new Date(),
+        tenant_id:tenant_id
       },
       {
         tracker_id: req.tracker_id, // Pass extra ID through options
@@ -46,7 +47,12 @@ exports.create_industry = async (req, res) => {
 
 exports.find_all_industries = async (req, res) => {
   try {
-    const find_all = await Industry.findAll({});
+    const tenant_id = req.tenant
+    const find_all = await Industry.findAll({
+      where:{
+        tenant_id:tenant_id
+      }
+    });
 
     return res.json({
       message: "industry found",
@@ -62,6 +68,7 @@ exports.create_email = async (req, res) => {
   try {
     console.log(req.body);
     const { details, incoming_data, outgoing_data } = req.body;
+    const tenant_id = req.tenant
     console.log(details.address, "-----------");
     if (!emailValidator.validate(details.address)) {
       return res.json({
@@ -70,7 +77,7 @@ exports.create_email = async (req, res) => {
       });
     }
     const find_e = await Email.findOne({
-      where: { email_address: details.address },
+      where: { email_address: details.address ,tenant_id:tenant_id},
     });
     if (find_e) {
       return res.json({ message: "email already exist ", statusCode: 400 });
@@ -85,6 +92,7 @@ exports.create_email = async (req, res) => {
       account_name: details.account_name ?? "",
       diff_email: details.diff_email ?? false,
       domain: details.domain ?? "",
+      tenant_id:tenant_id,
       attachment_limit: incoming_data.attachment_limit ?? "",
       default_incoming: incoming_data.default_incoming ?? false,
       default_outgoing: outgoing_data.default_outgoing ?? false,
@@ -120,7 +128,12 @@ exports.create_email = async (req, res) => {
 
 exports.find_all_email = async (req, res) => {
   try {
-    const find_all = await Email.findAll({});
+    const tenant_id = req.tenant
+    const find_all = await Email.findAll({
+      where:{
+        tenant_id:tenant_id
+      },
+    });
 
     return res.json({
       message: "email found",
@@ -135,8 +148,9 @@ exports.find_all_email = async (req, res) => {
 exports.find_user_created_email = async (req, res) => {
   try {
     const user = req.query.u_id;
+    const tenant_id = req.tenant
     console.log(user, "ddd");
-    const find_email = await Email.findAll({ where: { created_by: user } });
+    const find_email = await Email.findAll({ where: { created_by: user ,tenant_id:tenant_id} });
     return res.json({
       message: "email found",
       statusCode: 200,
@@ -157,13 +171,14 @@ exports.create_email_user_email = async (req, res) => {
       send_me_a_copy,
       allowed_in_mentions,
     } = req.body;
+    const tenant_id = req.tenant
     console.log(req.body, "user");
-    const find_email = await UserEmail.findOne({ where: { user_id: user_id } });
+    const find_email = await UserEmail.findOne({ where: { user_id: user_id,tenant_id:tenant_id} });
     if (find_email) {
       return res.json({ message: "email already exist", statusCode: 400 });
     }
     const find_user_email = await UserEmail.findOne({
-      where: { user_id: user_id },
+      where: { user_id: user_id ,tenant_id:tenant_id},
     });
 
     const create_ = await UserEmail.create({
@@ -176,6 +191,7 @@ exports.create_email_user_email = async (req, res) => {
       default_email: find_user_email ? false : true,
       created_by: req.user,
       created_at: new Date(),
+      tenant_id:tenant_id
     });
     return res.json({
       message: "email created",
@@ -190,8 +206,9 @@ exports.create_email_user_email = async (req, res) => {
 exports.find_selected_user_email = async (req, res) => {
   try {
     const id = req.query.user_id;
+    const tenant_id = req.tenant
     const find_email = await UserEmail.findAll({
-      where: { user_id: id },
+      where: { user_id: id,tenant_id:tenant_id },
       include: {
         model: Email,
         as: "email",

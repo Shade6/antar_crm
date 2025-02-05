@@ -17,13 +17,14 @@ exports.createContact = async (req, res) => {
       company_name,
       address,
     } = req.body;
-    console.log(req.body, "opopo");
+    const tenant_id = req.tenant
     // Create a new contact entry
     if (!address?.value) {
       return res.json({ message: "Address is required", statusCode: 400 });
     }
     const details = {
       salutation: salutation.value || null,
+      tenant_id:tenant_id,
       first_name,
       last_name,
       email_id: email, // Assuming email_id corresponds to email
@@ -55,7 +56,12 @@ exports.createContact = async (req, res) => {
 
 exports.getContacts = async (req, res) => {
   try {
-    const contacts = await Contact.findAll();
+    const tenant_id = req.tenant
+    const contacts = await Contact.findAll({
+      where:{
+        tenant_id:tenant_id
+      }
+    });
     return res.status(200).json({
       data: contacts,
       statusCode: 200,
@@ -71,12 +77,13 @@ exports.getContacts = async (req, res) => {
 
 exports.deleteContact = async (req, res) => {
   const contactId = req.query.id;
+  const tenant_id = req.tenant
   console.log(contactId);
   if (!contactId) {
     return res.json({ message: "Contact id is required", statusCode: 400 });
   }
   const find_contact = await Contact.findOne({
-    where: { contact_id: contactId },
+    where: { contact_id: contactId,tenant_id:tenant_id },
   });
   if (!find_contact) {
     return res.json({ message: "Contact not found", statusCode: 400 });
@@ -86,13 +93,13 @@ exports.deleteContact = async (req, res) => {
     { where: { address_id: find_contact.address_id } }
   );
   const find_opportunity = await Opportunity.findOne({
-    where: { contact_id: find_contact.contact_id },
+    where: { contact_id: find_contact.contact_id,tenant_id:tenant_id },
   });
   if(find_organization){
     find_opportunity.contact_id= null
     find_opportunity.save()
   }
-  const deleted = await Contact.destroy({ where: { contact_id: contactId } });
+  const deleted = await Contact.destroy({ where: { contact_id: contactId ,tenant_id:tenant_id} });
   if (deleted) {
     return res.json({
       message: "Contact deleted successfully",
@@ -105,7 +112,7 @@ exports.deleteContact = async (req, res) => {
 exports.contact_details_by_id = async (req, res) => {
   try {
     const contactId = req.query.id;
-
+    const tenant_id = req.tenant
     if (!contactId) {
       return res.status(200).json({
         message: "Contact ID is required",
@@ -114,7 +121,7 @@ exports.contact_details_by_id = async (req, res) => {
     }
 
     // Fetch contact by ID
-    const contact = await Contact.findOne({ where: { contact_id: contactId } });
+    const contact = await Contact.findOne({ where: { contact_id: contactId ,tenant_id:tenant_id} });
 
     if (!contact) {
       return res.status(200).json({
@@ -125,7 +132,7 @@ exports.contact_details_by_id = async (req, res) => {
 
     // Fetch opportunities directly linked to the contact
     const opportunities = await Opportunity.findAll({
-      where: { contact_id: contactId },
+      where: { contact_id: contactId,tenant_id:tenant_id },
     });
 
     // Fetch additional opportunities via contact mappings
@@ -167,8 +174,9 @@ exports.contact_details_by_id = async (req, res) => {
 exports.get_contact_by_id = async (req, res) => {
   try {
     const contactId = req.query.id;
+    const tenant_id = req.tenant
     const contact = await Contact.findOne({
-      where: { contact_id: contactId },
+      where: { contact_id: contactId ,tenant_id:tenant_id},
       include: [{ model: AddressContact, as: "address_contact" }],
     });
     if (!contact) {
@@ -194,9 +202,10 @@ exports.update_contact = async (req, res) => {
       company_name,
       address,
     } = req.body;
+    const tenant_id = req.tenant
     console.log(req.body, "opopo");
     const contact = await Contact.findOne({
-      where: { contact_id: contact_id },
+      where: { contact_id: contact_id ,tenant_id:tenant_id},
     });
     if (!contact) {
       return res.json({ message: "Contact not found", statusCode: 400 });
@@ -217,7 +226,7 @@ exports.update_contact = async (req, res) => {
         company_name: company_name,
         address_id: address?.value,
       },
-      { where: { contact_id: contact_id } }
+      { where: { contact_id: contact_id,tenant_id:tenant_id} }
     );
     await AddressContact.update(
       { status: true },
