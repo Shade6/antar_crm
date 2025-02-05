@@ -481,7 +481,7 @@ const handle_add_discount = () => {
           { label: 'Product Name', key: 'product_name', width: '180px' },
           { label: 'Product Unit Price', key: 'unit_price', width: '150px' },
           {
-            label: 'Product Tax Rate Per Unit',
+            label: 'Product Tax  Per Unit',
             key: 'tax_rate',
             width: '180px',
           },
@@ -501,7 +501,7 @@ const handle_add_discount = () => {
             description: 'Create a new record to get started',
             button: {
               label: 'New Record',
-              variant: 'solid',
+              variant: 'solid', 
             },
           },
         }"

@@ -89,7 +89,7 @@ const handle_timeFrame = async (data) => {
 
   <div class="border  h-full w-full p-4">
     <div class="flex justify-between px-3 py-2">
-      <span class="font-bold"><u>Revenue Chart</u> </span>
+      <span class="font-bold"><u>Revenue </u> </span>
       <Dropdown
         class=""
         :options="[

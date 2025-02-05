@@ -86,6 +86,8 @@ const login_handler = async () => {
     password: password.value,
   });
   if (res.status == "success") {
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("role", res.role_id);
     console.log(res, "success if");
     toast.success(res.message, {
       position: "top-right",
@@ -107,8 +109,7 @@ const login_handler = async () => {
     const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
       switchStore.AddMenu(decryptedData);
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("role", res.role_id);
+     
       router.push(`/antar_/${res.landing}`);
     } else {
       toast.success(res.message, {
