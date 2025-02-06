@@ -120,8 +120,7 @@ exports.find_all_lead_by_search = async (req, res) => {
     const search = req.query.search || "";
     const field = req.query.field;
     const type = req.query.type;
- console.log(field,type,search,'==============')
-    // List of valid operators for dynamic queries
+    const tenant_id = req.tenant
     const validOperators = ["like", "iLike", "eq", "ne"];
     if (!validOperators.includes(type)) {
       return res.json({
@@ -142,11 +141,12 @@ exports.find_all_lead_by_search = async (req, res) => {
     const find_all_lead = await Leads.findAll({
       where: {
         [field]: { [Op[type]]: type === "like" || type === "iLike" ? `%${search}%` : search },
+        tenant_id:tenant_id
       },
     });
 
     return res.status(200).json({
-      message: "Leads found",
+      message: "Leads found", 
       statusCode: 200,
       data: find_all_lead,
     });

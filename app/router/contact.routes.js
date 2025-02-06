@@ -47,5 +47,11 @@ module.exports = (app) => {
     AccessChecker.access_create,
     controller.update_contact
   );
+  router.get("/contact_filter",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.contact_filter
+  )
   app.use("/api/v1/crm/", router);
 };

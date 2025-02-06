@@ -47,6 +47,14 @@ module.exports = (app) => {
     AccessChecker.access_create,
     controller.SingleProduct
   );
+  
+  router.get(
+    "/product_filter",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.product_filter
+  );
   router.get("/delete_image", controller.d_product_image);
 
   app.use("/api/v1/crm/", router);

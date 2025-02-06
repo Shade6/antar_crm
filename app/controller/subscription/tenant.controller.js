@@ -19,7 +19,8 @@ exports.createTenant = async (req, res) => {
     email,
     organization_name,
     subscription_plan,
-    user_name,
+    first_name,
+    last_name,
   } = req.body;
 
   try {
@@ -28,6 +29,12 @@ exports.createTenant = async (req, res) => {
         message: "please enter organization name",
         statusCode: 400,
       });
+    }
+    if(!first_name){
+      return res.json({message:'please enter first name and last name'})
+    }
+    if(!last_name){
+      return res.json({message:'please enter first name and last name'})
     }
     if (!contact) {
       return res.json({ message: "please enter contact", statusCode: 400 });
@@ -53,13 +60,12 @@ exports.createTenant = async (req, res) => {
       return res.json({ message: "email already in use", statusCode: 400 });
     }
 
-   
     const freePlan = await Plan.findOne({
       where: { plan_id: subscription_plan },
     });
 
-    if(!freePlan){
-      return res.json({message:'plan not found',statusCode:400})
+    if (!freePlan) {
+      return res.json({ message: "plan not found", statusCode: 400 });
     }
     // Create the tenant
     const tenant = await Tenant.create({
@@ -70,7 +76,6 @@ exports.createTenant = async (req, res) => {
     });
 
     // Get the Free Plan (30-day trial)
-
 
     // Create a subscription for the tenant with the free plan
     await Subscription.create({
@@ -93,7 +98,6 @@ exports.createTenant = async (req, res) => {
       }
     }
 
-
     const create_role = await Role.create({
       tenant_id: tenant.tenant_id,
       role_name: "system admin",
@@ -102,30 +106,33 @@ exports.createTenant = async (req, res) => {
       owner: true,
       is_active: true,
       is_deletable: false,
-      created_by: '1',
+      created_by: "1",
       created_at: new Date(),
     });
 
-// create user as system admin
+    // create user as system admin
     const user_create = await Users.create({
       tenant_id: tenant.tenant_id,
-      first_name: splitName(user_name)?.firstName,
-      last_name: splitName(user_name)?.lastName,
+      first_name: first_name,
+      last_name: last_name,
       email: email,
       password: hashedPassword,
       role_id: create_role.role_id,
       created_at: new Date(),
     });
-    // create role as system admin for  user 
+    // create role as system admin for  user
 
-    await Users.update({role_id:create_role.role_id},{where:{user_id:user_create.user_id}})
+    await Users.update(
+      { role_id: create_role.role_id },
+      { where: { user_id: user_create.user_id } }
+    );
 
     const find_all_modules = await Module.findAll({
       where: {
         [Op.or]: [{ docs_type: "crm" }, { docs_type: "user" }],
       },
     });
-//create the multiple permissions for the system admin
+    //create the multiple permissions for the system admin
     for (let name of find_all_modules) {
       await ModulePermission.create({
         tenant_id: tenant.tenant_id,

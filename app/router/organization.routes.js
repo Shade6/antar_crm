@@ -70,6 +70,13 @@ module.exports = (app) => {
     AccessChecker.access_create,
     controller.create_estimate
   );
+
+  router.get("/estimate_filter",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.estimate_filter
+  )
   router.get(
     "/pdf_estimate_details",
     Authenticator.user,
@@ -90,6 +97,13 @@ module.exports = (app) => {
     Subscription.check_subscription,
     AccessChecker.access_create,
     controller.fetch_org_estimate
+  );
+  router.get(
+    "/organization_filter",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.organization_filter
   );
 
   app.use("/api/v1/crm/", router);

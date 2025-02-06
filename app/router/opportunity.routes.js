@@ -85,5 +85,11 @@ module.exports = (app) => {
     AccessChecker.access_create,
     controller.handle_remove_extra_contact
   );
+  router.get("/opportunity_filter",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.opportunity_filter
+  )
   app.use("/api/v1/crm/", router);
 };

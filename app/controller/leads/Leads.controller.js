@@ -169,6 +169,8 @@ exports.getLeads = async (req, res) => {
     const user = req.user;
     const tenant_id = req.tenant
 
+    console.log(user,'----')
+
     const find_assignees = await LeadAssignee.findAll({
       where: { user_id: user },
     });

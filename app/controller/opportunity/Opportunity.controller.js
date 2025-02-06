@@ -1,4 +1,5 @@
 const { where } = require("sequelize");
+const { Op } = require("sequelize");
 const db = require("../../models");
 const Opportunity = db.opportunity;
 const Organization = db.organization;
@@ -444,3 +445,51 @@ exports.handle_remove_extra_contact =async(req,res)=>{
     return res.json({ message: error.message, statusCode: 400 });
   }
 }
+
+
+exports.opportunity_filter = async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const field = req.query.field;
+    const type = req.query.type;
+const  tenant_id = req.tenant
+    const validOperators = ["like", "iLike", "eq", "ne"];
+    if (!validOperators.includes(type)) {
+      return res.json({
+        message: `Invalid search type: '${type}'. Allowed types are: ${validOperators.join(
+          ", "
+        )}`,
+        statusCode: 400,
+      });
+    }
+
+    if (!Opportunity.rawAttributes[field]) {
+      return res.json({
+        message: `Invalid field: '${field}'.`,
+        statusCode: 400,
+      });
+    }
+
+    const find_all_lead = await Opportunity.findAll({
+      where: {
+        [field]: {
+          [Op[type]]:
+            type === "like" || type === "iLike" ? `%${search}%` : search,
+        },
+        tenant_id:tenant_id
+      },
+      include: [
+        { model: Organization, as: "organization" },
+        { model: Contact, as: "contact" },
+      ],
+    });
+
+    return res.status(200).json({
+      message: "Opportunity found",
+      statusCode: 200,
+      data: find_all_lead,
+    });
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 400 });
+  }
+};
