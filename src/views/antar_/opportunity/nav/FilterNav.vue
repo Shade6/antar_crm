@@ -163,20 +163,7 @@ watch(()=>filter.value.text,(newValue)=>{
                   :options="[
                     {
                       label: 'Name',
-                      value: 'first_name',
-                    },
-                    {
-                      label: 'Email',
-                      value: 'email',
-                    },
-
-                    {
-                      label: 'Phone',
-                      value: 'contact',
-                    },
-                    {
-                      label: 'Company',
-                      value: 'company',
+                      value: 'opportunity_name',
                     },
                     {
                       label: 'Status',
@@ -184,7 +171,7 @@ watch(()=>filter.value.text,(newValue)=>{
                     },
                     {
                       label: 'Created at',
-                      value: 'created_at',
+                      value: 'created_on',
                     },
                   ]"
                   v-model="filter.field"

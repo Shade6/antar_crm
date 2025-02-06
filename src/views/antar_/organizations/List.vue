@@ -1,5 +1,11 @@
 <template>
     <Nav />
+    <FilterNav
+    @search="handle_search"
+    @refresh="handle_refresh"
+    @filter="handle_filter"
+    @sort="handle_sort"
+    />
     <div class="p-4">
       <ListView
       class="h-[550px] p-4"
@@ -82,10 +88,11 @@
   } from "frappe-ui";
   const single = ref();
   import Nav from "./nav/Nav.vue";
+  import FilterNav from "./nav/FilterNav.vue";
   const router = useRouter();
   import "@/assets/toast.css";
   import { useToast } from "vue-toast-notification";
-  import { get_all_organization,delete_organization } from '@/api/userApi';
+  import { get_all_organization,delete_organization,organization_filter } from '@/api/userApi';
   const toast = useToast();
   const lead_list = ref([]);
   const fetch_organization = async()=>{
@@ -150,5 +157,36 @@
       });
     }
   };
+  const handle_search = async(data)=>{
+
+}
+const handle_refresh = async(data)=>{
+  fetch_organization()
+}
+const handle_filter = async(data)=>{
+  console.log('ddddd')
+  const res = await organization_filter(data)
+    lead_list.value = res.data.map((item) => ({
+        id:item.organization_id,
+        organization: item.organization_name || 'N/A',
+        website: item.website || 'N/A',
+        industry: item.industry || 'N/A',
+        annual_revenue: item.annual_revenue || 'N/A',
+        last_modified: item.last_modified || 'N/A',
+        image:item.image || ''
+      }));
+}
+const handle_sort = async (data) => {
+  console.log(data.field);
+  lead_list.value = lead_list.value.sort((a, b) => {
+    console.log(a[data.field]);
+    if (data.sort_order === "asc") {
+      return a[data.field.value] < b[data.field.value] ? -1 : 1;
+    } else {
+      return a[data.field.value] > b[data.field.value] ? -1 : 1;
+    }
+  });
+};
+
   </script>
   

@@ -1,5 +1,6 @@
 <script setup>
 import Nav from "./nav/Nav.vue";
+import FilterNav from "./nav/FilterNav.vue";
 import {
   ListView,
   FeatherIcon,
@@ -52,6 +53,27 @@ const handle_item =async(data)=>{
   }
 }
 onMounted(fetch);
+
+const handle_search = async(data)=>{
+
+}
+const handle_refresh = async(data)=>{
+  fetch()
+}
+const handle_filter = async(data)=>{
+
+}
+const handle_sort = async (data) => {
+  console.log(data.field);
+  lead_list.value = lead_list.value.sort((a, b) => {
+    console.log(a[data.field]);
+    if (data.sort_order === "asc") {
+      return a[data.field.value] < b[data.field.value] ? -1 : 1;
+    } else {
+      return a[data.field.value] > b[data.field.value] ? -1 : 1;
+    }
+  });
+};
 </script>
 <!-- :columns="[ { label: 'Estimate code ', key: 'estimate_number', icon: 'user',
 width: '180px' }, { label: 'sub total', key: 'sub_total', width: '180px' }, {
@@ -61,6 +83,12 @@ key: 'grand_total', width: '180px' }, { label:'download Estimate'
 
 <template>
   <Nav></Nav>
+  <FilterNav
+    @search="handle_search"
+    @refresh="handle_refresh"
+    @filter="handle_filter"
+    @sort="handle_sort"
+  />
   <div class="p-4">
     <ListView
       class="h-[250px]"

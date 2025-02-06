@@ -167,24 +167,20 @@ watch(()=>filter.value.text,(newValue)=>{
                     },
                     {
                       label: 'Email',
-                      value: 'email',
+                      value: 'email_id',
                     },
 
                     {
                       label: 'Phone',
-                      value: 'contact',
+                      value: 'phone',
                     },
                     {
-                      label: 'Company',
-                      value: 'company',
-                    },
-                    {
-                      label: 'Status',
-                      value: 'status',
+                      label: 'Organization',
+                      value: 'organization',
                     },
                     {
                       label: 'Created at',
-                      value: 'created_at',
+                      value: 'created_on',
                     },
                   ]"
                   v-model="filter.field"
@@ -261,12 +257,8 @@ watch(()=>filter.value.text,(newValue)=>{
                       value: 'mobile',
                     },
                     {
-                      label: 'Company',
+                      label: 'Organization',
                       value: 'organization',
-                    },
-                    {
-                      label: 'Status',
-                      value: 'status',
                     },
                     {
                       label: 'modified at',

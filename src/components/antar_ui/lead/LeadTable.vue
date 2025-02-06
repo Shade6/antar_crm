@@ -11,7 +11,11 @@ import {
   ListSelectBanner,
   Button,
 } from "frappe-ui";
-import { find_all_lead, delete_lead,find_all_lead_by_search } from "@/api/userApi.js";
+import {
+  find_all_lead,
+  delete_lead,
+  find_all_lead_by_search,
+} from "@/api/userApi.js";
 import LeadNav from "@/components/antar_ui/lead/nav/LeadNav.vue";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -31,7 +35,8 @@ const fetch = async () => {
       organization: val.company || "no company",
       status: val.status,
       email: val.email,
-      lead_score: val.lead_score + (val.lead_value == null ? "" : " " + val.lead_value),
+      lead_score:
+        val.lead_score + (val.lead_value == null ? "" : " " + val.lead_value),
       assigned: val.assigned || "Not Assigned",
       modified: val.modified || new Date().toLocaleDateString(),
     }));
@@ -130,8 +135,10 @@ const handle_search = async (data) => {
           email: val.email,
           mobile: val.contact,
           assigned: val.assigned || "Not Assigned",
-          lead_score: val.lead_score + (val.lead_value == null ? "" : " " + val.lead_value),
-          lead_status: val.lead_value??'Not Assigned',
+          lead_score:
+            val.lead_score +
+            (val.lead_value == null ? "" : " " + val.lead_value),
+          lead_status: val.lead_value ?? "Not Assigned",
           modified: val.modified || new Date().toLocaleDateString(),
         }));
       } else {
@@ -156,28 +163,33 @@ const handle_search = async (data) => {
   }, 300); // 300ms delay before executing
 };
 
-const handle_refresh = ()=>{
-  fetch()
-}
-const handle_filter=async(data)=>{
-  handle_search(data)
-}
-const handle_sort=async(data)=>{
-  console.log(data.field)
+const handle_refresh = () => {
+  fetch();
+};
+const handle_filter = async (data) => {
+  handle_search(data);
+};
+const handle_sort = async (data) => {
+  console.log(data.field);
   lead_list.value = lead_list.value.sort((a, b) => {
-    console.log(a[data.field])
-    if (data.sort_order === 'asc') {
+    console.log(a[data.field]);
+    if (data.sort_order === "asc") {
       return a[data.field.value] < b[data.field.value] ? -1 : 1;
     } else {
       return a[data.field.value] > b[data.field.value] ? -1 : 1;
     }
   });
-}
+};
 onMounted(fetch);
 </script>
 
 <template>
-      <LeadNav @search="handle_search" @refresh="handle_refresh" @filter="handle_filter" @sort="handle_sort" />
+  <LeadNav
+    @search="handle_search"
+    @refresh="handle_refresh"
+    @filter="handle_filter"
+    @sort="handle_sort"
+  />
   <ListView
     class="h-[550px] p-4"
     :columns="[

@@ -9,7 +9,7 @@ let switchStore = () => {
   return data;
 };
 
-export const create_images= async (data) => {
+export const create_images = async (data) => {
   return (
     await axios.post(
       `${USER_API}create_image?mdl=${switchStore().pageId}`,
@@ -23,7 +23,7 @@ export const create_images= async (data) => {
     )
   ).data;
 };
-export const create_file_pdf= async (data,id,estimate_id) => {
+export const create_file_pdf = async (data, id, estimate_id) => {
   return (
     await axios.post(
       `${USER_API}create_file_pdf?mdl=${switchStore().pageId}&&id=${id}&&estimate_id=${estimate_id}`,
@@ -37,7 +37,6 @@ export const create_file_pdf= async (data,id,estimate_id) => {
     )
   ).data;
 };
-
 
 export const userLogin = async (data) => {
   return (await axiosInstance.post(`login`, data)).data;
@@ -613,10 +612,7 @@ export const get_all_address_contact = async () => {
 
 export const create_product = async (data) => {
   return (
-    await axiosInstance.post(
-      `create_product?mdl=${switchStore().pageId}`,
-      data
-    )
+    await axiosInstance.post(`create_product?mdl=${switchStore().pageId}`, data)
   ).data;
 };
 
@@ -659,7 +655,6 @@ export const create_extra_contact = async (data) => {
   ).data;
 };
 
-
 export const find_extra_contact = async (data) => {
   return (
     await axiosInstance.get(
@@ -667,8 +662,6 @@ export const find_extra_contact = async (data) => {
     )
   ).data;
 };
-
-
 
 export const handle_remove_extra_contact = async (data) => {
   return (
@@ -681,23 +674,16 @@ export const handle_remove_extra_contact = async (data) => {
 export const get_existing_org_estimate = async (data) => {
   return (
     await axiosInstance.get(
-      `get_existing_org_estimate?mdl=${switchStore().pageId}&&id=${data}`,
+      `get_existing_org_estimate?mdl=${switchStore().pageId}&&id=${data}`
     )
   ).data;
 };
-
-
 
 export const find_all_estimate = async () => {
   return (
-    await axiosInstance.get(
-      `find_all_estimate?mdl=${switchStore().pageId}`
-    )
+    await axiosInstance.get(`find_all_estimate?mdl=${switchStore().pageId}`)
   ).data;
 };
-
-
-
 
 export const create_estimate = async (data) => {
   return (
@@ -708,8 +694,7 @@ export const create_estimate = async (data) => {
   ).data;
 };
 
-
-export const pdf_estimate_details = async (data,id) => {
+export const pdf_estimate_details = async (data, id) => {
   return (
     await axiosInstance.get(
       `pdf_estimate_details?mdl=${switchStore().pageId}&&id=${data}&&opportunity_id=${id}`
@@ -717,18 +702,11 @@ export const pdf_estimate_details = async (data,id) => {
   ).data;
 };
 
-
-
-
-export const find_pdf = async (data,id) => {
+export const find_pdf = async (data, id) => {
   return (
-    await axiosInstance.get(
-      `find_pdf?mdl=${switchStore().pageId}&&id=${data}`
-    )
+    await axiosInstance.get(`find_pdf?mdl=${switchStore().pageId}&&id=${data}`)
   ).data;
 };
-
-
 
 export const fetch_org_estimate = async (data) => {
   return (
@@ -738,12 +716,10 @@ export const fetch_org_estimate = async (data) => {
   ).data;
 };
 
-
-
 export const find_dashboard = async (data) => {
   return (
     await axiosInstance.get(
-      `find_dashboard?mdl=${switchStore().pageId}&&timeframe=${'24h'}`
+      `find_dashboard?mdl=${switchStore().pageId}&&timeframe=${"24h"}`
     )
   ).data;
 };
@@ -795,6 +771,86 @@ export const find_dashboard_top_5_territory = async (data) => {
   return (
     await axiosInstance.get(
       `find_dashboard_top_5_territory?mdl=${switchStore().pageId}&&timeframe=${data}`
+    )
+  ).data;
+};
+
+export const contact_filter = async (data) => {
+  return (
+    await axiosInstance.get(
+      `contact_filter?mdl=${switchStore().pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`
+    )
+  ).data;
+};
+
+export const contact_find_by_name = async (data) => {
+  return (
+    await axiosInstance.get(
+      `contact_find_by_name?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+export const opportunity_filter = async (data) => {
+  return (
+    await axiosInstance.get(
+      `opportunity_filter?mdl=${switchStore().pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`
+    )
+  ).data;
+};
+
+export const opportunity_find_by_name = async (data) => {
+  return (
+    await axiosInstance.get(
+      `opportunity_find_by_name?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+export const organization_filter = async (data) => {
+  return (
+    await axiosInstance.get(
+      `organization_filter?mdl=${switchStore().pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`
+    )
+  ).data;
+};
+
+export const organization_find_by_name = async (data) => {
+  return (
+    await axiosInstance.get(
+      `organization_find_by_name?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+export const estimate_filter = async (data) => {
+  return (
+    await axiosInstance.get(
+      `estimate_filter?mdl=${switchStore().pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`
+    )
+  ).data;
+};
+
+export const estimate_find_by_name = async (data) => {
+  return (
+    await axiosInstance.get(
+      `estimate_find_by_name?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+export const product_filter = async (data) => {
+  return (
+    await axiosInstance.get(
+      `product_filter?mdl=${switchStore().pageId}&&search=${data.text}&field=${data.field?.value}&type=${data.type?.value}&sort_field=${data.sort_field?.value}&sort_order=${data.sort_order?.value}`
+    )
+  ).data;
+};
+
+export const product_find_by_name = async (data) => {
+  return (
+    await axiosInstance.get(
+      `product_find_by_name?mdl=${switchStore().pageId}&&id=${data}`
     )
   ).data;
 };

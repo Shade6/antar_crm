@@ -163,16 +163,16 @@ watch(()=>filter.value.text,(newValue)=>{
                   :options="[
                     {
                       label: 'Name',
-                      value: 'first_name',
+                      value: 'product_name',
                     },
                     {
-                      label: 'Email',
-                      value: 'email',
+                      label: 'Product type',
+                      value: 'product_type',
                     },
 
                     {
-                      label: 'Phone',
-                      value: 'contact',
+                      label: 'Unit price',
+                      value: 'unit_price',
                     },
                     {
                       label: 'Company',

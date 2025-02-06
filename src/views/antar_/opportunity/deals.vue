@@ -1,5 +1,11 @@
 <template>
   <Nav />
+  <FilterNav
+    @search="handle_search"
+    @refresh="handle_refresh"
+    @filter="handle_filter"
+    @sort="handle_sort"
+  />
   <div class="p-4">
  
     <ListView
@@ -94,11 +100,12 @@ import {
 } from "frappe-ui";
 const single = ref();
 import Nav from "./nav/Nav.vue";
+import FilterNav from "./nav/FilterNav.vue";
 const router = useRouter();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useSwitchStore } from '@/stores/switch';
-import { get_all_deal ,delete_deal} from '@/api/userApi';
+import { get_all_deal ,delete_deal,opportunity_filter} from '@/api/userApi';
 const switchStore = useSwitchStore()
 const toast = useToast();
 const lead_list = ref([]);
@@ -132,12 +139,12 @@ const fetch_deal = async()=>{
   const res = await get_all_deal()
   lead_list.value = res.data.map(deal => ({
       id: deal.opportunity_id,
-      name: deal.contact.first_name || '' + ' ' + deal.contact.last_name || '',
-      organization: deal.organization.organization_name || 'Not Assigned',
-      status: deal.status || 'Not Assigned',
-      email: deal.contact.email || 'Not Assigned',
-      performace: deal.deal_score || 'Not added',
-      assigned: deal.deal_owner || 'Not Assigned',
+      name: deal?.contact?.first_name || '' + ' ' + deal?.contact?.last_name || '',
+      organization: deal?.organization?.organization_name || 'Not Assigned',
+      status: deal?.status || 'Not Assigned',
+      email: deal?.contact?.email || 'Not Assigned',
+      performace: deal?.deal_score || 'Not added',
+      assigned: deal?.deal_owner || 'Not Assigned',
       modified: new Date(deal.changed_on).toLocaleDateString() || 'Not Assigned',
     }));
 
@@ -168,4 +175,35 @@ const handleDelete = async(rows) => {
     }
  
 }
+const handle_search = async(data)=>{
+
+}
+const handle_refresh = async(data)=>{
+  fetch_deal()
+}
+const handle_filter = async(data)=>{
+  const res = await opportunity_filter(data)
+  lead_list.value = res.data.map(deal => ({
+      id: deal.opportunity_id,
+      name: deal.contact.first_name || '' + ' ' + deal.contact.last_name || '',
+      organization: deal.organization.organization_name || 'Not Assigned',
+      status: deal.status || 'Not Assigned',
+      email: deal.contact.email || 'Not Assigned',
+      performace: deal.deal_score || 'Not added',
+      assigned: deal.deal_owner || 'Not Assigned',
+      modified: new Date(deal.changed_on).toLocaleDateString() || 'Not Assigned',
+    }));
+}
+const handle_sort = async (data) => {
+  console.log(data.field);
+  lead_list.value = lead_list.value.sort((a, b) => {
+    console.log(a[data.field]);
+    if (data.sort_order === "asc") {
+      return a[data.field.value] < b[data.field.value] ? -1 : 1;
+    } else {
+      return a[data.field.value] > b[data.field.value] ? -1 : 1;
+    }
+  });
+};
+
 </script>

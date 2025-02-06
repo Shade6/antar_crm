@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import Nav from "./nav/Nav.vue";
+import FilterNav from "./nav/FilterNav.vue";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -15,7 +16,7 @@ import {
     ListSelectBanner,
     Button,
   } from "frappe-ui";
-import { get_all_product,delete_product } from "@/api/userApi";
+import { get_all_product,delete_product ,product_filter} from "@/api/userApi";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const products = ref([]);
@@ -82,10 +83,54 @@ const handleDelete = async(id)=>{
       });
   }
 }
+const handle_search = async(data)=>{
+
+}
+const handle_refresh = async(data)=>{
+  fetch_products()
+}
+const handle_filter = async(data)=>{
+  const res = await product_filter(data);
+    if (res.statusCode === 200) {
+      products.value = res.data.map(product => ({
+        id: product.product_id,
+        name: {
+          label: product.product_name,
+          image: product.product_image, // Placeholder image
+        },
+        unit_price: product.unit_price || 'N/A', // Assuming email is part of the product data
+        type: {
+          label: product.product_type,
+          color: 'blue', // Placeholder color
+        },
+        status: {
+          label: product.status,
+          bg_color: product.status === 'Active' ? 'bg-surface-green-3' : 'bg-surface-red-5',
+        },
+      }));
+    }
+}
+const handle_sort = async (data) => {
+  console.log(data.field);
+  lead_list.value = lead_list.value.sort((a, b) => {
+    console.log(a[data.field]);
+    if (data.sort_order === "asc") {
+      return a[data.field.value] < b[data.field.value] ? -1 : 1;
+    } else {
+      return a[data.field.value] > b[data.field.value] ? -1 : 1;
+    }
+  });
+};
 </script>
 
 <template>
   <Nav></Nav>
+  <FilterNav
+    @search="handle_search"
+    @refresh="handle_refresh"
+    @filter="handle_filter"
+    @sort="handle_sort"
+  />
   <div class="p-4">
     <div>
       <ListView

@@ -282,24 +282,11 @@ const handle_contact_view = (data)=>{
           :class="{ 'text-black border-black': tab === 0, 'text-gray-500': tab !== 0 }"
           @click="tab = 0"
         >
-          <svg
-            class="shrink-0 size-5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
+      
+          <FeatherIcon name="key" class="w-4"/>
           Opportunities
           <span
-            class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
+            class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
             >{{ state.opportunities.length }}</span
           >
         </button>
@@ -308,25 +295,10 @@ const handle_contact_view = (data)=>{
           class="hs-tab-active:font-semibold hs-tab-active:border-black hs-tab-active:text-black py-4 px-1 inline-flex items-center gap-x-2 border-b-2 border-transparent text-xl whitespace-nowrap text-gray-500 hover:text-black focus:outline-none focus:text-black disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500"
           @click="tab = 1"
         >
-          <svg
-            class="shrink-0 size-5"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <circle cx="12" cy="10" r="3"></circle>
-            <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
-          </svg>
+        <FeatherIcon name="user-check" class="w-4"/>
           Contacts
           <span
-            class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
+            class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
             >{{ contacts_list.length }}</span
           >
         </button>
@@ -336,10 +308,10 @@ const handle_contact_view = (data)=>{
           @click="tab = 3"
         >
         
-          <AppsIcon/>
+          <FeatherIcon name="bar-chart-2" class="w-4"/>
           Estimates
           <span
-            class="text-white font-medium text-sm bg-black px-2 py-1 rounded-full"
+            class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
             >{{ estimate_list.length }}</span
           >
         </button>
