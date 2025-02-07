@@ -22,6 +22,10 @@ const switchStore = useSwitchStore();
 
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
+import { useRoute } from "vue-router";
+const route = useRoute(); // Get the current route
+const lead_route_id = route.params.id;
+
 const toast = useToast();
 const array_list = ref([]);
 const Cred_status = ref(null);
@@ -61,7 +65,7 @@ const fetch = async () => {
       },
     });
   }
-  const res = await get_lead_task_by_lead_id(switchStore.create_form);
+  const res = await get_lead_task_by_lead_id(lead_route_id);
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -85,7 +89,7 @@ const fetch = async () => {
 const save_ = async () => {
 
   const data = {
-    lead_id: switchStore.create_form,
+    lead_id: lead_route_id,
     title: title_name.value,
     description: Description.value,
     type: status.value,
@@ -151,7 +155,7 @@ const edit_task = async (task) => {
 const update_task = async () => {
   const data = {
     task_id: task_id.value,
-    lead_id: switchStore.create_form,
+    lead_id: lead_route_id,
     title: title_name.value,
     description: Description.value,
     type: status.value,

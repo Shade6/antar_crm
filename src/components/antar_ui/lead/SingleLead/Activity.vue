@@ -10,10 +10,14 @@ import Attachments from "./ActivityCom/Attachments.vue";
 const switchStore = useSwitchStore();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
+
 const toast = useToast();
+import { useRoute } from "vue-router";
+const route = useRoute(); // Get the current route
+const lead_route_id = route.params.id;
 const array_list = ref([]);
 const fetch = async () => {
-  const res = await get_lead_activity(switchStore.create_form);
+  const res = await get_lead_activity(lead_route_id);
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {

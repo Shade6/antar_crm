@@ -10,6 +10,10 @@ import {
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
+import { useRoute } from "vue-router";
+const route = useRoute(); // Get the current route
+const lead_route_id = route.params.id;
+
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -18,7 +22,7 @@ const Cred_status = ref(null);
 const comment = ref("");
 const comment_id = ref(null);
 const fetch = async () => {
-  const res = await get_lead_comment_by_lead_id(switchStore.create_form);
+  const res = await get_lead_comment_by_lead_id(lead_route_id);
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -42,7 +46,7 @@ const fetch = async () => {
 const save_ = async () => {
   const data = {
     comment: comment.value,
-    lead_id: switchStore.create_form,
+    lead_id: lead_route_id,
   };
   const res = await create_lead_comment(data);
   if (res.statusCode == 200) {

@@ -854,3 +854,35 @@ export const product_find_by_name = async (data) => {
     )
   ).data;
 };
+
+export const find_status_of_lead = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_status_of_lead?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+
+export const update_lead_status = async (id,data) => {
+  return (
+    await axiosInstance.put(`update_lead_status?mdl=${switchStore().pageId}&&id=${id}&&status=${data}`)
+  ).data;
+};
+
+
+
+export const find_status_of_opportunity = async (data) => {
+  return (
+    await axiosInstance.get(
+      `find_status_of_opportunity?mdl=${switchStore().pageId}&&id=${data}`
+    )
+  ).data;
+};
+
+
+export const update_opportunity_status = async (id,data) => {
+  return (
+    await axiosInstance.put(`update_opportunity_status?mdl=${switchStore().pageId}&&id=${id}&&status=${data}`)
+  ).data;
+};

@@ -48,14 +48,44 @@ const router = createRouter({
           name: "dashboard_home",
           component: () => import("../views/antar_/home.vue"),
         },
+        // {
+        //   path: "/antar_/leads",
+        //   name: "dashboard",
+        //   component: () => import("../views/antar_/leads/leads.vue"),
+        // },
         {
           path: "/antar_/leads",
-          name: "dashboard",
-          component: () => import("../views/antar_/leads/leads.vue"),
+          children: [
+            {
+              path: "",
+              name: "lead-list", // Unique name for this route
+              component: () => import("../views/antar_/lead_mangae/List.vue"),
+            },
+            {
+              path: "create",
+              name: "create-lead", // Consistent naming convention
+              component: () => import("../views/antar_/lead_mangae/Create.vue"),
+            },
+            {
+              path: "kanban",
+              name: "kanban-view-list", // More descriptive name
+              component: () => import("../views/antar_/lead_mangae/Kanban.vue"),
+            },
+            {
+              path: ":id",
+              name: "lead-detail", // Consistent naming convention
+              component: () => import("../views/antar_/lead_mangae/Single.vue"),
+            },
+            {
+              path: "convert-lead",
+              name: "lead-convert", // Consistent naming convention
+              component: () => import("../views/antar_/lead_mangae/Edit.vue"),
+            },
+          
+          ],
         },
         {
           path: "/antar_/opportunities",
-          
           children: [
             {
               path: "",

@@ -1,5 +1,5 @@
 <script setup>
-import { h, ref, watch } from "vue";
+import { h, ref, watch, onMounted } from "vue";
 import ListIcon from "@/components/Icons/ListIcon.vue";
 import CreateLead from "@/components/modal/CreateLead.vue";
 import {
@@ -13,11 +13,18 @@ import {
 } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import { useReloadStore } from "@/stores/reload";
-import { findAllUsers,update_lead_assignee,find_single_lead ,remove_lead_assignee} from "@/api/userApi.js";
+import {
+  findAllUsers,
+  update_lead_assignee,
+  find_single_lead,
+  remove_lead_assignee,
+  find_status_of_lead,
+  update_lead_status,
+} from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-const lead_details = ref({})
+const lead_details = ref({});
 const props = defineProps({
   assignee: {
     type: Object,
@@ -26,14 +33,19 @@ const props = defineProps({
 });
 const users = ref([]);
 const switchStore = useSwitchStore();
-const reloadStore = useReloadStore()
+const reloadStore = useReloadStore();
 const dialog2 = ref(false);
+const status = ref("");
 const handle_create = () => {
   switchStore.changeCreateForm("create_lead");
 };
 const people = ref([]);
 
 const fetch = async () => {
+  const status_res = await find_status_of_lead(switchStore.create_form);
+  if (status_res.statusCode == 200) {
+    status.value = status_res.data;
+  }
   people.value = props.assignee.map((val) => ({
     label: val?.user?.first_name + " " + val?.user?.last_name,
     value: val?.user?.user_id,
@@ -61,32 +73,33 @@ const fetch = async () => {
     });
   }
 };
-const find_lead = async()=>{
-  const res = await find_single_lead(switchStore.create_form)
- if(res.statusCode == 200){
-  lead_details.value = res.data
- }else{
-  toast.success(res.message, {
-    position: "top-right",
-    duration: 3000,
-    dismissible: true,
-  });
- }
-} 
+const find_lead = async () => {
+  const res = await find_single_lead(switchStore.create_form);
+  if (res.statusCode == 200) {
+    lead_details.value = res.data;
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+    });
+  }
+};
 watch(
   () => dialog2.value,
   () => {
     fetch();
-    if(dialog2.value ==true){
-      find_lead()
+    if (dialog2.value == true) {
+      find_lead();
     }
   }
 );
+onMounted(fetch);
 const handle_update = async () => {
-    const details_data = {
-        lead_id :switchStore.create_form,
-        users:people.value
-    }
+  const details_data = {
+    lead_id: switchStore.create_form,
+    users: people.value,
+  };
   const res = await update_lead_assignee(details_data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
@@ -103,7 +116,7 @@ const handle_update = async () => {
         borderLeft: "5px solid green",
       },
     });
-    reloadStore.set_assignee_reload()
+    reloadStore.set_assignee_reload();
   } else {
     toast.success(res.message, {
       position: "top-right",
@@ -121,9 +134,12 @@ const handle_update = async () => {
     });
   }
 };
-const handle_remove = async(id)=>{
-  const res = await remove_lead_assignee({lead_id:lead_details.value.lead_id,id:id})
-  if(res.statusCode == 200){
+const handle_remove = async (id) => {
+  const res = await remove_lead_assignee({
+    lead_id: lead_details.value.lead_id,
+    id: id,
+  });
+  if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -138,8 +154,8 @@ const handle_remove = async(id)=>{
         borderLeft: "5px solid green",
       },
     });
-    reloadStore.set_assignee_reload()
-  }else{
+    reloadStore.set_assignee_reload();
+  } else {
     toast.success(res.message, {
       position: "top-right",
       duration: 3000,
@@ -155,7 +171,36 @@ const handle_remove = async(id)=>{
       },
     });
   }
-}
+};
+
+const handle_click_status = async () => {
+  toast.success("ddd", {
+    position: "top-right",
+    duration: 3000,
+    dismissible: true,
+    style: {
+      background: "#FFF5F5",
+      color: "black",
+      padding: "4px 20px",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+      borderLeft: "5px solid red",
+    },
+  });
+};
+
+watch(
+  () => status.value,
+  async (data) => {
+    console.log(data, "-----------------------------");
+    if (switchStore.create_form) {
+      if (status.value.value) {
+        await update_lead_status(switchStore.create_form, data.value);
+      }
+    }
+  }
+);
 </script>
 
 <template>
@@ -181,7 +226,6 @@ const handle_remove = async(id)=>{
           </span>
         </template>
       </Breadcrumbs>
-      
 
       <Dropdown
         :options="[
@@ -223,7 +267,7 @@ const handle_remove = async(id)=>{
             </div>
           </div>
         </Button>
-      </Dropdown> 
+      </Dropdown>
     </div>
 
     <div class="p-1 flex">
@@ -260,7 +304,7 @@ const handle_remove = async(id)=>{
                   <div class="">
                     <span class="my-auto"> {{ peop?.label }}</span>
                     <Button
-                    v-if="lead_details.assigned_to !== peop?.value"
+                      v-if="lead_details.assigned_to !== peop?.value"
                       class="my-auto"
                       :variant="'ghost'"
                       :ref_for="true"
@@ -273,9 +317,7 @@ const handle_remove = async(id)=>{
                       :link="null"
                       @click="handle_remove(peop?.value)"
                     >
-                  
-                      
-                      <FeatherIcon  class="w-4" name="x" />
+                      <FeatherIcon class="w-4" name="x" />
                     </Button>
                   </div>
                 </div>
@@ -287,6 +329,49 @@ const handle_remove = async(id)=>{
             <Button class="ml-2" @click="dialog2 = false"> Close </Button>
           </template>
         </Dialog>
+      </div>
+
+      <div v-if="switchStore.create_form">
+        <div class="px-2">
+          <Autocomplete
+            :options="[
+              { label: 'New', value: 'New', color: 'green' },
+              { label: 'Contacted', value: 'Contacted', color: 'blue' },
+              { label: 'Nurture', value: 'Nurture', color: 'yellow' },
+              { label: 'Qualified', value: 'Qualified', color: 'green' },
+              { label: 'UnQualified', value: 'UnQualified', color: 'red' },
+              { label: 'Junk', value: 'Junk', color: 'orange' },
+            ]"
+            v-model="status"
+            placeholder="status"
+          >
+            <template #prefix> </template>
+            <template #item-prefix="{ option }">
+              <span
+                @click="handle_click_status"
+                class="w-4 h-4 border rounded-full"
+                :style="{ border: '4px solid ' + option.color }"
+              ></span>
+            </template>
+          </Autocomplete>
+        </div>
+      </div>
+      <div v-if="switchStore.create_form">
+        <div class="">
+          <Button
+            :variant="'solid'"
+            :ref_for="true"
+            theme="gray"
+            size="sm"
+            label="Button"
+            :loading="false"
+            :loadingText="null"
+            :disabled="false"
+            :link="null"
+          >
+            Convert to opportunity
+          </Button>
+        </div>
       </div>
       <Button
         class="mx-2"

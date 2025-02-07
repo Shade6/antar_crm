@@ -1,4 +1,8 @@
+
+
+
 <script setup>
+import Nav from "./nav/Nav.vue";
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput } from "frappe-ui";
 
@@ -6,38 +10,75 @@ import {
   find_all_industry,
   find_all_territories,
   findAllUsers,
-  create_lead
+  create_lead,
+  get_all_product,
+  find_single_lead
+
 } from "@/api/userApi.js";
+import { useRouter } from "vue-router";
+const router = useRouter();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
+
 const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
+const product_list = ref([]);
+const lead_data = ref({})
 
 const form_details = ref({
-    salutation:null,
-    first_name:null,
-    last_name:null,
-    email:null,
-    mobile:null,
-    gender:null,
-    organization:null,
-    website:null,
-    employees:null,
-    territory_id:null,
-    revenue:null,
-    industry_id:null,
-    status:null,
-    owner_id:null
-})
+  lead_id:router.currentRoute.value.hash,
+  salutation: null,
+  first_name: null,
+  last_name: null,
+  email: null,
+  mobile: null,
+  gender: null,
+  organization: null,
+  website: null,
+  employees: null,
+  territory_id: null,
+  revenue: null,
+  industry_id: null,
+  status: null,
+  owner_id: null,
+  opportunity_name: null,
+  opportunity_value: null,
+  product:null
+});
 
 const fetch = async () => {
-  const [industry_res, territory_res, users_res] = await Promise.all([
+  const [industry_res, territory_res, users_res,product_res,lead_ref] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
+    get_all_product(),
+    find_single_lead(router.currentRoute.value.hash.slice(1))
   ]);
+  if (lead_ref.statusCode == 200) {
+    lead_data.value = lead_ref.data
+    
+    form_details.value.lead_id=lead_ref.data.lead_id
+    form_details.value.salutation= lead_ref.data.salutation
+    form_details.value.first_name=lead_ref.data.first_name
+    form_details.value.last_name= lead_ref.data.last_name
+    form_details.value.email= lead_ref.data.email
+    form_details.value.mobile=lead_ref.data.contact
+    form_details.value.gender=lead_ref.data.gender
+    form_details.value.organization= lead_ref.data.company
+    form_details.value.website= lead_ref.data.website
+    form_details.value. employees= lead_ref.data.employees
+    form_details.value.territory_id=lead_ref.data.territory_id
+    form_details.value.revenue= lead_ref.data.revenue
+    form_details.value.industry_id= lead_ref.data.industry_id
+    form_details.value.status= lead_ref.data.status
+    form_details.value.owner_id= lead_ref.data.assigned_to
+
+
+  } else {
+    show_error(lead_ref);
+  }
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
       label: val.industry_name,
@@ -62,6 +103,15 @@ const fetch = async () => {
   } else {
     show_error(users_res);
   }
+  if (product_res.statusCode == 200) {
+    product_list.value = product_res.data.map((val, i) => ({
+      label: val.product_name ,
+      value: val.product_id,
+    }));
+  } else {
+    show_error(product_res);
+  }
+  
 };
 const show_error = (res) => {
   toast.success(res.message, {
@@ -80,10 +130,10 @@ const show_error = (res) => {
   });
 };
 
-const handle_save_lead =async()=>{
-    const res = await create_lead(form_details.value)
-    if(res.statusCode == 200){
-        toast.success(res.message, {
+const handle_save_lead = async () => {
+  const res = await create_lead(form_details.value);
+  if (res.statusCode == 200) {
+    toast.success(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -97,48 +147,35 @@ const handle_save_lead =async()=>{
         borderLeft: "5px solid green",
       },
     });
-   
-    }else{
-        toast.success(res.message, {
-    position: "top-right",
-    duration: 3000,
-    dismissible: true,
-    style: {
-      background: "#FFF5F5",
-      color: "black",
-      padding: "4px 20px",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-      borderLeft: "5px solid red",
-    },
-  });
-    }
-}
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
 onMounted(fetch);
 </script>
-
 <template>
+  <Nav @save="handle_save_lead" />
+  
   <div class="mx-4">
-    <div class="my-3 flex justify-center relative">
-      <span class="text-3xl font-semibold">Create Lead</span>
-      <div class="p-1 absolute start-0">
-        <Button
-       
-          :variant="'outline'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Close
-        </Button>
-      </div>
+    <div class="p-2">
+        <span class="text-xs text-gray-600">Lead created on</span>
+        <br>
+        <span class="px-2 py-1 ">{{ new Date(lead_data.created_at).toLocaleDateString() }}</span>
     </div>
+    
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
@@ -319,12 +356,18 @@ onMounted(fetch);
         />
       </div>
     </div>
+
+
+
+
+
+
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
         <Autocomplete
           :options="territory_list"
-          v-model="form_details?.territory_id"
+          v-model="form_details.territory_id"
           placeholder="Select territory"
         />
       </div>
@@ -353,6 +396,48 @@ onMounted(fetch);
       </div>
     </div>
     <hr class="my-3" />
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >opportunity name
+          </span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="enter opportunity name"
+            :disabled="false"
+            :modelValue="form_details.opportunity_name"
+            v-model="form_details.opportunity_name"
+          />
+        </div>
+
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >opportunity value
+          </span>
+          <TextInput
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="enter opportunity value"
+            :disabled="false"
+            :modelValue="form_details.opportunity_value"
+            v-model="form_details.opportunity_value"
+          />
+        </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Product/Service</span>
+          <Autocomplete
+            :options="product_list"
+              v-model="form_details.product"
+              placeholder="Select product/service"
+            :multiple="true"
+          />
+        </div>
+      </div>
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Status </span>
@@ -396,25 +481,10 @@ onMounted(fetch);
         />
       </div>
     </div>
-    <div class="flex justify-center">
-      <div class="p-1 my-3">
-        <Button
-          :variant="'solid'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-          @click="handle_save_lead"
-        >
-          Create Lead
-        </Button>
-      </div>
-    </div>
+  
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

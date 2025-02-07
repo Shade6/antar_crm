@@ -16,13 +16,16 @@ const toast = useToast();
 const array_list = ref([]);
 const dialog2 = ref(false);
 const note_id = ref(null);
+import { useRoute } from "vue-router";
+const route = useRoute(); // Get the current route
+const lead_route_id = route.params.id;
 
 const Cred_status = ref(null);
 const title_name = ref("");
 const content = ref("");
 
 const fetch = async () => {
-  const res = await get_lead_note_by_lead_id(switchStore.create_form);
+  const res = await get_lead_note_by_lead_id(lead_route_id);
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -45,7 +48,7 @@ const fetch = async () => {
 
 const save_ = async () => {
   const data = {
-    lead_id: switchStore.create_form,
+    lead_id: lead_route_id,
     title: title_name.value,
     content: content.value,
     status: false,
@@ -252,7 +255,7 @@ const delete_note = async(data)=>{
     </div>
   </div>
   <div v-if="Cred_status == null">
-    <div v-if="array_list.length == 0">
+    <div v-if="array_list?.length == 0">
       <div class="text-center">
         <span class="text-gray-500">Notes was empty</span>
       </div>

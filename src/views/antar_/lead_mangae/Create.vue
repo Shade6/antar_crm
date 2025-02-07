@@ -1,4 +1,5 @@
 <script setup>
+import Nav from "./nav/Nav.vue";
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput } from "frappe-ui";
 
@@ -6,31 +7,33 @@ import {
   find_all_industry,
   find_all_territories,
   findAllUsers,
-  create_lead
+  create_lead,
 } from "@/api/userApi.js";
+
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
+
 const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
 
 const form_details = ref({
-    salutation:null,
-    first_name:null,
-    last_name:null,
-    email:null,
-    mobile:null,
-    gender:null,
-    organization:null,
-    website:null,
-    employees:null,
-    territory_id:null,
-    revenue:null,
-    industry_id:null,
-    status:null,
-    owner_id:null
-})
+  salutation: null,
+  first_name: null,
+  last_name: null,
+  email: null,
+  mobile: null,
+  gender: null,
+  organization: null,
+  website: null,
+  employees: null,
+  territory_id: null,
+  revenue: null,
+  industry_id: null,
+  status: null,
+  owner_id: null,
+});
 
 const fetch = async () => {
   const [industry_res, territory_res, users_res] = await Promise.all([
@@ -80,10 +83,10 @@ const show_error = (res) => {
   });
 };
 
-const handle_save_lead =async()=>{
-    const res = await create_lead(form_details.value)
-    if(res.statusCode == 200){
-        toast.success(res.message, {
+const handle_save_lead = async () => {
+  const res = await create_lead(form_details.value);
+  if (res.statusCode == 200) {
+    toast.success(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -97,48 +100,29 @@ const handle_save_lead =async()=>{
         borderLeft: "5px solid green",
       },
     });
-   
-    }else{
-        toast.success(res.message, {
-    position: "top-right",
-    duration: 3000,
-    dismissible: true,
-    style: {
-      background: "#FFF5F5",
-      color: "black",
-      padding: "4px 20px",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-      borderLeft: "5px solid red",
-    },
-  });
-    }
-}
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+};
 onMounted(fetch);
 </script>
-
 <template>
+  <Nav @save="handle_save_lead" />
   <div class="mx-4">
-    <div class="my-3 flex justify-center relative">
-      <span class="text-3xl font-semibold">Create Lead</span>
-      <div class="p-1 absolute start-0">
-        <Button
-       
-          :variant="'outline'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-        >
-          Close
-        </Button>
-      </div>
-    </div>
+  
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
@@ -324,7 +308,7 @@ onMounted(fetch);
         <span class="text-gray-500 font-medium text-sm my-1">Territory</span>
         <Autocomplete
           :options="territory_list"
-          v-model="form_details?.territory_id"
+          v-model="form_details.territory_id"
           placeholder="Select territory"
         />
       </div>
@@ -396,25 +380,10 @@ onMounted(fetch);
         />
       </div>
     </div>
-    <div class="flex justify-center">
-      <div class="p-1 my-3">
-        <Button
-          :variant="'solid'"
-          :ref_for="true"
-          theme="gray"
-          size="sm"
-          label="Button"
-          :loading="false"
-          :loadingText="null"
-          :disabled="false"
-          :link="null"
-          @click="handle_save_lead"
-        >
-          Create Lead
-        </Button>
-      </div>
-    </div>
+  
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

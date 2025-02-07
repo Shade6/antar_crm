@@ -14,6 +14,11 @@ import {
   delete_lead_attachment
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
+
+import { useRoute } from "vue-router";
+const route = useRoute(); // Get the current route
+const lead_route_id = route.params.id;
+
 const file_data = ref(null);
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -25,7 +30,7 @@ const link_open = ref(true);
 
 const file = ref(null);
 const fetch = async () => {
-  const res = await get_attachment_by_lead_id(switchStore.create_form);
+  const res = await get_attachment_by_lead_id(lead_route_id);
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -50,7 +55,7 @@ const save_ = async () => {
   if(file_data.value==null){
 
   const data = {
-    lead_id: switchStore.create_form,
+    lead_id: lead_route_id,
     title: file.value,
   };
   const res = await create_lead_attachment(data);
@@ -94,7 +99,7 @@ const save_ = async () => {
     const formData = new FormData();
     formData.append("file", file_data.value);
 
-    const res = await create_lead_attachment(formData,switchStore.create_form);
+    const res = await create_lead_attachment(formData,lead_route_id);
     if (res.statusCode == 200) {
       fetch();
       file_data.value = null;

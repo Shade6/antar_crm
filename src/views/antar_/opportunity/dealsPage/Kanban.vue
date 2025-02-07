@@ -1,11 +1,13 @@
 <script setup >
 import Nav from "../nav/Nav.vue";
+import KanbanDetails from "./KanbanDetails.vue"
+
 </script>
 
 <template>
     <Nav />
-    <div>
-        kanban
+    <div class="p-4">
+        <KanbanDetails/>
     </div>
 </template>
 
