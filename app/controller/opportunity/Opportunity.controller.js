@@ -493,3 +493,45 @@ const  tenant_id = req.tenant
     return res.json({ message: error.message, statusCode: 400 });
   }
 };
+
+
+exports.find_status_of_opportunity = async(req,res)=>{
+  try {
+    const id = req.query.id;
+    const find_lead  = await Opportunity.findOne({where:{Opportunity_id:id}})
+    if(!find_lead){
+      return res.json({ message:'Opportunity not found', statusCode: 404})
+    }
+
+    return res.json({message:'Opportunity status found', statusCode:200,data:find_lead.status})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+}
+
+exports.update_opportunity_status = async(req,res)=>{
+  try {
+    const id = req.query.id;
+    const status = req.query.status;
+
+    console.log(id, status,'dfdfdfdf----------------')
+    
+    const find_leads = await Opportunity.findOne({where:{opportunity_id:id}})
+    console.log(find_leads,'----------------------------------------',id)
+    if(!find_leads){
+      return res.json({ message:'opportunity not found', statusCode: 404})
+    }
+
+    if(!status){
+      return res.json({ message:"no status entered",statusCode:400})
+    }
+
+
+    find_leads.status = status;
+    find_leads.save()
+
+    return res.json({ message:'status was updated', statusCode:200})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+}

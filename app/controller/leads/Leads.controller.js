@@ -231,7 +231,10 @@ exports.find_single_lead = async (req, res) => {
 exports.find_assignees = async (req, res) => {
   try {
     const lead_id = req.query.id;
-    
+    const find_lead = await Leads.findOne({where:{lead_id: lead_id}})
+    if(!find_lead){
+      return res.json({message:'lead not found',statusCode:400})
+    }
     if (!lead_id) {
       return res.json({
         message: "lead requirement not found",
@@ -260,6 +263,7 @@ exports.find_assignees = async (req, res) => {
       message: "lead assignee found",
       statusCode: 200,
       data: findALl ?? [],
+      leader:find_lead?.assigned_to
     });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
@@ -653,3 +657,44 @@ exports.get_lead_activity = async (req, res) => {
     return res.json({ message: error.message, statusCode: 500 });
   }
 };
+
+
+exports.find_status_of_lead = async(req,res)=>{
+  try {
+    const id = req.query.id;
+    const find_lead  = await Leads.findOne({where:{lead_id:id}})
+    if(!find_lead){
+      return res.json({ message:'lead not found', statusCode: 404})
+    }
+
+    return res.json({message:'lead status found', statusCode:200,data:find_lead.status})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+}
+
+exports.update_lead_status = async(req,res)=>{
+  try {
+    const id = req.query.id;
+    const status = req.query.status;
+
+    console.log(id, status,'dfdfdfdf----------------')
+    
+    const find_leads = await Leads.findOne({where:{lead_id:id}})
+    if(!find_leads){
+      return res.json({ message:'lead not found', statusCode: 404})
+    }
+
+    if(!status){
+      return res.json({ message:"no status entered",statusCode:400})
+    }
+
+
+    find_leads.status = status;
+    find_leads.save()
+
+    return res.json({ message:'lead status updated', statusCode:200})
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+}

@@ -91,5 +91,17 @@ module.exports = (app) => {
     AccessChecker.access_create,
     controller.opportunity_filter
   )
+  router.get("/find_status_of_opportunity",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.find_status_of_opportunity
+  )
+  router.put("/update_opportunity_status",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_create,
+    controller.update_opportunity_status
+  )
   app.use("/api/v1/crm/", router);
 };

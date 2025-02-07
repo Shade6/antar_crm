@@ -227,5 +227,19 @@ module.exports = (app) => {
     AccessChecker.access_read,
     controller.get_lead_activity
   );
+  router.get(
+    "/find_status_of_lead",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_read,
+    controller.find_status_of_lead
+  );
+  router.put(
+    "/update_lead_status",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_amend,
+    controller.update_lead_status
+  );
   app.use("/api/v1/crm/", router);
 };
