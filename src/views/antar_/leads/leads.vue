@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, watch } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import CreateLead from "@/components/antar_ui/lead/CreateLead.vue";
@@ -46,4 +46,4 @@ watch(
   <div v-else>
     <Landing />
   </div>
-</template>
+</template> -->

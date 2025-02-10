@@ -86,7 +86,7 @@ const handle_update = () => {
       </Breadcrumbs>
       
 
-      <Dropdown
+      <!-- <Dropdown
        class="my-auto"
         :options="[
           {
@@ -128,7 +128,7 @@ const handle_update = () => {
             </div>
           </div>
         </Button>
-      </Dropdown> 
+      </Dropdown>  -->
     </div>
 
     <div class="p-1 flex">

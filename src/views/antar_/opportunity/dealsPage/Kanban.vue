@@ -8,8 +8,8 @@ import Test from "./Test.vue"
 <template>
     <Nav />
     <div class="p-4">
-        <Test/>
-        <!-- <KanbanDetails/> -->
+        <!-- <Test/> -->
+        <KanbanDetails/>
     </div>
 </template>
 

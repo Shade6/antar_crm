@@ -34,6 +34,7 @@ watch(
 const logout = () => {
   switchStore.clearPersist();
   localStorage.clear();
+  window.location.reload();
   router.push(`/login`);
 };
 const go_to_settings = () => {
