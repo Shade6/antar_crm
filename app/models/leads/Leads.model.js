@@ -51,6 +51,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ['New', 'Contacted', 'Nurture','Qualified','UnQualified','Junk'],
       },
+      converted:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       employees:{
         type: Sequelize.STRING,
       },

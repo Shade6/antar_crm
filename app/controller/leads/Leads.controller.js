@@ -8,6 +8,10 @@ const Territory = db.territory;
 const Industry = db.industry;
 const LeadScore = db.lead_score;
 const ActivityLog = db.activity_log;
+const Contact = db.contacts
+const Organization = db.organization
+const Opportunity = db.opportunity
+const ProductMapping = db.product_mapping
 exports.create_lead = async (req, res) => {
   try {
     console.log(req.body);
@@ -27,7 +31,7 @@ exports.create_lead = async (req, res) => {
       status,
       owner_id,
     } = req.body;
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
     console.log("start ---------");
     const validation = field_checker.checkNullValues({
       salutation: salutation.value,
@@ -46,7 +50,7 @@ exports.create_lead = async (req, res) => {
     }
 
     const find_owner = await Users.findOne({
-      where: { user_id: owner_id.value ,tenant_id:tenant_id},
+      where: { user_id: owner_id.value, tenant_id: tenant_id },
     });
 
     if (!find_owner) {
@@ -61,7 +65,6 @@ exports.create_lead = async (req, res) => {
       const job_title_in_score = find_lead_score.job_title;
       const number_of_employees_in_score = find_lead_score.number_of_employees;
       const annual_revenue_in_score = find_lead_score.annual_revenue;
-
 
       if (territory_id) {
         const find_territory = JSON.parse(territory_in_score).some(
@@ -139,7 +142,7 @@ exports.create_lead = async (req, res) => {
         changed_by: req.user,
         created_at: new Date(),
         updated_at: new Date(),
-        tenant_id:tenant_id
+        tenant_id: tenant_id,
       },
       {
         tracker_id: req.tracker_id, // Pass extra ID through options
@@ -167,19 +170,23 @@ exports.create_lead = async (req, res) => {
 exports.getLeads = async (req, res) => {
   try {
     const user = req.user;
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
 
-    console.log(user,'----')
+    console.log(user, "----");
 
     const find_assignees = await LeadAssignee.findAll({
       where: { user_id: user },
     });
-    console.log(find_assignees.length)
-    if(find_assignees.length == 0){
-      return res.json({message:'lead assignee not found',statusCode:400})
+    console.log(find_assignees.length);
+    if (find_assignees.length == 0) {
+      return res.json({ message: "lead assignee not found", statusCode: 400 });
     }
     const find_all = await Leads.findAll({
-      where: { lead_id: find_assignees.map((val) => val.lead_id) ,tenant_id:tenant_id},
+      where: {
+        lead_id: find_assignees.map((val) => val.lead_id),
+        tenant_id: tenant_id,
+        converted:false,
+      },
     });
     return res.json({
       message: "leads found",
@@ -194,7 +201,7 @@ exports.getLeads = async (req, res) => {
 exports.find_single_lead = async (req, res) => {
   try {
     const lead_id = req.query.id;
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
     if (!lead_id) {
       return res.json({
         message: "lead requirement not found",
@@ -202,7 +209,7 @@ exports.find_single_lead = async (req, res) => {
       });
     }
     const find_all = await Leads.findOne({
-      where: { lead_id: lead_id ,tenant_id:tenant_id},
+      where: { lead_id: lead_id, tenant_id: tenant_id,converted:false },
       include: [
         {
           model: Territory,
@@ -231,9 +238,9 @@ exports.find_single_lead = async (req, res) => {
 exports.find_assignees = async (req, res) => {
   try {
     const lead_id = req.query.id;
-    const find_lead = await Leads.findOne({where:{lead_id: lead_id}})
-    if(!find_lead){
-      return res.json({message:'lead not found',statusCode:400})
+    const find_lead = await Leads.findOne({ where: { lead_id: lead_id } });
+    if (!find_lead) {
+      return res.json({ message: "lead not found", statusCode: 400 });
     }
     if (!lead_id) {
       return res.json({
@@ -263,7 +270,7 @@ exports.find_assignees = async (req, res) => {
       message: "lead assignee found",
       statusCode: 200,
       data: findALl ?? [],
-      leader:find_lead?.assigned_to
+      leader: find_lead?.assigned_to,
     });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
@@ -273,9 +280,11 @@ exports.find_assignees = async (req, res) => {
 exports.update_lead_assignee = async (req, res) => {
   try {
     const { lead_id, users } = req.body;
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
     console.log(req.body);
-    const find_lead = await Leads.findOne({ where: { lead_id: lead_id,tenant_id:tenant_id } });
+    const find_lead = await Leads.findOne({
+      where: { lead_id: lead_id, tenant_id: tenant_id },
+    });
     if (!find_lead) {
       return res.json({ message: "lead not found", statusCode: 400 });
     }
@@ -485,7 +494,7 @@ exports.get_lead_scoring_rules = async (req, res) => {
 exports.delete_lead_scoring_rules = async (req, res) => {
   try {
     const lead_ids = req.query.id;
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
     const ids = lead_ids.split(",");
     console.log(ids);
     if (ids.length == 0) {
@@ -493,10 +502,12 @@ exports.delete_lead_scoring_rules = async (req, res) => {
     }
     let count = 0;
     for (let id of ids) {
-      const find_lead_score = await Leads.findOne({ where: { lead_id: id ,tenant_id:tenant_id} });
+      const find_lead_score = await Leads.findOne({
+        where: { lead_id: id, tenant_id: tenant_id },
+      });
       if (find_lead_score) {
         await Leads.destroy(
-          { where: { lead_id: id ,tenant_id:tenant_id} },
+          { where: { lead_id: id, tenant_id: tenant_id } },
           {
             tracker_id: req.tracker_id, // Pass extra ID through options
           }
@@ -518,7 +529,7 @@ exports.update_lead = async (req, res) => {
     let score = 0;
     let lead_value;
     console.log(req.body);
-    const tenant_id = req.tenant
+    const tenant_id = req.tenant;
     const find_lead_score = await LeadScore.findOne();
     if (find_lead_score) {
       const territory_in_score = find_lead_score.territory;
@@ -587,7 +598,7 @@ exports.update_lead = async (req, res) => {
     const update_lead = await Leads.update(
       { ...req.body, lead_score: score, lead_value: lead_value },
       {
-        where: { lead_id: lead_id ,tenant_id:tenant_id},
+        where: { lead_id: lead_id, tenant_id: tenant_id },
       },
       {
         tracker_id: req.tracker_id, // Pass extra ID through options
@@ -608,7 +619,7 @@ exports.remove_lead_assignee = async (req, res) => {
     console.log(req.body);
     const lead_id = req.query.lead_id;
     const user_id = req.query.id;
-    
+
     const find_lead_assignee = await LeadAssignee.findOne({
       where: { lead_id: lead_id, user_id: user_id },
     });
@@ -643,58 +654,174 @@ exports.get_lead_activity = async (req, res) => {
           { module_name: "lead_note" },
           { module_name: "lead_task" },
         ],
-        id_value: lead_id
+        id_value: lead_id,
       },
       include: {
         model: Users,
-        as: 'user',
-        attributes: ['first_name', 'last_name', 'user_id']
+        as: "user",
+        attributes: ["first_name", "last_name", "user_id"],
       },
-      order: [['created_at', 'DESC']], // Corrected sorting by data
+      order: [["created_at", "DESC"]], // Corrected sorting by data
     });
-    res.json({ message: "activity found", statusCode: 200, data: find_activity });
+    res.json({
+      message: "activity found",
+      statusCode: 200,
+      data: find_activity,
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
 };
 
-
-exports.find_status_of_lead = async(req,res)=>{
+exports.find_status_of_lead = async (req, res) => {
   try {
     const id = req.query.id;
-    const find_lead  = await Leads.findOne({where:{lead_id:id}})
-    if(!find_lead){
-      return res.json({ message:'lead not found', statusCode: 404})
+    const find_lead = await Leads.findOne({ where: { lead_id: id } });
+    if (!find_lead) {
+      return res.json({ message: "lead not found", statusCode: 404 });
     }
 
-    return res.json({message:'lead status found', statusCode:200,data:find_lead.status})
+    return res.json({
+      message: "lead status found",
+      statusCode: 200,
+      data: find_lead.status,
+    });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
-}
+};
 
-exports.update_lead_status = async(req,res)=>{
+exports.update_lead_status = async (req, res) => {
   try {
     const id = req.query.id;
     const status = req.query.status;
 
-    console.log(id, status,'dfdfdfdf----------------')
-    
-    const find_leads = await Leads.findOne({where:{lead_id:id}})
-    if(!find_leads){
-      return res.json({ message:'lead not found', statusCode: 404})
+    console.log(id, status, "dfdfdfdf----------------");
+
+    const find_leads = await Leads.findOne({ where: { lead_id: id } });
+    if (!find_leads) {
+      return res.json({ message: "lead not found", statusCode: 404 });
     }
 
-    if(!status){
-      return res.json({ message:"no status entered",statusCode:400})
+    if (!status) {
+      return res.json({ message: "no status entered", statusCode: 400 });
     }
-
 
     find_leads.status = status;
-    find_leads.save()
+    find_leads.save();
 
-    return res.json({ message:'lead status updated', statusCode:200})
+    return res.json({ message: "lead status updated", statusCode: 200 });
   } catch (error) {
     return res.json({ message: error.message, statusCode: 500 });
   }
-}
+};
+
+exports.convert_lead = async (req, res) => {
+  try {
+    const {
+      lead_id,
+      salutation,
+      first_name,
+      last_name,
+      email,
+      mobile,
+      gender,
+      organization,
+      website,
+      employees,
+      territory_id,
+      revenue,
+      industry_id,
+      status,
+      owner_id,
+      opportunity_name,
+      opportunity_value,
+      product,
+    } = req.body;
+
+    // Find lead
+    const find_lead = await Leads.findOne({ where: { lead_id } });
+
+    if (!find_lead) {
+      return res.status(400).json({ message: "Lead not found", statusCode: 400 });
+    }
+   console.log(req.body)
+
+    // return res.json({message:'complete',statusCode:200})
+
+    const getValue = (data, defaultValue = "") => {
+      if (data && typeof data === "object" && "value" in data) {
+        return data.value;
+      }
+      return data ?? defaultValue;
+    };
+    
+    // Create Contact
+    const create_Contact = await Contact.create({
+      first_name: getValue(first_name),
+      tenant_id: req.tenant,
+      last_name: getValue(last_name),
+      email_id: getValue(email),
+      user_id: getValue(owner_id),
+      status: getValue(status, "New"),
+      salutation: getValue(salutation),
+      gender: getValue(gender),
+      phone: getValue(mobile, null),
+      company_name: getValue(organization),
+    });
+    
+    // Create Organization
+    const create_Organization = await Organization.create({
+      organization_name: getValue(organization),
+      no_of_employees: getValue(employees, null),
+      annual_revenue: getValue(revenue, null),
+      website: getValue(website),
+      tenant_id: req.tenant,
+      territory_id: getValue(territory_id, null),
+      industry_id: getValue(industry_id, null),
+      created_on: new Date(),
+    });
+    
+    // Create Opportunity
+    const create_Opportunity = await Opportunity.create({
+      organization_id: create_Organization.organization_id,
+      tenant_id: req.tenant,
+      opportunity_name: getValue(opportunity_name),
+      opportunity_value: getValue(opportunity_value, 0),
+      contact_id: create_Contact.contact_id,
+      opportunity_owner_id: getValue(owner_id),
+      lead_id: lead_id,
+      status: "New",
+      created_by: getValue(owner_id),
+      created_on: new Date(),
+    });
+    
+    
+
+    if(product.length >0){
+      for (let pro of product){
+          await ProductMapping.create({
+            opportunity_id:create_Opportunity.opportunity_id,
+            product_id :pro.value
+          })
+      }
+    }
+
+    find_lead.converted = true;
+    find_lead.save()
+
+
+
+    return res.status(201).json({
+      message: "Lead converted successfully",
+      statusCode: 200,
+      contact: create_Contact,
+      organization: create_Organization,
+      opportunity: create_Opportunity,
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message, statusCode: 500 });
+  }
+};
+

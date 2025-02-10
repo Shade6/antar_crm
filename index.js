@@ -67,6 +67,8 @@ require("./app/router/Image.routes")(app)
 require("./app/router/userAccess/Dashboard.routes.js")(app)
 require("./app/router/subscription/subscription.routes.js")(app)
 
+require("./app/router/Superset.routes.js")(app)
+
 const PORT =  8088;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
