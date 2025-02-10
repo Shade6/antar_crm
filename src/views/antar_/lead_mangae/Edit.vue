@@ -12,7 +12,8 @@ import {
   findAllUsers,
   create_lead,
   get_all_product,
-  find_single_lead
+  find_single_lead,
+  convert_lead
 
 } from "@/api/userApi.js";
 import { useRouter } from "vue-router";
@@ -165,9 +166,45 @@ const handle_save_lead = async () => {
   }
 };
 onMounted(fetch);
+
+
+const handle_convert_lead = async()=>{
+   const res = await convert_lead(form_details.value)
+   if (res.statusCode == 200) {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+}
 </script>
 <template>
-  <Nav @save="handle_save_lead" />
+  <Nav @convert="handle_convert_lead" />
   
   <div class="mx-4">
     <div class="p-2">
@@ -418,7 +455,7 @@ onMounted(fetch);
             >opportunity value
           </span>
           <TextInput
-            :type="'text'"
+            :type="'number'"
             :ref_for="true"
             size="sm"
             variant="subtle"

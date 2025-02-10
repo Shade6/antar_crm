@@ -4,11 +4,12 @@
     
   </div>
 </template>
+
 <script>
 import { onMounted } from "vue";
 import "smart-webcomponents/source/styles/smart.default.css";
 import "smart-webcomponents/source/modules/smart.kanban.js";
-import { get_all_deal, update_opportunity_status } from "@/api/userApi.js";
+import { find_all_lead, update_lead_status } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useSwitchStore } from "@/stores/switch";
@@ -20,37 +21,54 @@ export default {
 
     onMounted(async () => {
       let data = [];
-      const res = await get_all_deal();
+      const res = await find_all_lead();
       if (res.statusCode == 200) {
         data = res.data.map((val) => ({
-          text: `
-          <div>
+          text: `<div>
             <span >
-                <strong>${val?.opportunity_name }</strong>
+                <strong>${val?.first_name + " " + val?.last_name}</strong>
             </span>
          
             <br>
             <span>
-               <span>value:</span> ${val?.opportunity_value}
+               <span>company:</span> ${val?.company}
             </span>
             <br>
             <span>
-               <span>org:</span> ${val?.organization?.organization_name}
+               <span>company:</span> ${val?.company}
+            </span>
+                 <br>
+            <span>
+               <button >view details</button>
             </span>
             <br>
             <span>
-                ${new Date(val?.changed_on).toLocaleDateString()}
+                ${new Date(val?.created_at).toLocaleDateString()}
             </span>
-         </div>
-`,
+         </div>`,
+   
           status: val?.status,
-          id: val?.opportunity_id,
+          id: val?.lead_id,
         }));
       }
+
       const kanban = document.getElementById("kanban");
 
+            kanban.addEventListener("click", async (event) => {
+            const clickedElement = event; // The exact element clicked
+            console.log("Clicked Element:", clickedElement);
+
+            // Get data attributes if stored (e.g., data-id, data-title)
+            const dataId = clickedElement.getAttribute("data-id");
+            const dataTitle = clickedElement.getAttribute("data-title");
+
+            console.log("Clicked Data ID:", dataId);
+            console.log("Clicked Data Title:", dataTitle);
+            });
+
+
       kanban.addEventListener("change", async (event) => {
-        const res_d = await update_opportunity_status(
+        const res_d = await update_lead_status(
           event?.detail?.value?.id,
           event?.detail?.value?.status
         );

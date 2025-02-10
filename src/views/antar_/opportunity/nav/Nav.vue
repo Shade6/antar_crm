@@ -1,5 +1,5 @@
 <script setup>
-import { h, ref, watch, defineEmits } from "vue";
+import { h, ref, watch, defineEmits ,onMounted} from "vue";
 import { useRouter } from "vue-router";
 import ListIcon from "@/components/icons/ListIcon.vue";
 import { Dropdown, FeatherIcon, Button, Breadcrumbs,Autocomplete } from "frappe-ui";
@@ -29,40 +29,119 @@ const handle_create = () => {
 };
 
 const currentPath = router.currentRoute.value.path;
-const isCreateRoute = () => {
-
-  if (currentPath === "/antar_/opportunities/create") {
-    route_list.value.push({ label: "New Opportunity", route: "/antar_/opportunities/create" });
-  } else if (currentPath.includes("/antar_/opportunities/")) {
-    const dealId = currentPath.split("/").pop();
-    find_status(dealId)
-    route_list.value.push({ label: `Opportunity ${dealId}`, route: currentPath });
-  }
-  return currentPath === "/antar_/opportunities/create";
-};
 
 const checkSingle=()=>{
     return currentPath.split("/").pop() 
 }
 const find_status =async(data)=>{
      const res = await find_status_of_opportunity(data)
-     if(res.statusCode == 200){
-        status.value = res.data
-     }
+     if (res.statusCode == 200) {
+      const foundStatus = [
+        { label: "New", value: "New", color: "green" },
+        { label: "Contacted", value: "Contacted", color: "blue" },
+        { label: "Nurture", value: "Nurture", color: "yellow" },
+        { label: "Qualified", value: "Qualified", color: "green" },
+        { label: "UnQualified", value: "UnQualified", color: "red" },
+        { label: "Junk", value: "Junk", color: "orange" },
+      ].find((item) => item.value === res.data);
+
+      if (foundStatus) {
+        status.value = foundStatus;
+      }
+    }
 }
 
-watch(()=>status.value,async(data)=>{
-  console.log(data.value,'=======')
-  if(data.value){
-    const res = await update_opportunity_status(currentPath.split("/").pop(),data.value)
+onMounted(() => {
 
+  if (router.currentRoute.value.fullPath == "/antar_/opportunities/create") {
+    route_list.value = [
+      {
+        label: "Opportunities",
+        icon: "",
+        route: "/antar_/opportunities",
+      },
+      {
+        label: "Create New Opportunities",
+        icon: "",
+      },
+    ];
+  } else if (router.currentRoute.value.path == "/antar_/opportunities") {
+    route_list.value = [
+      {
+        label: "Opportunities",
+        icon: "",
+        route: "/antar_/opportunities",
+      },
+    ];
+  } else if (router.currentRoute.value.params?.id) {
+    find_status(router.currentRoute.value.params?.id)
+    route_list.value = [
+      {
+        label: "Opportunities",
+        icon: "",
+        route: "/antar_/opportunities",
+      },
+      {
+        label: `single Opportunities ${router.currentRoute.value.params?.id}`,
+        icon: "",
+      },
+    ];
+  } else if (router.currentRoute.value.path == "/antar_/leads/kanban") {
+    route_list.value = [
+      {
+        label: "Opportunities",
+        icon: "",
+        route: "/antar_/opportunities",
+      },
+      {
+        label: "kanban view",
+        icon: "",
+      },
+    ];
   }
- 
-})
+});
 
 
 const handle_save = () => {
   emit("save");
+};
+const handleSelect = async (value) => {
+  console.log("Selected:", value.value);
+  const res = await update_opportunity_status(
+    router.currentRoute.value.params?.id,
+    value.value
+  );
+  if (res.statusCode == 200) {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
 };
 </script>
 
@@ -78,6 +157,7 @@ const handle_save = () => {
       </Breadcrumbs>
 
       <Dropdown
+      class="my-auto"
         :options="[
           {
             group: '',
@@ -112,7 +192,7 @@ const handle_save = () => {
     </div>
 
     <div class="p-1 flex">
-      <div v-if="status">
+      <div v-if="router.currentRoute?.value?.params?.id">
       
         <div class="px-2">
           <Autocomplete
@@ -126,8 +206,16 @@ const handle_save = () => {
             ]"
             v-model="status"
             placeholder="status"
+             @update:modelValue="handleSelect"
           >
-            <template #prefix> </template>
+            <template #prefix> 
+
+              <span
+                @click="handle_click_status"
+                class="w-4 h-4 border rounded-full mr-2"
+                :style="{ border: '4px solid ' + status.color }"
+              ></span>
+            </template>
             <template #item-prefix="{ option }">
               <span
                 @click="handle_click_status"
@@ -139,8 +227,8 @@ const handle_save = () => {
         </div>
       </div>
       <Button
-        v-if="!isCreateRoute()"
-        :variant="'solid'"
+      v-if="router.currentRoute.value.path == '/antar_/opportunities' || router.currentRoute?.value?.params?.id"
+      :variant="'solid'"
         :ref_for="true"
         theme="gray"
         size="sm"
@@ -154,7 +242,7 @@ const handle_save = () => {
         create
       </Button>
       <Button
-        v-else
+        v-if="router.currentRoute.value.path == '/antar_/opportunities/create'"
         :variant="'solid'"
         :ref_for="true"
         theme="gray"

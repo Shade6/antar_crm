@@ -139,7 +139,7 @@ const fetch_deal = async()=>{
   const res = await get_all_deal()
   lead_list.value = res.data.map(deal => ({
       id: deal.opportunity_id,
-      name: deal?.contact?.first_name || '' + ' ' + deal?.contact?.last_name || '',
+      name: deal?.opportunity_name,
       organization: deal?.organization?.organization_name || 'Not Assigned',
       status: deal?.status || 'Not Assigned',
       email: deal?.contact?.email || 'Not Assigned',

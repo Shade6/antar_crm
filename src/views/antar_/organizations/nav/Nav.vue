@@ -83,6 +83,7 @@ const handle_update = () => {
       
 
       <Dropdown
+      class="my-auto"
         :options="[
           {
             group: '',

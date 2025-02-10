@@ -19,7 +19,7 @@ import {
   findAllUsers,
   remove_lead_assignee,
 } from "@/api/userApi.js";
-const emit = defineEmits(["save"]);
+const emit = defineEmits(["save","convert"]);
 const router = useRouter();
 import { useSwitchStore } from "@/stores/switch";
 import "@/assets/toast.css";
@@ -267,6 +267,9 @@ watch(
 const handle_convert_lead = ()=>{
     router.push(`/antar_/leads/convert-lead#${router.currentRoute.value.params?.id}`);
 }
+const handle_convert_save = ()=>{
+  emit("convert")
+}
 </script>
 
 <template>
@@ -371,6 +374,7 @@ const handle_convert_lead = ()=>{
       </div>
       <div v-if="router.currentRoute?.value?.params?.id">
         <div class="px-2">
+        
           <Autocomplete
             :options="[
               { label: 'New', value: 'New', color: 'green' },
@@ -428,7 +432,7 @@ const handle_convert_lead = ()=>{
         :loadingText="null"
         :disabled="false"
         :link="null"
-        @click="handle_save"
+        @click="handle_convert_save"
       >
         Save & Convert
       </Button>
