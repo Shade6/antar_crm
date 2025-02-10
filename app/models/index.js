@@ -38,10 +38,10 @@ db.communication = require("./communication/Communication.model.js")(sequelize, 
 db.contacts = require("./Contacts.model.js")(sequelize, Sequelize);
 db.customers = require("./customer/Customers.model.js")(sequelize, Sequelize);
 db.leads = require("./leads/Leads.model.js")(sequelize, Sequelize);
-db.notes = require("./notes/Notes.model.js")(sequelize, Sequelize);
+// db.notes = require("./notes/Notes.model.js")(sequelize, Sequelize);
 db.salesInvoices = require("./salesinvoice/SalesInvoices.model.js")(sequelize, Sequelize);
 db.salesOrders = require("./salesorder/SalesOrders.model.js")(sequelize, Sequelize);
-db.tasksAndActivities = require("./taskactivity/TasksAndActivities.model.js")(sequelize, Sequelize);
+// db.tasksAndActivities = require("./taskactivity/TasksAndActivities.model.js")(sequelize, Sequelize);
 
 
 db.lead_assignee = require("./leads/LeadAssignee.js")(sequelize,Sequelize)
@@ -60,7 +60,7 @@ db.lead_attachment = require("./leads/LeadAttachments.model.js")(sequelize,Seque
 
 db.user_email = require("./users/UserEmail.model.js")(sequelize,Sequelize)
 db.contact_email = require("./opportunity/ContactEmail.js")(sequelize,Sequelize)
-db.deal_status = require("./opportunity/DealStatus.js")(sequelize,Sequelize)
+// db.deal_status = require("./opportunity/DealStatus.js")(sequelize,Sequelize)
 db.organization = require("./Organization.js")(sequelize,Sequelize)
 db.currency = require("./opportunity/Currency.js")(sequelize,Sequelize) 
 db.opportunity = require("./opportunity/Opportunities.js")(sequelize,Sequelize)
@@ -83,6 +83,11 @@ db.plan = require('./subscription/plan.js')(sequelize,Sequelize)
 db.subscription = require('./subscription/subscription.js')(sequelize,Sequelize)
 db.tenant= require('./subscription/tenant.js')(sequelize,Sequelize)
 
+
+db.note = require("./taskActivity/NoteDetails.js")(sequelize,Sequelize)
+db.task = require('./taskActivity/TaskDetails.js')(sequelize,Sequelize)
+db.comment = require('./taskActivity/CommentsDetails.js')(sequelize,Sequelize)
+db.attachment = require('./taskActivity/AttachmentsDetails.js')(sequelize,Sequelize)
 
 //-------------------
 db.organization.hasMany(db.estimate, { //---this is the reference 

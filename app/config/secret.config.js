@@ -1,7 +1,3 @@
-exports.USER =  "root"
-
-// exports.PASSWORD =  "Gold$321"
-// exports.HOST = '13.235.27.155'
-
-exports.PASSWORD =  "9074764296"
-exports.HOST = 'localhost'
+exports.USER =  process.env.DB_USER
+exports.PASSWORD =  process.env.DB_PASSWORD
+exports.HOST = process.env.DB_HOST

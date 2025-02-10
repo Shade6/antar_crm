@@ -35,10 +35,7 @@ app.use('/image',express.static('public'))
   const db = require("./app/models");
   db.sequelize
   .sync()
-  .then(() => {
-    console.log("----------------------DB connected successfully.-------------------------");
-
-  })
+  .then(() => {console.log("DB connected successfully.")})
   .catch((err) => {
     console.log("Failed to connect db: " + err.message);
   });
