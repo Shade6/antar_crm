@@ -63,6 +63,7 @@ require("./app/router/products.routes")(app)
 require("./app/router/Image.routes")(app)
 require("./app/router/userAccess/Dashboard.routes.js")(app)
 require("./app/router/subscription/subscription.routes.js")(app)
+require("./app/router/TasksAndActivities.routes.js")(app)
 
 require("./app/router/Superset.routes.js")(app)
 
