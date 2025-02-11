@@ -3,10 +3,16 @@ import { ref, onMounted, h } from "vue";
 import { Button, FeatherIcon, Dropdown } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
-  get_lead_comment_by_lead_id,
-  create_lead_comment,
-  delete_lead_comment,
-  update_lead_comment,
+  // get_lead_comment_by_lead_id,
+
+  // create_lead_comment,
+  get_all_basic_comments,
+  create_basic_comments,
+  update_basic_comments,
+  delete_basic_comments
+  // delete_lead_comment,
+
+  // update_lead_comment,
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -20,9 +26,9 @@ const toast = useToast();
 const array_list = ref([]);
 const Cred_status = ref(null);
 const comment = ref("");
-const comment_id = ref(null);
+const comment_id = ref('');
 const fetch = async () => {
-  const res = await get_lead_comment_by_lead_id(lead_route_id);
+  const res = await get_all_basic_comments({lead_id:lead_route_id,opportunity_id:null});
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -47,8 +53,9 @@ const save_ = async () => {
   const data = {
     comment: comment.value,
     lead_id: lead_route_id,
+    type:"lead"
   };
-  const res = await create_lead_comment(data);
+  const res = await create_basic_comments(data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
@@ -111,15 +118,14 @@ function getTimeDifference(dateString) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
 }
-const edit_comment = async (comment) => {
-
-    comment.value = comment.comment;
-  comment_id.value = comment.lead_comment_id;
-
-  Cred_status.value = "create";
+const edit_comment = async (commentItem) => {  // Change parameter name
+    comment.value = commentItem.comment;      // Use the ref correctly
+    comment_id.value = commentItem.comment_id;
+    Cred_status.value = "create";
 };
+
 const delete_comment = async (id) => {
-  const res = await delete_lead_comment(id);
+  const res = await delete_basic_comments(id);
   if (res.statusCode == 200) {
     fetch()
     toast.success(res.message, {
@@ -158,7 +164,7 @@ const update_comment = async () => {
     comment: comment.value,
     comment_id: comment_id.value,
   };
-  const res = await update_lead_comment(data);
+  const res = await update_basic_comments(data);
   if (res.statusCode == 200) {
     comment_id.value = null
     Cred_status.value = null
@@ -199,7 +205,9 @@ const update_comment = async () => {
 </script>
 
 <template>
+
   <div class="p-3 flex justify-between">
+   
     <span class="text-2xl font-medium"> Comments </span>
     <div class="p-1">
       <Button
@@ -213,7 +221,7 @@ const update_comment = async () => {
         :loadingText="null"
         :disabled="false"
         :link="null"
-        @click="()=>{Cred_status = 'create';comment_id.value=null}"
+        @click="()=>{Cred_status = 'create';comment_id=''}"
       >
         <div class="flex justify-start">
           <FeatherIcon class="w-4" name="plus" /> <span>New Comment</span>
@@ -288,7 +296,7 @@ const update_comment = async () => {
                   label: 'Delete comment',
                   icon: () => h(FeatherIcon, { name: 'trash' }),
                   onClick: () => {
-                    delete_comment(comment.lead_comment_id);
+                    delete_comment(comment.comment_id);
                   },
                 },
               ],
@@ -338,6 +346,7 @@ const update_comment = async () => {
         :modelValue="comment"
         v-model="comment"
       ></textarea>
+    
     </div>
     <div class="flex gap-3 justify-end">
       <div class="p-1">
@@ -351,14 +360,14 @@ const update_comment = async () => {
           :loadingText="null"
           :disabled="false"
           :link="null"
-          @click="Cred_status = null"
+           @click="()=>{Cred_status =null;comment_id=''}"
         >
           Discard
         </Button>
       </div>
       <div class="p-1">
         <Button
-          v-if="comment_id == null"
+          v-if="comment_id == ''"
           :variant="'subtle'"
           :ref_for="true"
           theme="gray"

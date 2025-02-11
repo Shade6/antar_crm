@@ -12,11 +12,15 @@ import {
 } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
-  create_lead_task,
-  get_lead_task_by_lead_id,
+  // create_lead_task,
+  create_basic_task,
+  // get_lead_task_by_lead_id,
+  get_all_basic_task,
   findAllUsers,
-  delete_lead_task,
-  update_lead_task,
+  // delete_lead_task,
+  // update_lead_task,
+  delete_basic_task,
+  update_basic_task
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -99,7 +103,7 @@ const save_ = async () => {
     task_status: type_status.value,
     note_text:note_text.value
   };
-  const res = await create_lead_task(data);
+  const res = await create_basic_task(data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",

@@ -287,6 +287,7 @@ const handle_contact_view = (data)=>{
           Opportunities
           <span
             class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
+              style="padding: 3px 7px;"
             >{{ state.opportunities.length }}</span
           >
         </button>
@@ -299,6 +300,7 @@ const handle_contact_view = (data)=>{
           Contacts
           <span
             class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
+              style="padding: 3px 7px;"
             >{{ contacts_list.length }}</span
           >
         </button>
@@ -311,7 +313,8 @@ const handle_contact_view = (data)=>{
           <FeatherIcon name="bar-chart-2" class="w-4"/>
           Estimates
           <span
-            class="text-white font-medium text-sm bg-black px-1 py-0 rounded-full"
+            class="text-white font-medium text-sm bg-black   rounded-full"
+            style="padding: 3px 8px;"
             >{{ estimate_list.length }}</span
           >
         </button>

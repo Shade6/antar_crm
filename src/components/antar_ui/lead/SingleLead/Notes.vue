@@ -3,10 +3,14 @@ import { ref, onMounted } from "vue";
 import { Button, FeatherIcon, Textarea, TextInput, Dialog ,Dropdown} from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
-  create_lead_note_attachment,
-  get_lead_note_by_lead_id,
-  update_lead_note,
-  delete_lead_note,
+  // create_lead_note_attachment,
+  // get_lead_note_by_lead_id,
+  // update_lead_note,
+  // delete_lead_note,
+  delete_basic_notes,
+  update_basic_notes,
+  get_all_basic_notes,
+  create_basic_notes
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -25,7 +29,7 @@ const title_name = ref("");
 const content = ref("");
 
 const fetch = async () => {
-  const res = await get_lead_note_by_lead_id(lead_route_id);
+  const res = await get_all_basic_notes({lead_id:lead_route_id,opportunity_id:null});
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -53,7 +57,7 @@ const save_ = async () => {
     content: content.value,
     status: false,
   };
-  const res = await create_lead_note_attachment(data);
+  const res = await create_basic_notes(data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
@@ -130,11 +134,11 @@ const edit_note = async(data)=>{
 }
 const update_note = async()=>{
   const data = {
-    lead_note_id: note_id.value,
+    note_id: note_id.value,
     title: title_name.value,
     content: content.value,
   }
-  const res = await update_lead_note(data)
+  const res = await update_basic_notes(data)
   if(res.statusCode == 200){
     fetch()
     dialog2.value = false
@@ -174,7 +178,7 @@ const update_note = async()=>{
   }
 }
 const delete_note = async(data)=>{
-  const res = await delete_lead_note(data.lead_note_id)
+  const res = await delete_basic_notes(data.note_id)
   if(res.statusCode == 200){
     fetch()
     toast.success(res.message, {

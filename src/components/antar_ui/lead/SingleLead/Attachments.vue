@@ -9,9 +9,14 @@ import {
 } from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
-  create_lead_attachment,
-  get_attachment_by_lead_id,
-  delete_lead_attachment
+  // create_lead_attachment,
+  // get_attachment_by_lead_id,
+  // delete_lead_attachment
+  create_basic_attachments,
+  get_all_basic_attachments,
+  update_basic_attachments,
+  delete_basic_attachments,
+  create_images
 } from "@/api/userApi.js";
 const switchStore = useSwitchStore();
 
@@ -56,9 +61,9 @@ const save_ = async () => {
 
   const data = {
     lead_id: lead_route_id,
-    title: file.value,
+    title: file_data.value,
   };
-  const res = await create_lead_attachment(data);
+  const res = await create_basic_attachments(data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
@@ -147,9 +152,31 @@ function getTimeDifference(dateString) {
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
 }
-const handleFileChange = (event) => {
+const handleFileChange = async(event) => {
   const file = event.target.files[0];
-  file_data.value = file;
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await create_images(formData);
+  if (res.statusCode == 200) {
+    file_data.value = res.data?.file;
+    
+  } else {
+    toast.error(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
+ 
 };
 const delete_attachment = async(id)=>{
   const res = await delete_lead_attachment(id);
@@ -225,8 +252,9 @@ const delete_attachment = async(id)=>{
           <div class="flex justify-center" v-else>
             <div class="flex flex-col justify-center items-center">
               <div>
-              <span>File Name</span>
-              <span>{{ file_data?.name }}</span>
+      
+              <!-- <span v-if="file_data">{{ file_data?.name }}</span> -->
+               <img v-if="file_data" width="100" :src="file_data"/>
             </div>
             <Button @click="file_data = null">Remove file</Button>
             </div>

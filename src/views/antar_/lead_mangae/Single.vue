@@ -293,17 +293,21 @@ onMounted(async () => {
     <!-- Tabs Component -->
     <div class="flex-grow" :style="{ width: tabsWidth + '%' }">
       <Tabs class="w-full" v-model="state.index" :tabs="tabs">
+      
         <template #tab-label="{ tab }">
+          
           <div class="flex items-center gap-2">
             <!-- Render the icon -->
             <component :is="tab.icon" />
             <!-- Label -->
-            <span>{{ tab.label }}</span>
+           
           </div>
+       
         </template>
 
         <template #default="{ tab }">
           <div class="p-5">
+          
             <component :is="tab.content"></component>
           </div>
         </template>

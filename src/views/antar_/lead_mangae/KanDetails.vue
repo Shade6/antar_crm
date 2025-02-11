@@ -35,10 +35,6 @@ export default {
             </span>
             <br>
             <span>
-               <span>company:</span> ${val?.company}
-            </span>
-                 <br>
-            <span>
                <button >view details</button>
             </span>
             <br>

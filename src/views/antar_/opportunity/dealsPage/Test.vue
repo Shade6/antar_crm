@@ -1,28 +1,31 @@
 <template>
-    <button>
-        
-    </button>
-    <iframe 
-        :src="`https://superset.shade6.com/embedded_dashboard/${dashboardId}?token=${jwtToken}`"
-        width="100%"
-        height="800px"
-        frameborder="0"
-    ></iframe>
-    </template>
-     
-    <script>
-    export default {
-      data() {
-        return {
-          dashboardId: "1",
-          jwtToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNzM5MDMyMTI3LCJqdGkiOiI0MWZjZjVlYi03YjE3LTRmYWEtOTg1Ny04Mzc0MGRiMDAzMWIiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoxLCJuYmYiOjE3MzkwMzIxMjcsImNzcmYiOiJjODhkNWFlMS05YTAxLTRjNTMtYTgxMi01ZDM3NWE5YzdhZTgiLCJleHAiOjE3MzkwMzMwMjd9.lt7huKA--FNujRc5OajmqJnqLyvxM4lWzro2d_r8ibs"
-        };
+  <div ref="supersetContainer" id="superset" style="width: 100%; height: 100vh;"></div>
+  </template>
+   
+  <script setup>
+  import { ref, onMounted } from "vue";
+  import { embedDashboard } from "@superset-ui/embedded-sdk";
+  import {} from "@/api/userApi.js"
+  const supersetContainer = ref(null);
+  onMounted(async () => {
+    await embedDashboard({
+      id: "d3a5987f-ed4f-4850-bac1-068fcac70d09",
+      supersetDomain: "https://superset.shade6.com",
+      mountPoint: supersetContainer.value,
+      fetchGuestToken: async () => {
+        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoidGVuYW50XzEyMyIsImZpcnN0X25hbWUiOiJUZW5hbnQiLCJsYXN0X25hbWUiOiIxMjMifSwicmVzb3VyY2VzIjpbeyJ0eXBlIjoiZGFzaGJvYXJkIiwiaWQiOiIyIn1dLCJybHNfcnVsZXMiOlt7ImNsYXVzZSI6InRlbmFudF9pZCA9ICcxMjMnIn1dLCJpYXQiOjE3MzkyODY2MDMuMTg3MzM0LCJleHAiOjE3MzkyODY5MDMuMTg3MzM0LCJhdWQiOiJodHRwOi8vMC4wLjAuMDo4MDgwLyIsInR5cGUiOiJndWVzdCJ9.3BwqOBO_evO8NNV8bR_kU1Aw9feoJgTsvNkxDUPHq04"; // Replace with actual token from backend
       },
-      async mounted() {
-        const tenantId = '70c5e766-84f7-40df-97a8-180ac557ffda'; // Get from user session
-        const response = await fetch(`https://superset.shade6.com/api/get-tenant-dashboard?tenant_id=${tenantId}`);
-        const data = await response.json();
-        this.dashboardId = data.dashboardId;
-      }
-    };
-    </script>
+      dashboardUiConfig: {
+        hideTitle: false,
+        hideChartControls: true,
+      },
+    });
+  });
+  </script>
+   
+  <style >
+  #superset iframe{
+    width:100%;
+    height: 100%;
+  }
+  </style>
