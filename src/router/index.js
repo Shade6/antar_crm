@@ -280,10 +280,31 @@ const router = createRouter({
           name: "report",
           component: () => import("../views/antar_/report/Report.vue"),
         },
+        // {
+        //   path: "/antar_/campaign",
+        //   name: "campaign",
+        //   component: () => import("../views/antar_/campaign/Campaign.vue"),
+        // },
         {
           path: "/antar_/campaign",
-          name: "campaign",
-          component: () => import("../views/antar_/campaign/Campaign.vue"),
+          children: [
+            {
+              path: "",
+              name: "campaign-list", // Unique name for this route
+              component: () => import("../views/antar_/campaign/Campaign.vue"),
+            },
+            {
+              path: "create-email-campaign",
+              name: "create-email-campaign", // Consistent naming convention
+              component: () => import("../views/antar_/campaign/CreateEmailCamb.vue"),
+            },
+            {
+              path: "create-whatsapp-campaign",
+              name: "create-whatsapp-campaign", // Consistent naming convention
+              component: () => import("../views/antar_/campaign/CreateWhatsappCamp.vue"),
+            },
+    
+          ],
         },
       ],
     },

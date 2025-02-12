@@ -43,10 +43,10 @@ import {ListView,Tabs} from 'frappe-ui'
         showTooltip: true,
         resizeColumn: true,
         emptyState: {
-        title: 'No Email found',
-        description: 'Create a new Email to get started',
+        title: 'No Email Campaign found',
+        description: 'Create a new Email Campaign to get started',
         button: {
-          label: 'New Email',
+          label: 'New Email Campaign',
           variant: 'solid',
           onClick: () => console.log('New Record'),
         },

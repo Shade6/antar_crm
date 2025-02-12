@@ -21,7 +21,7 @@ import ERPNextIcon from "../icons/ERPNextIcon.vue";
 
 const switchStore = useSwitchStore();
 
-const sidebarOpen = ref(true);
+const sidebarOpen = ref(false);
 const handle_side_bar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };

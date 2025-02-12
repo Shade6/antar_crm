@@ -46,7 +46,7 @@
       },
     });
   }
-onMounted(fetch_embed)
+onMounted(handle_fetch_data)
 
 </script>
 

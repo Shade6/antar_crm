@@ -43,10 +43,10 @@ import {ListView,Tabs} from 'frappe-ui'
         showTooltip: true,
         resizeColumn: true,
         emptyState: {
-        title: 'No Whatsapp found',
-        description: 'Create a new Whatsapp to get started',
+        title: 'No Whatsapp Campaign found',
+        description: 'Create a new Whatsapp Campaign to get started',
         button: {
-          label: 'New Whatsapp',
+          label: 'New Whatsapp Campaign',
           variant: 'solid',
           onClick: () => console.log('New Record'),
         },

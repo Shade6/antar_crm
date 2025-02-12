@@ -15,7 +15,7 @@ const currentHash = ref(router.currentRoute.value.hash); // Get the initial hash
 const tabs = ref([
   { id: "Email", label: "Email campaign" ,icon:"mail"},
   { id: "Whatsapp", label: "Whatsapp campaign" ,icon:"message-circle"},
-  { id: "Campaign", label: "Campaign",icon:"cpu" },
+
   { id: "Statistics", label: "Statistics",icon:"slack" },
 ])
 
@@ -54,10 +54,13 @@ onMounted(() => {
       </li>
      
     </ul>
-      <EmailTable v-if=" currentHash == '#Email'" />
-      <WhatsappTable v-if=" currentHash == '#Whatsapp'"/>
-      <CampaignTable v-if=" currentHash == '#Campaign'"/>
-      <Statistics v-if=" currentHash == '#Statistics'"/>
+    <div class="my-3">
+        <EmailTable v-if=" currentHash == '#Email'" />
+        <WhatsappTable v-if=" currentHash == '#Whatsapp'"/>
+        <!-- <CampaignTable v-if=" currentHash == '#Campaign'"/> -->
+        <Statistics v-if=" currentHash == '#Statistics'"/>
+    </div>
+
   </div>
 </template>
 
