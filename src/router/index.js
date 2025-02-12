@@ -275,6 +275,16 @@ const router = createRouter({
             },
           ],
         },
+        {
+          path: "/antar_/report",
+          name: "report",
+          component: () => import("../views/antar_/report/Report.vue"),
+        },
+        {
+          path: "/antar_/campaign",
+          name: "campaign",
+          component: () => import("../views/antar_/campaign/Campaign.vue"),
+        },
       ],
     },
   ],

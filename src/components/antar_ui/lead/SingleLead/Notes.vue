@@ -3,10 +3,7 @@ import { ref, onMounted } from "vue";
 import { Button, FeatherIcon, Textarea, TextInput, Dialog ,Dropdown} from "frappe-ui";
 import { useSwitchStore } from "@/stores/switch";
 import {
-  // create_lead_note_attachment,
-  // get_lead_note_by_lead_id,
-  // update_lead_note,
-  // delete_lead_note,
+
   delete_basic_notes,
   update_basic_notes,
   get_all_basic_notes,

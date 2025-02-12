@@ -1024,7 +1024,39 @@ export const delete_basic_task = async (data) => {
 
 
 
-export  const createTenantInSuperset=async()=>
-  {
 
-}
+export const get_all_notes = async (data) => {
+  return (
+    await axiosInstance.get(
+      `get_all_notes?mdl=${switchStore().pageId}`
+    )
+  ).data;
+};
+
+export const get_all_task = async (data) => {
+  return (
+    await axiosInstance.get(
+      `get_all_task?mdl=${switchStore().pageId}`
+    )
+  ).data;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+export const superset_login = async () => {
+  return (
+    await axiosInstance.post(
+      `superset_login?mdl=${switchStore().pageId}`)
+  ).data;
+};
+
+

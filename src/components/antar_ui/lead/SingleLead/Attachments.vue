@@ -35,7 +35,7 @@ const link_open = ref(true);
 
 const file = ref(null);
 const fetch = async () => {
-  const res = await get_attachment_by_lead_id(lead_route_id);
+  const res = await get_all_basic_attachments({lead_id:lead_route_id,opportunity_id:null});
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -57,7 +57,7 @@ const fetch = async () => {
 };
 
 const save_ = async () => {
-  if(file_data.value==null){
+  // if(file_data.value==null){
 
   const data = {
     lead_id: lead_route_id,
@@ -80,7 +80,7 @@ const save_ = async () => {
       },
     });
     fetch();
-    file.value = null;
+    file_data.value = null;
     link_open.value = true;
     dialog2.value = false;
   } else {
@@ -100,29 +100,29 @@ const save_ = async () => {
     });
   }
 
-    }else{
-    const formData = new FormData();
-    formData.append("file", file_data.value);
+  //   }else{
+  //   const formData = new FormData();
+  //   formData.append("file", file_data.value);
 
-    const res = await create_lead_attachment(formData,lead_route_id);
-    if (res.statusCode == 200) {
-      fetch();
-      file_data.value = null;
-      link_open.value = true;
-      dialog2.value = false;
-      toast.success(res.message, {
-        position: "top-right",
-        duration: 3000,
-        dismissible: true,
-      });
-    }else{
-      toast.success(res.message, {
-        position: "top-right",
-        duration: 3000,
-        dismissible: true,
-      });
-    } 
-  }
+  //   const res = await create_lead_attachment(formData,lead_route_id);
+  //   if (res.statusCode == 200) {
+  //     fetch();
+  //     file_data.value = null;
+  //     link_open.value = true;
+  //     dialog2.value = false;
+  //     toast.success(res.message, {
+  //       position: "top-right",
+  //       duration: 3000,
+  //       dismissible: true,
+  //     });
+  //   }else{
+  //     toast.success(res.message, {
+  //       position: "top-right",
+  //       duration: 3000,
+  //       dismissible: true,
+  //     });
+  //   } 
+  // }
 };
 
 onMounted(fetch);
@@ -159,7 +159,6 @@ const handleFileChange = async(event) => {
   const res = await create_images(formData);
   if (res.statusCode == 200) {
     file_data.value = res.data?.file;
-    
   } else {
     toast.error(res.message, {
       position: "top-right",
@@ -179,7 +178,8 @@ const handleFileChange = async(event) => {
  
 };
 const delete_attachment = async(id)=>{
-  const res = await delete_lead_attachment(id);
+
+  const res = await delete_basic_attachments(id);
   if(res.statusCode==200){
     toast.success(res.message, {
       position: "top-right",
@@ -244,7 +244,7 @@ const delete_attachment = async(id)=>{
                   placeholder="Enter the link"
                   :disabled="false"
                   modelValue=""
-                  v-model="file"
+                  v-model="file_data"
                 />
               </div>
             </div>
@@ -289,7 +289,7 @@ const delete_attachment = async(id)=>{
           <div class="flex gap-3">
             <div class="p-1">
               <Button
-                @click="delete_attachment(image.lead_attachment_id)"
+                @click="delete_attachment(image.attachment_id)"
                 :variant="'subtle'"
                 :ref_for="true"
                 theme="gray"

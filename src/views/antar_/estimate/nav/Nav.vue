@@ -80,51 +80,6 @@ const handle_update = () => {
           </span>
         </template>
       </Breadcrumbs>
-      
-
-      <!-- <Dropdown
-       class="my-auto"
-        :options="[
-          {
-            group: '',
-            items: [
-              {
-                label: 'List',
-                icon: () => h(FeatherIcon, { name: 'menu' }),
-              },
-              {
-                label: 'Kanban',
-                icon: () => h(FeatherIcon, { name: 'bar-chart-2' }),
-                onClick: () => router.push('/antar_/deals/kanban')
-              },
-              {
-                label: 'Group By',
-                icon: () => h(FeatherIcon, { name: 'align-center' }),
-              },
-            ],
-          },
-          {
-            group: '',
-            items: [
-              {
-                label: 'Create',
-                icon: () => h(FeatherIcon, { name: 'pluse-circle' }),
-              },
-            ],
-          },
-        ]"
-      >
-        <Button class="mx-2 hover:bg-gray-300 px-2 rounded-sm">
-          <div class="flex gap-2">
-            <div class="my-auto">
-              <ListIcon />
-            </div>
-            <div>
-              <span class="">List</span>
-            </div>
-          </div>
-        </Button>
-      </Dropdown>  -->
     </div>
 
     <div class="p-1 flex">

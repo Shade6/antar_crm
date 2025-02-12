@@ -69,7 +69,7 @@ const fetch = async () => {
       },
     });
   }
-  const res = await get_lead_task_by_lead_id(lead_route_id);
+  const res = await get_all_basic_task({lead_id:lead_route_id,opportunity_id:null});
   if (res.statusCode == 200) {
     array_list.value = res.data;
   } else {
@@ -151,7 +151,7 @@ const edit_task = async (task) => {
   };
   dateTimeValue.value = task.task_date;
   type_status.value = task.task_status;
-  task_id.value = task.lead_task_id;
+  task_id.value = task.task_id;
   dialog2.value = true;
   note_text.value = task.note_text
 };
@@ -164,12 +164,12 @@ const update_task = async () => {
     description: Description.value,
     type: status.value,
     big_status: big_status.value,
-    user_id: member.value,
+    user_id: member.value.val,
     task_data: dateTimeValue.value,
     task_status: type_status.value,
     note_text:note_text.value
   };
-  const res = await update_lead_task(data);
+  const res = await update_basic_task(data);
   if (res.statusCode == 200) {
     toast.success(res.message, {
       position: "top-right",
