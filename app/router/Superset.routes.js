@@ -27,7 +27,7 @@ module.exports = (app) => {
       const accessToken = response.data?.access_token;
 
       if (!accessToken) {
-        return res.status(400).json({ error: "Authentication failed" });
+        return res.status(400).json({ message: "Authentication failed" ,statusCode:400});
       }
    
 
@@ -46,13 +46,14 @@ module.exports = (app) => {
         csrf_token: csrf_token_response,
         access_token: accessToken,
         gust_token: guest_token_response,
+        statusCode:200
       });
     } catch (error) {
       console.error(
         "Error logging into Superset:",
         error?.response?.data || error
       );
-      res.status(500).json({ error: "Failed to authenticate with Superset" });
+      res.status(200).json({ error: "Failed to authenticate with Superset" ,statusCode:400});
     }
   }
 
@@ -158,7 +159,12 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
-  router.post("/superset/login", login_superset);
+
+
+
+
+
+  router.post("/superset_login", login_superset);
 
   app.use("/api/v1/crm/", router);
 };

@@ -25,11 +25,12 @@ const TasksAndActivities = {
         created_by,
         task_data,
       } = req.body;
-      console.log(req.body);
+      console.log(req.body, "iiiiii create ");
       const newTask = await LeadTask.create({
         lead_id: lead_id,
         opportunity_id: opportunity_id,
         user_id: user_id.val,
+        tenant_id: req.tenant,
         title: title,
         description: description,
         type: type,
@@ -43,12 +44,13 @@ const TasksAndActivities = {
 
       res.status(200).json({
         ...newTask.toJSON(),
-        statusCode: 201,
+        statusCode: 200,
+        message: "Task created successfully",
       });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       res.status(200).json({
-        error: error.message,
+        message: error.message,
         statusCode: 500,
       });
     }
@@ -58,12 +60,18 @@ const TasksAndActivities = {
     try {
       const { lead_id, opportunity_id } = req.query;
       const whereClause = {};
-      console.log("==================================");
+
       if (lead_id != "null") whereClause.lead_id = lead_id;
       if (opportunity_id != "null") whereClause.opportunity_id = opportunity_id;
       console.log(whereClause);
 
-      const tasks = await LeadTask.findAll({ where: whereClause });
+      const tasks = await LeadTask.findAll({
+        where: whereClause,
+        include: {
+          model: Users,
+          as: "user",
+        },
+      });
       res.status(200).json({
         data: tasks,
         statusCode: 200,
@@ -78,7 +86,9 @@ const TasksAndActivities = {
 
   updateBasicTask: async (req, res) => {
     try {
+      console.log("[[[[[[[[[[[[[[[[[[[");
       const { task_id, ...updates } = req.body;
+      console.log(req.body);
       if (!task_id)
         return res.status(200).json({
           error: "Task ID is required",
@@ -138,7 +148,24 @@ const TasksAndActivities = {
   createBasicNotes: async (req, res) => {
     try {
       const { lead_id, opportunity_id, title, content, status } = req.body;
-      console.log(req.body, "======");
+
+      if (lead_id) {
+        const find_lead = await Leads.findByPk(lead_id);
+        if (!find_lead) {
+          return res.json({ message: "lead not found ", statusCode: 400 });
+        }
+      }
+
+      if (opportunity_id) {
+        const find_opportunity = await Opportunities.findByPk(opportunity_id);
+        if (!find_opportunity) {
+          return res.json({
+            message: "opportunity  not found ",
+            statusCode: 400,
+          });
+        }
+      }
+
       const newNote = await LeadNote.create({
         lead_id,
         opportunity_id,
@@ -151,12 +178,13 @@ const TasksAndActivities = {
 
       res.status(200).json({
         ...newNote.toJSON(),
-        statusCode: 201,
+        statusCode: 200,
+        message: "notes created successfully",
       });
     } catch (error) {
       console.log(error.message);
       res.status(200).json({
-        error: error.message,
+        message: error.message,
         statusCode: 500,
       });
     }
@@ -256,6 +284,7 @@ const TasksAndActivities = {
         lead_id,
         opportunity_id,
         user_id: req.user,
+        tenant_id: req.tenant,
         comment,
         created_at: new Date(),
       });
@@ -364,22 +393,25 @@ const TasksAndActivities = {
   createBasicAttachments: async (req, res) => {
     try {
       const { lead_id, opportunity_id, title } = req.body;
+      console.log("data", req.body);
 
       const newAttachment = await LeadAttachment.create({
         lead_id,
         opportunity_id,
-        user_id:req.user,
+        user_id: req.user,
+        tenant_id: req.tenant,
         title,
         created_at: new Date(),
       });
 
       res.status(200).json({
         ...newAttachment.toJSON(),
-        statusCode: 201,
+        statusCode: 200,
+        message: "lead attachment created successfully",
       });
     } catch (error) {
       res.status(200).json({
-        error: error.message,
+        message: error.message,
         statusCode: 500,
       });
     }
@@ -392,7 +424,7 @@ const TasksAndActivities = {
 
       if (lead_id != "null") whereClause.lead_id = lead_id;
       if (opportunity_id != "null") whereClause.opportunity_id = opportunity_id;
-
+      console.log(whereClause);
       const attachments = await LeadAttachment.findAll({ where: whereClause });
       res.status(200).json({
         data: attachments,
@@ -438,16 +470,18 @@ const TasksAndActivities = {
   deleteBasicAttachments: async (req, res) => {
     try {
       const { id } = req.query;
+      console.log(id);
       if (!id)
         return res.status(200).json({
-          error: "Attachment ID is required",
+          message: "Attachment ID is required",
           statusCode: 400,
         });
 
       const attachment = await LeadAttachment.findByPk(id);
+      console.log(attachment);
       if (!attachment)
         return res.status(200).json({
-          error: "Attachment not found",
+          message: "Attachment not found",
           statusCode: 404,
         });
 
@@ -458,7 +492,49 @@ const TasksAndActivities = {
       });
     } catch (error) {
       res.status(200).json({
-        error: error.message,
+        message: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+  getUserNotes: async (req, res) => {
+    try {
+      const data = await LeadNote.findAll({
+        where: { user_id: req.user },
+        include: {
+          model: Users,
+          as: "user",
+        },
+      });
+      res.status(200).json({
+        data: data,
+        statusCode: 200,
+        message: "note found",
+      });
+    } catch (error) {
+      res.status(200).json({
+        message: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+  getUserTask: async (req, res) => {
+    try {
+      const data = await LeadTask.findAll({
+        where: { created_by: req.user },
+        include: {
+          model: Users,
+          as: "user",
+        },
+      });
+      res.status(200).json({
+        data: data,
+        statusCode: 200,
+        message: "task found",
+      });
+    } catch (error) {
+      res.status(200).json({
+        message: error.message,
         statusCode: 500,
       });
     }

@@ -13,9 +13,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       lead_id: {
         type: Sequelize.UUID, // Match the data type in `Leads`
-     
       },
       opportunity_id:{
+        type: Sequelize.UUID
+      },
+      tenant_id:{
         type: Sequelize.UUID
       },
       user_id: { // user_id
