@@ -94,6 +94,23 @@ const handle_create_whatsapp_campaign = ()=>{
       </div>
 
       <div class="px-1">
+    
+        <Button
+          v-if="router.currentRoute.value.name == 'create-email-campaign'"
+        class="mx-3"
+          :variant="'subtle'"
+          :ref_for="true"
+          theme="gray"
+          size="sm"
+          label="Button"
+          :loading="false"
+          :loadingText="null"
+          :disabled="false"
+          :link="null"
+        >
+        Preview & Test
+        </Button>
+
         <Button
           v-if="router.currentRoute.value.name == 'create-email-campaign'"
           :variant="'solid'"
@@ -107,7 +124,22 @@ const handle_create_whatsapp_campaign = ()=>{
           :link="null"
           @click="handle_create_email_campaign()"
         >
-          Save Email Campaign
+          Schedule Campaign
+        </Button>
+        <Button
+          v-if="router.currentRoute.value.name == 'create-whatsapp-campaign'"
+        class="mx-3"
+          :variant="'subtle'"
+          :ref_for="true"
+          theme="gray"
+          size="sm"
+          label="Button"
+          :loading="false"
+          :loadingText="null"
+          :disabled="false"
+          :link="null"
+        >
+          Preview & Test
         </Button>
         <Button
           v-if="router.currentRoute.value.name == 'create-whatsapp-campaign'"
