@@ -89,6 +89,14 @@ db.task = require('./taskActivity/TaskDetails.js')(sequelize,Sequelize)
 db.comment = require('./taskActivity/CommentsDetails.js')(sequelize,Sequelize)
 db.attachment = require('./taskActivity/AttachmentsDetails.js')(sequelize,Sequelize)
 
+
+db.call_campaign_analytics = require("./campaign/CallCampaignAnalytics.js")(sequelize,Sequelize)
+db.campaign = require("./campaign/Campaign.js")(sequelize,Sequelize)
+db.campaign_list = require("./campaign/CampaignList.js")(sequelize,Sequelize)
+db.campaign_list_members = require("./campaign/CampaignListMembers.js")(sequelize,Sequelize)
+db.email_campaign_analytics = require("./campaign/EmailCampaignAnalytics.js")(sequelize,Sequelize)
+db.whatsapp_campaign_analytics = require("./campaign/WhatsappCampaignAnalytics.js")(sequelize,Sequelize)
+
 //-------------------
 db.organization.hasMany(db.estimate, { //---this is the reference 
   foreignKey: 'organization_id',
