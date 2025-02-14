@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import ListIcon from "@/components/icons/ListIcon.vue";
 import { Dropdown, FeatherIcon, Button, Breadcrumbs } from "frappe-ui";
 
-const emit = defineEmits(["refresh","create_email_campaign","create_whatsapp_campaign"]);
+const emit = defineEmits(["refresh","create_email_campaign","create_whatsapp_campaign","create_campaign_list"]);
 const router = useRouter();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -24,6 +24,10 @@ const handle_create_page = () => {
   if (router?.currentRoute?.value?.hash == "#Whatsapp") {
     router.push("/antar_/campaign/create-whatsapp-campaign");
   }
+  if (router?.currentRoute?.value?.hash == "#List") {
+    router.push("/antar_/campaign/create-campaign-list");
+  }
+  
 };
 onMounted(() => {
 
@@ -51,6 +55,18 @@ if (router.currentRoute.value.fullPath == "/antar_/campaign/create-email-campaig
       icon: "",
     },
   ];
+} else if (router.currentRoute.value.path == "/antar_/campaign/create-campaign-list") {
+    route_list.value = [
+    {
+      label: "Campaign",
+      icon: "",
+      route: "/antar_/campaign",
+    },
+    {
+      label: "Create New List Campaign",
+      icon: "",
+    },
+  ];
 } 
 });
 const handle_create_email_campaign = ()=>{
@@ -58,6 +74,10 @@ const handle_create_email_campaign = ()=>{
 }
 const handle_create_whatsapp_campaign = ()=>{
    emit("create_whatsapp_campaign")
+}
+
+const handle_create_campaign_list =()=>{
+  emit("create_campaign_list")
 }
 </script>
 
@@ -155,6 +175,21 @@ const handle_create_whatsapp_campaign = ()=>{
           @click="handle_create_whatsapp_campaign()"
         >
           Save Whatsapp Campaign
+        </Button>
+        <Button
+          v-if="router.currentRoute.value.name == 'create-campaign-list'"
+          :variant="'solid'"
+          :ref_for="true"
+          theme="gray"
+          size="sm"
+          label="Button"
+          :loading="false"
+          :loadingText="null"
+          :disabled="false"
+          :link="null"
+          @click="handle_create_campaign_list()"
+        >
+          Save Campaign List
         </Button>
       </div>
     </div>

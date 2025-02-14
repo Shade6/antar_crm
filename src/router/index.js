@@ -303,6 +303,11 @@ const router = createRouter({
               name: "create-whatsapp-campaign", // Consistent naming convention
               component: () => import("../views/antar_/campaign/CreateWhatsappCamp.vue"),
             },
+            {
+              path: "create-campaign-list",
+              name: "create-campaign-list", // Consistent naming convention
+              component: () => import("../views/antar_/campaign/page/CreateList.vue"),
+            },
     
           ],
         },

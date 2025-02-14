@@ -7,6 +7,7 @@ import CampaignTable from "./page/CampaignTable.vue"
 import EmailTable from "./page/EmailTable.vue"
 import WhatsappTable from "./page/WatsappTable.vue"
 import Statistics from "./page/Statistics.vue"
+import List from "./page/List.vue"
 
 
 const router = useRouter();
@@ -15,8 +16,8 @@ const currentHash = ref(router.currentRoute.value.hash); // Get the initial hash
 const tabs = ref([
   { id: "Email", label: "Email campaign" ,icon:"mail"},
   { id: "Whatsapp", label: "Whatsapp campaign" ,icon:"message-circle"},
-
   { id: "Statistics", label: "Statistics",icon:"slack" },
+  { id: "List", label: "List",icon:"book-open" },
 ])
 
 // Watch for changes in the hash value
@@ -59,6 +60,7 @@ onMounted(() => {
         <WhatsappTable v-if=" currentHash == '#Whatsapp'"/>
         <!-- <CampaignTable v-if=" currentHash == '#Campaign'"/> -->
         <Statistics v-if=" currentHash == '#Statistics'"/>
+        <List v-if=" currentHash == '#List'"/>
     </div>
 
   </div>

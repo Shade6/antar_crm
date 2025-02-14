@@ -5,12 +5,40 @@ import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
-import { TextInput , Button , Checkbox ,Dialog ,Textarea} from "frappe-ui";
+ import {getCampaignLists} from "@/api/userApi.js"
+import { TextInput , Button , Checkbox ,Dialog ,Textarea ,Autocomplete} from "frappe-ui";
 const toast = useToast();
 const router = useRouter();
 const currentHash = ref(router.currentRoute.value.hash);
 const state = ref(false)
 const dialog2 = ref(false)
+const campaign_list = ref([])
+
+const fetch = async()=>{
+   const res = await getCampaignLists()
+   if(res.statusCode == 200){
+       campaign_list.value = res.data.map((val)=>({
+          label:val.list_name,
+          value:val.id
+       }))
+   }else{
+       toast.success(res.message, {
+       position: "top-right",
+       duration: 3000,
+       dismissible: true,
+       style: {
+         background: "#FFF5F5",
+         color: "black",
+         padding: "4px 20px",
+         borderRadius: "8px",
+         fontSize: "16px",
+         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+         borderLeft: "5px solid red",
+       },
+     });
+   }
+}
+onMounted(fetch)
 watch(
   () => router.currentRoute.value.hash,
   (newHash) => {
@@ -285,37 +313,24 @@ const toggleAccordion = (id) => {
 
         <div class="px-6">
           <span>Send To</span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="Placeholder"
-            :disabled="false"
-            modelValue=""
-          />
           <div class="p-2">
-            <Checkbox
-              size="sm"
-              :value="false"
-              v-model="state"
-              label="Don’t send to unengaged contacts"
-            />
+            <Autocomplete
+              :options="campaign_list"
+              v-model="user_id"
+              placeholder="Select person"
+            >
+              <template #prefix> </template>
+              <template #item-prefix="{ option }">
+                <img :src="option.image" class="h-4 w-4 rounded-full" />
+              </template>
+            </Autocomplete>
           </div>
+
 
         </div>
         
         <div class="px-6">
-          <span>Don't Send To</span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="Placeholder"
-            :disabled="false"
-            modelValue=""
-          />
+       
          <div class="my-3">
           
           <span>Filter recipients</span>

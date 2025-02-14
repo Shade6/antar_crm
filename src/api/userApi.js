@@ -1041,11 +1041,115 @@ export const get_all_task = async (data) => {
   ).data;
 };
 
+// campaign apis 
 
 
 
+// Call Campaign Analytics API Calls
+export const getCallCampaignAnalytics = async () => {
+  return (await axiosInstance.get(`/call_campaign_analytics?mdl=${switchStore().pageId}`)).data;
+};
 
+export const createCallCampaignAnalytic = async (data) => {
+  return (await axiosInstance.post(`/call_campaign_analytics?mdl=${switchStore().pageId}`, data)).data;
+};
 
+export const deleteCallCampaignAnalytic = async (id) => {
+  return (await axiosInstance.delete(`/call_campaign_analytics/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const deleteMultipleCallCampaignAnalytics = async (data) => {
+  return (await axiosInstance.delete(`/call_campaign_analytics?mdl=${switchStore().pageId}`, { data })).data;
+};
+
+// Campaign API Calls
+export const getCampaigns = async () => {
+  return (await axiosInstance.get(`/campaigns?mdl=${switchStore().pageId}`)).data;
+};
+
+export const createCampaign = async (data) => {
+  return (await axiosInstance.post(`/campaigns?mdl=${switchStore().pageId}`, data)).data;
+};
+
+export const deleteCampaign = async (id) => {
+  return (await axiosInstance.delete(`/campaigns/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const deleteMultipleCampaigns = async (data) => {
+  return (await axiosInstance.delete(`/campaigns?mdl=${switchStore().pageId}`, { data })).data;
+};
+
+// Campaign List API Calls
+export const getCampaignLists = async () => {
+  return (await axiosInstance.get(`/campaign_lists?mdl=${switchStore().pageId}`)).data;
+};
+
+export const createCampaignList = async (data) => {
+  return (await axiosInstance.post(`/create_campaign_lists?mdl=${switchStore().pageId}`, data)).data;
+};
+
+export const deleteCampaignList = async (id) => {
+  return (await axiosInstance.delete(`/campaign_lists/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const deleteMultipleCampaignLists = async (data) => {
+  return (await axiosInstance.delete(`/campaign_lists?mdl=${switchStore().pageId}`, { data })).data;
+};
+
+// Campaign List Member API Calls
+export const getCampaignListMembers = async () => {
+  return (await axiosInstance.get(`/campaign_list_members?mdl=${switchStore().pageId}`)).data;
+};
+
+export const createCampaignListMember = async (data) => {
+  return (await axiosInstance.post(`/campaign_list_members?mdl=${switchStore().pageId}`, data)).data;
+};
+
+export const deleteCampaignListMember = async (id) => {
+  return (await axiosInstance.delete(`/campaign_list_members/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const deleteMultipleCampaignListMembers = async (data) => {
+  return (await axiosInstance.delete(`/campaign_list_members?mdl=${switchStore().pageId}`, { data })).data;
+};
+
+// Email Campaign Analytics API Calls
+export const getEmailCampaignAnalytics = async () => {
+  return (await axiosInstance.get(`/email_campaign_analytics?mdl=${switchStore().pageId}`)).data;
+};
+
+export const getEmailCampaignAnalytic = async (id) => {
+  return (await axiosInstance.get(`/email_campaign_analytics/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const editEmailCampaignAnalytic = async (id, data) => {
+  return (await axiosInstance.put(`/email_campaign_analytics/${id}?mdl=${switchStore().pageId}`, data)).data;
+};
+
+export const deleteEmailCampaignAnalytic = async (id) => {
+  return (await axiosInstance.delete(`/email_campaign_analytics/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+// WhatsApp Campaign Analytics API Calls
+export const getWhatsappCampaignAnalytics = async () => {
+  return (await axiosInstance.get(`/whatsapp_campaign_analytics?mdl=${switchStore().pageId}`)).data;
+};
+
+export const getWhatsappCampaignAnalytic = async (id) => {
+  return (await axiosInstance.get(`/whatsapp_campaign_analytics/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const editWhatsappCampaignAnalytic = async (id, data) => {
+  return (await axiosInstance.put(`/whatsapp_campaign_analytics/${id}?mdl=${switchStore().pageId}`, data)).data;
+};
+
+export const deleteWhatsappCampaignAnalytic = async (id) => {
+  return (await axiosInstance.delete(`/whatsapp_campaign_analytics/${id}?mdl=${switchStore().pageId}`)).data;
+};
+
+export const deleteMultipleWhatsappCampaignAnalytics = async (data) => {
+  return (await axiosInstance.delete(`/whatsapp_campaign_analytics?mdl=${switchStore().pageId}`, { data })).data;
+};
 
 
 
