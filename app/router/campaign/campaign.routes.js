@@ -39,22 +39,31 @@ module.exports = (app) => {
   );
 
   // Campaign Routes
-  router.get("/campaigns", Authenticator.user,   Subscription.check_subscription, controller.getCampaigns);
-  // router.get("/campaigns/:id", Authenticator.user, controller.getCampaign);
-  router.post("/campaigns", Authenticator.user,   Subscription.check_subscription, controller.createCampaign);
-  // router.put("/campaigns/:id", Authenticator.user, controller.editCampaign);
-  router.delete(
-    "/campaigns/:id",
-    Authenticator.user,
-    Subscription.check_subscription,
-    controller.deleteCampaign
-  );
-  router.delete(
-    "/campaigns",
-    Authenticator.user,
-    Subscription.check_subscription,
-    controller.deleteMultipleCampaigns
-  );
+  router.get("/campaigns", 
+      Authenticator.user, 
+      Subscription.check_subscription,
+       controller.getCampaigns);
+        // router.get("/campaigns/:id", Authenticator.user, controller.getCampaign);
+        router.post("/campaigns", 
+          Authenticator.user, 
+          Subscription.check_subscription,
+          controller.createCampaign);
+        // router.put("/campaigns/:id", Authenticator.user, controller.editCampaign);
+        router.delete(
+          "/campaigns/:id",
+          Authenticator.user,
+          Subscription.check_subscription,
+          controller.deleteCampaign
+        );
+        router.delete(
+          "/campaigns",
+          Authenticator.user,
+          Subscription.check_subscription,
+          controller.deleteMultipleCampaigns
+        );
+
+
+
 
   // Campaign List Routes
   router.get(
@@ -65,7 +74,7 @@ module.exports = (app) => {
   );
   // router.get("/campaign_lists/:id", Authenticator.user, controller.getCampaignList);
   router.post(
-    "/campaign_lists",
+    "/create_campaign_lists",
     Authenticator.user,
     Subscription.check_subscription,
     controller.createCampaignList

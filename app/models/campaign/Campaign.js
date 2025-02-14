@@ -1,11 +1,15 @@
 const { Sequelize } = require("sequelize");
-
+const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
   const Campaign = sequelize.define("campaigns", {
-    id: {
-      type: Sequelize.BIGINT,
+    campaign_id: {
+      type: Sequelize.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      allowNull: false,
+      defaultValue: Sequelize.UUIDV4,
+    },
+    tenant_id:{
+      type:Sequelize.UUID
     },
     campaign_title: {
       type: Sequelize.STRING(255),
@@ -42,6 +46,12 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.DATE,
       defaultValue: Sequelize.NOW,
     },
+    updated_at:{
+      type: Sequelize.DATE,
+    },
+    created_by:{
+      type:Sequelize.UUID
+    }
   });
 
   return Campaign;

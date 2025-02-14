@@ -1,11 +1,12 @@
 const { Sequelize } = require("sequelize");
-
+const { v4: uuidv4 } = require("uuid");
 module.exports = (sequelize, Sequelize) => {
   const WhatsappCampaignAnalytics = sequelize.define("whatsapp_campaign_analytics", {
     id: {
-      type: Sequelize.BIGINT,
+      type: Sequelize.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      allowNull: false,
+      defaultValue: Sequelize.UUIDV4,
     },
     campaign_id: {
       type: Sequelize.BIGINT,
@@ -31,6 +32,16 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.ENUM("sent", "delivered", "read", "replied", "failed"),
       allowNull: false,
     },
+    created_at:{
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.NOW,
+    },
+    updated_at:{
+      type: Sequelize.DATE,
+    },
+    created_by:{
+      type:Sequelize.UUID
+    }
   });
 
   return WhatsappCampaignAnalytics;

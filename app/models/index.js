@@ -97,6 +97,19 @@ db.campaign_list_members = require("./campaign/CampaignListMembers.js")(sequeliz
 db.email_campaign_analytics = require("./campaign/EmailCampaignAnalytics.js")(sequelize,Sequelize)
 db.whatsapp_campaign_analytics = require("./campaign/WhatsappCampaignAnalytics.js")(sequelize,Sequelize)
 
+
+
+//-------------------
+db.users.hasMany(db.campaign_list, { //---this is the reference 
+  foreignKey: 'user_id',
+  as: 'users'      
+});
+db.campaign_list.belongsTo(db.users, { //---this is the original table
+  foreignKey: 'user_id', 
+  targetKey: 'user_id',         
+  as: 'user' // Changed alias to avoid naming collision
+});
+
 //-------------------
 db.organization.hasMany(db.estimate, { //---this is the reference 
   foreignKey: 'organization_id',
