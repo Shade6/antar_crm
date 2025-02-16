@@ -1152,6 +1152,14 @@ export const deleteMultipleWhatsappCampaignAnalytics = async (data) => {
 };
 
 
+export const get_all_campaign_emails = async () => {
+  return (await axiosInstance.get(`/get_all_campaign_emails?mdl=${switchStore().pageId}`)).data;
+};
+
+export const create_campaign_email = async (data) => {
+  return (await axiosInstance.post(`/create_campaign_email?mdl=${switchStore().pageId}`, data)).data;
+};
+
 
 
 

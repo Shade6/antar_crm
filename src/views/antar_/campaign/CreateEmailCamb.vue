@@ -5,7 +5,7 @@ import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
- import {getCampaignLists} from "@/api/userApi.js"
+ import {getCampaignLists,get_all_campaign_emails} from "@/api/userApi.js"
 import { TextInput , Button , Checkbox ,Dialog ,Textarea ,Autocomplete} from "frappe-ui";
 const toast = useToast();
 const router = useRouter();
@@ -13,6 +13,7 @@ const currentHash = ref(router.currentRoute.value.hash);
 const state = ref(false)
 const dialog2 = ref(false)
 const campaign_list = ref([])
+const campaign_emails = ref([])
 
 const fetch = async()=>{
    const res = await getCampaignLists()
@@ -36,6 +37,14 @@ const fetch = async()=>{
          borderLeft: "5px solid red",
        },
      });
+   }
+
+   const email_res = await get_all_campaign_emails()
+   if(email_res.statusCode ==200){
+    campaign_emails.value = email_res.data.map((val)=>({
+      label:val.email,
+      value:val.campaign_email_id
+    }))
    }
 }
 onMounted(fetch)
@@ -102,7 +111,7 @@ const toggleAccordion = (id) => {
           <div class="m-3 flex">
             <div class="mx-2 flex justify-center items-center">
               <div
-                v-if="true"
+                v-if="false"
                 class="icon-animated icon-animated-tick"
                 tabindex="-1"
                 aria-hidden="true"
@@ -132,7 +141,7 @@ const toggleAccordion = (id) => {
                   </svg>
                 </div>
               </div>
-              <div v-if="false" class="bg-gray-200 w-8 h-8 rounded-full"></div>
+              <div v-if="true" class="bg-gray-200 w-8 h-8 rounded-full"></div>
             </div>
             <div>
               <span>Sender</span>
@@ -171,15 +180,13 @@ const toggleAccordion = (id) => {
             <div>
               <div class="p-2">
                 <span>Email Address</span>
-                <TextInput
-                  :type="'text'"
-                  :ref_for="true"
-                  size="sm"
-                  variant="subtle"
-                  placeholder="Placeholder"
-                  :disabled="false"
-                  modelValue=""
-                />
+                <div class="p-2">
+  <Autocomplete
+    :options="campaign_emails"
+    v-model="single"
+    placeholder="Select person"
+  />
+</div>
               </div>
               <div class="p-2">
                 <span>Name</span>
@@ -408,7 +415,7 @@ const toggleAccordion = (id) => {
           <div class="m-3 flex">
             <div class="mx-2 flex justify-center items-center">
               <div
-                v-if="true"
+                v-if="false"
                 class="icon-animated icon-animated-tick"
                 tabindex="-1"
                 aria-hidden="true"
@@ -438,7 +445,7 @@ const toggleAccordion = (id) => {
                   </svg>
                 </div>
               </div>
-              <div v-if="false" class="bg-gray-200 w-8 h-8 rounded-full"></div>
+              <div v-if="true" class="bg-gray-200 w-8 h-8 rounded-full"></div>
             </div>
             <div>
               <span>Subject</span>

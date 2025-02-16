@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Dialog,
   FeatherIcon,
+  ListView
 } from "frappe-ui";
 import {
   findAllUsers,
@@ -64,8 +65,10 @@ const fetch = async () => {
   const res = await get_all_contact();
   if (res.statusCode == 200) {
     contact_select_list.value = res.data.map((val) => ({
-      label: val.first_name + " " + val.last_name,
-      value: val.contact_id,
+      id:val.contact_id,
+      name: val.first_name + " " + val.last_name,
+      email: val.email_id,
+      industry:val.industry?.industry_name || 'no industry'
     }));
   } else {
     toast.success(res.message, {
@@ -229,7 +232,7 @@ onMounted(fetch);
       <label for="userId" class="block text-sm font-medium text-gray-700 mb-1">
         Select User
       </label>
-      <div class="flex justify-start flex-wrap gap-2 my-3">
+      <!-- <div class="flex justify-start flex-wrap gap-2 my-3">
         <div class="" v-for="select in selected_contact">
           <span class="px-3 py-1 border rounded-sm flex bg-blue-100"
             >{{ select.label }}
@@ -238,7 +241,47 @@ onMounted(fetch);
             </button>
           </span>
         </div>
-      </div>
+      </div> -->
+
+      <ListView
+      class="h-[150px]"
+      :columns="[
+        {
+          label: 'Name',
+          key: 'name',
+          width: 1,
+        },
+       
+        {
+          label: 'Email',
+          key: 'email',
+        },
+        {
+          label: 'Created Date',
+          key: 'date',
+        },
+        
+     
+      ]"
+      :rows="selected_contact ?? []"
+      :options="{
+          getRowRoute: (row) => ({ params: { id: row } }),
+        selectable: true,
+        showTooltip: true,
+        resizeColumn: true,
+        emptyState: {
+        title: 'No records found',
+        description: 'Create a new record to get started',
+        button: {
+          label: 'New Record',
+          variant: 'solid',
+          
+        },
+      },
+      }"
+      
+    />
+
 
       <div class="p-2">
         <Button  @click="dialog2 = true">
@@ -248,7 +291,7 @@ onMounted(fetch);
            </Button>
         <Dialog
           v-model="dialog2"
-          :options="{ size: 'xl' }"
+          :options="{ size: '5xl' }"
           :prevent-close="true"
         >
           <template #body-title>
@@ -332,7 +375,7 @@ onMounted(fetch);
 
               <div>
                 <div class="h-[250px] overflow-y-scroll">
-                  <div
+                  <!-- <div
                     class="p-2 border flex justify-between my-2 bg-gray-50"
                     v-for="data in contact_select_list"
                   >
@@ -402,13 +445,50 @@ onMounted(fetch);
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
+                  <ListView
+      class="h-[250px]"
+      :columns="[
+        {
+          label: 'Name',
+          key: 'name',
+        },
+       
+        {
+          label: 'Email',
+          key: 'email',
+        },
+        {
+          label: 'Industry',
+          key: 'industry',
+        },
+        
+     
+      ]"
+      :rows="contact_select_list ?? []"
+      :options="{
+          getRowRoute: (row) => ({ params: { id: row } }),
+        selectable: true,
+        showTooltip: true,
+        resizeColumn: true,
+        emptyState: {
+        title: 'No records found',
+        description: 'Create a new record to get started',
+        button: {
+          label: 'New Record',
+          variant: 'solid',
+          
+        },
+      },
+      }"
+      
+    />
                 </div>
               </div>
             </div>
           </template>
           <template #actions>
-            <Button variant="solid"> Confirm </Button>
+          
             <Button class="ml-2" @click="dialog2 = false"> Close </Button>
           </template>
         </Dialog>

@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import CreateAddress from "@/components/modal/CreateAddress.vue";
 import Nav from "@/views/antar_/contacts/nav/Nav.vue";
+import Mobile from "@/views/antar_/contacts/Mobile.vue"
 import {
     find_all_industry,
     find_all_territories,
@@ -33,7 +34,7 @@ const form_details = ref({
   designation: null,
   company_name: null,
   address: null,
-
+  industry:null
 });
 
 const fetch = async () => {
@@ -138,7 +139,9 @@ onMounted(fetch);
  
 
     <hr />
-    <div class="p-2 w-full">
+    <div class="flex">
+      
+        <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
           <Autocomplete
             class="w-[90%]"
@@ -168,6 +171,22 @@ onMounted(fetch);
             placeholder="Select salutation"
           />
         </div>
+        <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Email</span>
+          <TextInput
+            class="text-gray-500 font-medium text-sm my-1"
+            :type="'text'"
+            :ref_for="true"
+            size="sm"
+            variant="subtle"
+            placeholder="enter email address"
+            :disabled="false"
+            :modelValue="form_details.email"
+            v-model="form_details.email"
+          />
+        </div>
+    </div>
+    
       <div class="flex justify-between">
       
         <div class="p-2 w-full">
@@ -199,25 +218,12 @@ onMounted(fetch);
           />
         </div>
       </div>
-      <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Email</span>
-          <TextInput
-            class="text-gray-500 font-medium text-sm my-1"
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter email address"
-            :disabled="false"
-            :modelValue="form_details.email"
-            v-model="form_details.email"
-          />
-        </div>
+  
       <div class="flex justify-between">
       
         <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-          <TextInput
+         <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
+           <!-- <TextInput
             :type="'text'"
             :ref_for="true"
             size="sm"
@@ -226,7 +232,8 @@ onMounted(fetch);
             :disabled="false"
             :modelValue="form_details.mobile"
             v-model="form_details.mobile"
-          />
+          /> -->
+          <Mobile/>
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
@@ -256,7 +263,7 @@ onMounted(fetch);
    
     
 
-      <div class="">
+      <div class="flex">
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1"
             >company name</span
@@ -286,7 +293,20 @@ onMounted(fetch);
             v-model="form_details.designation"
           />
         </div>
-        <div class="">
+     
+      </div>
+      <div class="flex">
+
+        <div class="p-2 w-1/2">
+          <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
+          <Autocomplete
+            :options="industry_list"
+            v-model="form_details.industry"
+            placeholder="Select Industry"
+          />
+        </div>
+
+        <div class="w-1/2">
         <span class="text-gray-500 font-medium text-sm my-1">Address</span>
         <div class="p-2 w-full flex justify-center">
           <div class="w-[87%]">
@@ -300,12 +320,13 @@ onMounted(fetch);
      
 
           </div>
-          <div class="w-[20%] mx-3"> 
+          <div class="w-[30%] mx-3"> 
             <CreateAddress :type="'contact'" @get_all_address="fetch"/>
           </div>
         </div>
       </div>
       </div>
+      
 
   </div>
 </template>
