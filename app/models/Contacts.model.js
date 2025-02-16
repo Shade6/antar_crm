@@ -61,7 +61,9 @@ module.exports = (sequelize, Sequelize) => {
       department: {
         type: Sequelize.STRING,
       },
-
+      industry_id:{
+        type: Sequelize.UUID,
+      },
       created_by: {
         type: Sequelize.UUID,
       },

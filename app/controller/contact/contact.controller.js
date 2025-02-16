@@ -4,6 +4,7 @@ const Opportunity = db.opportunity;
 const ContactMapping = db.contact_mapping;
 const Address = db.address;
 const AddressContact = db.address_contact;
+const Industry = db.industry
 const { Op } = require("sequelize");
 exports.createContact = async (req, res) => {
   try {
@@ -17,6 +18,7 @@ exports.createContact = async (req, res) => {
       designation,
       company_name,
       address,
+      industry
     } = req.body;
     const tenant_id = req.tenant;
     // Create a new contact entry
@@ -34,6 +36,7 @@ exports.createContact = async (req, res) => {
       designation: designation,
       company_name: company_name,
       address_contact_id: address?.value, // Assuming address is an object with a value property
+      industry:industry.value
     };
     console.log(details);
     const newContact = await Contact.create(details);
@@ -62,6 +65,10 @@ exports.getContacts = async (req, res) => {
       where: {
         tenant_id: tenant_id,
       },
+      include:{
+        model:Industry,
+        as:'industry'
+      }
     });
     return res.status(200).json({
       data: contacts,

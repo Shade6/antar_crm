@@ -7,7 +7,8 @@ const EmailCampaignAnalytics = db.email_campaign_analytics;
 const WhatsappCampaignAnalytics = db.whatsapp_campaign_analytics;
 const Contacts = db.contacts
 const Users = db.users;
-
+const CampaignEmail = db.campaign_email
+const emailValidator = require("email-validator");
 // Call Campaign Analytics Controller
 
 exports.getCallCampaignAnalytics = async (req, res) => {
@@ -520,3 +521,44 @@ exports.getEmailCampaignAnalytics = async (req, res) => {
     });
   }
 };
+
+
+exports.get_all_campaign_emails=async(req,res)=>{
+  try {
+    const find_all_emails =await CampaignEmail.findAll({where:{tenant_id:req.tenant}})
+    res.json({message:'email found',statusCode:200,data:find_all_emails ||[]});
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({
+      message: error.message,
+      statusCode: 400,
+    });
+  }
+}
+
+exports.create_campaign_email=async(req,res)=>{
+try {
+    const {email} = req.body
+ if (!emailValidator.validate(email)) {
+      return res.json({
+        message: "invalid email ! please check the email",
+        statusCode: 400,
+      });
+    }
+
+    const create_ = await CampaignEmail.create({
+      tenant_id:req.tenant,
+      email:email,
+      created_by:req.user
+    })
+
+    res.json({message:'campaign email created',statusCode:200,data:create_})
+
+} catch (error) {
+  console.error(error);
+  return res.status(400).json({
+    message: error.message,
+    statusCode: 400,
+  });
+}
+}

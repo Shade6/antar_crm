@@ -182,5 +182,18 @@ module.exports = (app) => {
     controller.deleteMultipleWhatsappCampaignAnalytics
   );
 
+
+  router.get("/get_all_campaign_emails",
+    Authenticator.user,
+    Subscription.check_subscription,
+    controller.get_all_campaign_emails
+  )
+
+  router.post("/create_campaign_email",
+    Authenticator.user,
+    Subscription.check_subscription,
+    controller.create_campaign_email
+  )
+
   app.use("/api/v1/crm/", router);
 };
