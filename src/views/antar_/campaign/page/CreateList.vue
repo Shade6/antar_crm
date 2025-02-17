@@ -4,74 +4,65 @@ import { ref, onMounted, watch } from "vue";
 import {
   Button,
   TextInput,
-  Card,
   Autocomplete,
   Dialog,
   FeatherIcon,
-  ListView
 } from "frappe-ui";
-import {
-  findAllUsers,
-  createCampaignList,
-  get_all_contact,
-  contact_filter,
-} from "@/api/userApi.js";
-import "@/assets/toast.css";
+import { get_all_contact, contact_filter } from "@/api/userApi.js";
 import { useToast } from "vue-toast-notification";
+
 const toast = useToast();
 
 const list_name = ref("");
-const user_id = ref("");
 const isLoading = ref(false);
-const user_list = ref([]);
-const dialog2 = ref(false);
-const contact_select_list = ref([]);
-const selected_contact = ref([]);
-const filter_list = ref({
-  filter_name: null,
-  filter_type: null,
+const dialogVisible = ref(false);
+const contacts = ref([]);
+const selectedContacts = ref(new Set());
+const filters = ref({
+  field: null,
+  type: null,
   search: null,
 });
 
-const submitForm = async () => {
-  if (!list_name.value || !user_id.value) {
-    return;
-  }
+// Fetch all contacts on mount
+onMounted(async () => {
+  fetch()
+});
 
-  try {
-    isLoading.value = true;
-    const response = await fetch("/api/v1/lists", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        list_name: list_name.value,
-        user_id: user_id.value,
-      }),
-    });
 
-    const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || "Failed to create list");
-
-    list_name.value = "";
-    user_id.value = "";
-  } catch (error) {
-  } finally {
-    isLoading.value = false;
-  }
-};
-
+// Load contacts with current filters
+// const loadContacts = async () => {
+//   try {
+//     const res = await contact_filter({
+//       field: filters.value.field?.value,
+//       type: filters.value.type?.value,
+//       text: filters.value.search,
+//     });
+    
+//     contacts.value = res.data.map(contact => ({
+//       id: contact.contact_id,
+//       name: `${contact.first_name} ${contact.last_name}`,
+//       email: contact.email_id,
+//       phone: contact.phone,
+//       industry: contact.industry?.industry_name || 'N/A',
+//     }));
+//   } catch (error) {
+//     showError("Failed to load contacts");
+//   }
+// };
 const fetch = async () => {
   const res = await get_all_contact();
   if (res.statusCode == 200) {
-    contact_select_list.value = res.data.map((val) => ({
-      id:val.contact_id,
+    contacts.value = res.data.map((val) => ({
+      id: val.contact_id,
       name: val.first_name + " " + val.last_name,
       email: val.email_id,
-      industry:val.industry?.industry_name || 'no industry'
+      industry: val.industry?.industry_name || "no industry",
+      mobile: val.phone,
     }));
   } else {
-    toast.success(res.message, {
+    toast.error(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -87,91 +78,46 @@ const fetch = async () => {
     });
   }
 };
-const handle_create = async () => {
-  const res = await createCampaignList({
-    list_name: list_name.value,
-    user_id: user_id.value,
-  });
-  if (res.statusCode == 200) {
-    list_name.value = "";
-    user_id.value = "";
-    toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "white",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid green",
-      },
-    });
+
+
+
+// Toggle contact selection
+const toggleSelection = (contactId) => {
+  if (selectedContacts.value.has(contactId)) {
+    selectedContacts.value.delete(contactId);
   } else {
-    toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "#FFF5F5",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid red",
-      },
-    });
+    selectedContacts.value.add(contactId);
   }
+  console.log(selectedContacts.value,'------')
 };
-const handle_create_list = async() => {
-const res = await createCampaignList({
-    list_name: list_name.value,
-    contact_list:selected_contact.value
-})
-if(res.statusCode == 200){
-    toast.success(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "white",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid green",
-      },
-    });
-}else{
-    toast.success(res.message, {
-    position: "top-right",
-    duration: 3000,
-    dismissible: true,
-    style: {
-      background: "#FFF5F5",
-      color: "black",
-      padding: "4px 20px",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-      borderLeft: "5px solid red",
-    },
-  });
-}
+
+// Add selected contacts to list
+const addSelectedContacts = () => {
+  const newContacts = contacts.value.filter(c => 
+    selectedContacts.value.has(c.id) && 
+    !selectedContacts.value.has(c.id)
+  );
+  
+  selectedContacts.value = new Set([...selectedContacts.value, ...newContacts.map(c => c.id)]);
+  dialogVisible.value = false;
 
 };
+
+// Remove contact from selected
+const removeContact = (contactId) => {
+  selectedContacts.value.delete(contactId);
+};
+
+
+
 const handle_filter = async (val) => {
   const res = await contact_filter({
-    type: { value: filter_list.value.filter_type.value },
-    field: { value: filter_list.value.filter_name.value },
+    type: { value: filters.value.type.value },
+    field: { value: filters.value.field.value },
     text: val,
   });
   if (res.statusCode != 200) {
-    return toast.success(res.message, {
+    return toast.error(res.message, {
       position: "top-right",
       duration: 3000,
       dismissible: true,
@@ -186,426 +132,182 @@ const handle_filter = async (val) => {
       },
     });
   }
-  contact_select_list.value = res.data.map((val) => ({
-    label: val.first_name + " " + val.last_name,
-    value: val.contact_id,
+  contacts.value = res.data.map((val) => ({
+    id: val.contact_id,
+    name: val.first_name + " " + val.last_name,
+    email: val.email_id,
+    industry: val.industry?.industry_name || "no industry",
+    mobile: val.phone,
   }));
 };
 watch(
-  () => filter_list.value.search,
+  () => filters.value.search,
   async (value) => {
     handle_filter(value);
   }
 );
-const handle_select_contact = (data) => {
-  selected_contact.value.push(data);
+
+// Utility functions
+const showError = (message) => {
+  toast.error(message, { position: "top-right", duration: 3000 });
 };
-const handle_remove = (data) => {
-  const find_index = selected_contact.value.findIndex(
-    (val) => val.value == data
-  );
-  selected_contact.value.splice(find_index, 1);
+
+const showSuccess = (message) => {
+  toast.success(message, { position: "top-right", duration: 3000 });
 };
-onMounted(fetch);
 </script>
 
 <template>
-  <Nav @create_campaign_list="handle_create_list" />
-  <div class="p-4">
-    <div class="form-group">
-      <label
-        for="listName"
-        class="block text-sm font-medium text-gray-700 mb-1"
-      >
-        List Name
-      </label>
-      <TextInput
-        id="listName"
-        v-model="list_name"
-        type="text"
-        class="w-full"
-        placeholder="Enter list name"
-      />
+  <Nav @create_campaign_list="handleCreateList" />
+  
+  <div class="p-4 space-y-4">
+    <div>
+      <label class="block mb-2">List Name</label>
+      <TextInput v-model="list_name" placeholder="Enter list name" />
     </div>
 
-    <div class="form-group">
-      <label for="userId" class="block text-sm font-medium text-gray-700 mb-1">
-        Select User
-      </label>
-      <!-- <div class="flex justify-start flex-wrap gap-2 my-3">
-        <div class="" v-for="select in selected_contact">
-          <span class="px-3 py-1 border rounded-sm flex bg-blue-100"
-            >{{ select.label }}
-            <button @click="handle_remove(select.value)" class="mx-2 my-auto">
-              <FeatherIcon class="w-5 h-5 text-red-600 shadow-md rounded-full " name="x-circle" />
-            </button>
-          </span>
+    <div>
+      <label class="block mb-2">Selected Contacts ({{ selectedContacts.size }})</label>
+      <div class="border rounded p-2 min-h-[100px]">
+        <div v-if="selectedContacts.size === 0" class="text-gray-500">
+          No contacts selected 
         </div>
-      </div> -->
-
-      <ListView
-      class="h-[150px]"
-      :columns="[
-        {
-          label: 'Name',
-          key: 'name',
-          width: 1,
-        },
-       
-        {
-          label: 'Email',
-          key: 'email',
-        },
-        {
-          label: 'Created Date',
-          key: 'date',
-        },
-        
-     
-      ]"
-      :rows="selected_contact ?? []"
-      :options="{
-          getRowRoute: (row) => ({ params: { id: row } }),
-        selectable: true,
-        showTooltip: true,
-        resizeColumn: true,
-        emptyState: {
-        title: 'No records found',
-        description: 'Create a new record to get started',
-        button: {
-          label: 'New Record',
-          variant: 'solid',
-          
-        },
-      },
-      }"
-      
-    />
-
-
-      <div class="p-2">
-        <Button  @click="dialog2 = true">
-            <div class="flex">
-                <FeatherIcon class="w-4 h-4 mr-2" name="plus-circle" /> <span>Select Contacts </span> 
-            </div>
-           </Button>
-        <Dialog
-          v-model="dialog2"
-          :options="{ size: '5xl' }"
-          :prevent-close="true"
-        >
-          <template #body-title>
-            <h3>
-              Select Contact from ({{ contact_select_list?.length || "0" }})
-            </h3>
-          </template>
-          <template #body-content>
-            <div>
-              <div class="flex">
-                <div class="p-2">
-                  <span class="text-sm font-semibold text-gray-700"
-                    >Filter Field</span
-                  >
-                  <Autocomplete
-                    :options="[
-                      {
-                        label: 'Name',
-                        value: 'first_name',
-                      },
-                      {
-                        label: 'Email',
-                        value: 'email_id',
-                      },
-
-                      {
-                        label: 'Phone',
-                        value: 'phone',
-                      },
-                      {
-                        label: 'Organization',
-                        value: 'organization',
-                      },
-                      {
-                        label: 'Created at',
-                        value: 'created_on',
-                      },
-                    ]"
-                    v-model="filter_list.filter_name"
-                    placeholder="Select person"
-                  />
-                </div>
-                <div class="p-2">
-                  <span class="text-sm font-semibold text-gray-700"
-                    >Filter Type</span
-                  >
-                  <Autocomplete
-                    :options="[
-                      {
-                        label: 'Like',
-                        value: 'like',
-                      },
-                      {
-                        label: 'Equal',
-                        value: 'eq',
-                      },
-                      {
-                        label: 'Not Equal',
-                        value: 'ne',
-                      },
-                    ]"
-                    v-model="filter_list.filter_type"
-                    placeholder="Select person"
-                  />
-                </div>
-                <div class="p-2 max-w-52">
-                  <span class="text-sm font-semibold text-gray-700"
-                    >Search Based On Filter</span
-                  >
-                  <TextInput
-                    v-model="filter_list.search"
-                    placeholder="Search "
-                    type="text"
-                  >
-                    <template #prefix>
-                      <FeatherIcon class="w-4" name="search" />
-                    </template>
-                  </TextInput>
-                </div>
-              </div>
-
-              <div>
-                <div class="h-[250px] overflow-y-scroll">
-                  <!-- <div
-                    class="p-2 border flex justify-between my-2 bg-gray-50"
-                    v-for="data in contact_select_list"
-                  >
-                    <span class="my-auto">{{ data.label }}</span>
-                    <div class="p-1">
-                      <Button
-                        v-if="
-                          !selected_contact.some(
-                            (val) => val.value == data.value
-                          )
-                        "
-                        :variant="'outline'"
-                        :ref_for="true"
-                        theme="gray"
-                        size="sm"
-                        label="Button"
-                        :loading="false"
-                        :loadingText="null"
-                        :disabled="false"
-                        :link="null"
-                        @click="handle_select_contact(data)"
-                      >
-                        <FeatherIcon class="w-4 h-4" name="plus-circle" />
+        <!-- <div v-for="contact in contacts.filter(c => selectedContacts.has(c.id))" 
+             :key="contact.id"
+             class="flex items-center justify-between p-2 hover:bg-gray-50">
+          <span>{{ contact.name }} ({{ contact.email }})</span>
+          <Button @click="removeContact(contact.id)" variant="ghost">
+            <FeatherIcon name="x" class="w-4 h-4" />
+          </Button>
+        </div> -->
+        <table v-else class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+             
+                  <th class="text-left p-2">Name</th>
+                  <th class="text-left p-2">Email</th>
+                  <th class="text-left p-2">Phone</th>
+                  <th class="text-left p-2">Industry</th>
+                  <th class="text-left p-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="contact in contacts.filter(c => selectedContacts.has(c.id))"   class="hover:bg-gray-50 cursor-pointer">
+                  <td class="p-2">{{ contact.name }}</td>
+                  <td class="p-2">{{ contact.email }}</td>
+                  <td class="p-2">{{ contact.mobile }}</td>
+                  <td class="p-2">{{ contact.industry }}</td>
+                  <td class="p-2">
+                    <Button @click="removeContact(contact.id)" variant="ghost">
+                        <FeatherIcon name="trash" class="w-4 h-4" />
                       </Button>
-                      <div class="flex" v-else>
-                        <div
-                          class="icon-animated icon-animated-tick"
-                          tabindex="-1"
-                          aria-hidden="true"
-                        >
-                          <svg
-                            class="circle"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 100 100"
-                          >
-                            <circle cx="50" cy="50" r="50" />
-                          </svg>
-
-                          <div class="tick">
-                            <svg
-                              class="tick-leg1"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 25 52"
-                            >
-                              <polygon
-                                class=""
-                                points="1,41 0,48 25,52 25,45"
-                              />
-                            </svg>
-                            <svg
-                              class="tick-leg2"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 25 52"
-                            >
-                              <polygon
-                                class=""
-                                points="18,45 25,47 25,0 18,0"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                        <button @click="handle_remove(data.value)" class="mx-2">
-                          <FeatherIcon
-                            class="w-5 h-5 my-auto"
-                            name="x-circle"
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div> -->
-                  <ListView
-      class="h-[250px]"
-      :columns="[
-        {
-          label: 'Name',
-          key: 'name',
-        },
-       
-        {
-          label: 'Email',
-          key: 'email',
-        },
-        {
-          label: 'Industry',
-          key: 'industry',
-        },
-        
-     
-      ]"
-      :rows="contact_select_list ?? []"
-      :options="{
-          getRowRoute: (row) => ({ params: { id: row } }),
-        selectable: true,
-        showTooltip: true,
-        resizeColumn: true,
-        emptyState: {
-        title: 'No records found',
-        description: 'Create a new record to get started',
-        button: {
-          label: 'New Record',
-          variant: 'solid',
-          
-        },
-      },
-      }"
-      
-    />
-                </div>
-              </div>
-            </div>
-          </template>
-          <template #actions>
-          
-            <Button class="ml-2" @click="dialog2 = false"> Close </Button>
-          </template>
-        </Dialog>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
       </div>
+      
+      <Button class="mt-2 flex justify-between w-[150px]" @click="dialogVisible = true">
+       <div class="flex">
+        <FeatherIcon name="plus" class="w-4 h-4 mr-2" />
+        <span>Select Contacts</span> 
+       </div>
+      
+      </Button>
     </div>
+
+    <Dialog v-model="dialogVisible" :options="{ size: '5xl' }">
+      <template #body-title>
+        <h3 class="text-lg font-semibold">Select Contacts</h3>
+      </template>
+
+      <template #body-content>
+        <div class="space-y-4">
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="block mb-1">Filter Field</label>
+              <Autocomplete
+                :options="[
+                  { label: 'Name', value: 'first_name' },
+                  { label: 'Email', value: 'email_id' },
+                  { label: 'Phone', value: 'mobile' },
+                ]"
+                v-model="filters.field"
+              />
+            </div>
+            
+            <div class="flex-1">
+              <label class="block mb-1">Filter Type</label>
+              <Autocomplete
+                :options="[
+                  { label: 'Contains', value: 'like' },
+                  { label: 'Equals', value: 'eq' },
+                ]"
+                v-model="filters.type"
+              />
+            </div>
+            
+            <div class="flex-1">
+              <label class="block mb-1">Search</label>
+              <TextInput v-model="filters.search" placeholder="Search...">
+                <template #prefix>
+                  <FeatherIcon name="search" class="w-4 h-4" />
+                </template>
+              </TextInput>
+            </div>
+          </div>
+
+          <div class="border rounded overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="w-12"></th>
+                  <th class="text-left p-2">Name</th>
+                  <th class="text-left p-2">Email</th>
+                  <th class="text-left p-2">Phone</th>
+                  <th class="text-left p-2">Industry</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="contact in contacts" :key="contact.id" 
+                    class="hover:bg-gray-50 cursor-pointer"
+                    @click="toggleSelection(contact.id)">
+                  <td class="p-2 text-center">
+                    <input type="checkbox" 
+                           :checked="selectedContacts.has(contact.id)"
+                           class="form-checkbox">
+                  </td>
+                  <td class="p-2">{{ contact.name }}</td>
+                  <td class="p-2">{{ contact.email }}</td>
+                  <td class="p-2">{{ contact.mobile }}</td>
+                  <td class="p-2">{{ contact.industry }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+
+      <template #actions>
+        <Button variant="solid" @click="addSelectedContacts">
+          Add Selected ({{ selectedContacts.size }})
+        </Button>
+        <Button variant="ghost" @click="dialogVisible = false">Cancel</Button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <style scoped>
-.form-group {
-  margin-bottom: 1rem;
-}
-.icon-animated {
-  width: 30px;
-  height: 30px;
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
+table {
+  border-collapse: collapse;
 }
 
-.icon-animated .tick svg {
-  position: absolute;
-  left: 12px;
-  right: 0;
-  top: 10px;
-  bottom: 10;
-  fill: #fff;
-  width: 15px;
-  height: 22px;
+th, td {
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.icon-animated-tick .circle {
-  fill: #60d154;
-  animation-fill-mode: forwards;
-  animation-name: circle-pulse;
-  animation-duration: 4s;
-  animation-iteration-count: 1;
-}
-
-.tick-leg1 {
-  fill: #fff;
-  animation-fill-mode: forwards;
-  animation-name: tick-swipe1;
-  animation-duration: 1s;
-  animation-iteration-count: 1;
-  transform: scaleX(0);
-  transform-origin: left bottom;
-  opacity: 0;
-}
-
-.tick-leg2 {
-  fill: #fff;
-  animation-fill-mode: forwards;
-  animation-name: tick-swipe2;
-  animation-duration: 2s;
-  animation-iteration-count: 1;
-  transform: scaleY(0);
-  transform-origin: right bottom;
-  opacity: 0;
-}
-
-@keyframes tick-swipe1 {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.5;
-  }
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes tick-swipe2 {
-  40% {
-    opacity: 0;
-  }
-  47% {
-    transform: scaleY(0.15);
-    opacity: 1;
-  }
-  100% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
-}
-
-@keyframes circle-pulse {
-  0%,
-  25%,
-  75%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.tick {
-  width: 40%;
-  height: 150%;
-  transform: rotate(45deg) scale(0.8);
-  position: absolute;
-  left: 0;
-  top: 10;
-  bottom: 0;
-  right: 0;
-}
-
-.tick-holder {
-  transform: scale(0.6);
+tr:last-child td {
+  border-bottom: none;
 }
 </style>
