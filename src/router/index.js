@@ -138,6 +138,12 @@ const router = createRouter({
               name: "kanban-contact-view", // More descriptive name
               component: Kanban,
             },
+            {
+              path: "convert_contact",
+              name: "convert_contact", // More descriptive name
+              component: () => import("../views/antar_/contacts/Convert.vue"), 
+            },
+            
           ],
         },
         {

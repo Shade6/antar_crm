@@ -8,7 +8,7 @@ import {
   Dialog,
   FeatherIcon,
 } from "frappe-ui";
-import { get_all_contact, contact_filter } from "@/api/userApi.js";
+import { get_all_contact, contact_filter ,createCampaignList } from "@/api/userApi.js";
 import { useToast } from "vue-toast-notification";
 
 const toast = useToast();
@@ -148,17 +148,53 @@ watch(
 );
 
 // Utility functions
-const showError = (message) => {
-  toast.error(message, { position: "top-right", duration: 3000 });
+const handle_create = async () => {
+console.log(selectedContacts.value)
+const data = {
+    list_name: list_name.value,
+    contact_list:  Array.from(selectedContacts.value),
+  }
+  console.log(data)
+  const res = await createCampaignList(data);
+  if (res.statusCode == 200) {
+    list_name.value = "";
+    selectedContacts.value = "";
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "white",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid green",
+      },
+    });
+  } else {
+    toast.success(res.message, {
+      position: "top-right",
+      duration: 3000,
+      dismissible: true,
+      style: {
+        background: "#FFF5F5",
+        color: "black",
+        padding: "4px 20px",
+        borderRadius: "8px",
+        fontSize: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+        borderLeft: "5px solid red",
+      },
+    });
+  }
 };
 
-const showSuccess = (message) => {
-  toast.success(message, { position: "top-right", duration: 3000 });
-};
 </script>
 
 <template>
-  <Nav @create_campaign_list="handleCreateList" />
+  <Nav @create_campaign_list="handle_create" />
   
   <div class="p-4 space-y-4">
     <div>

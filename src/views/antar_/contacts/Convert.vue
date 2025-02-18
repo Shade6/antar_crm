@@ -4,12 +4,14 @@ import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import CreateAddress from "@/components/modal/CreateAddress.vue";
 import Nav from "@/views/antar_/contacts/nav/Nav.vue";
 import Mobile from "@/utils/Mobile.vue"
+
 import {
     find_all_industry,
     find_all_territories,
     findAllUsers,
     get_all_address_contact,
-    create_contact
+    create_contact,
+    contact_details_by_id
 } from "@/api/userApi.js";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
@@ -39,11 +41,12 @@ const form_details = ref({
 });
 
 const fetch = async () => {
-  const [industry_res, territory_res, users_res,address_res] = await Promise.all([
+  const [industry_res,territory_res,users_res,address_res,contact_res ] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
-    get_all_address_contact()
+    get_all_address_contact(),
+    contact_details_by_id(router.currentRoute.value.hash.split("#")[1])
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -77,6 +80,12 @@ const fetch = async () => {
   }else{
     show_error(address_res)
   }
+  if(contact_res.statusCode == 200){
+     autoEnter(contact_res.data)
+  }else{
+    show_error(contact_res)
+  }
+
 };
 const show_error = (res) => {
   toast.success(res.message, {
@@ -95,6 +104,18 @@ const show_error = (res) => {
   });
 };
 
+const autoEnter = (data)=>{
+    form_details.value.company_name = data.contact.company_name
+    form_details.value.first_name = data.contact.first_name
+    form_details.value.last_name = data.contact.last_name
+    form_details.value.email = data.contact.email_id
+    form_details.value.salutation = data.contact.salutation
+    form_details.value.code = data.contact.code
+    form_details.value.mobile = data.contact.phone
+    form_details.value.gender  = data.contact.gender
+    form_details.value.address = data.contact.address_contact_id
+    form_details.value.industry = data.contact.industry_id
+}
 const handle_save_contact = async () => {
   const res = await create_contact(form_details.value);
   if (res.statusCode == 200) {
@@ -139,6 +160,7 @@ const handle_mobile_number =(data)=>{
 </script>
 
 <template>
+   
   <Nav @save="handle_save_contact" />
   <div class=" mx-4">
  
@@ -229,17 +251,7 @@ const handle_mobile_number =(data)=>{
       
         <div class="p-2 w-full">
          <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-           <!-- <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter mobile number"
-            :disabled="false"
-            :modelValue="form_details.mobile"
-            v-model="form_details.mobile"
-          /> -->
-          <Mobile @mobile_action="handle_mobile_number"/>
+          <Mobile :code="form_details.code" :mobile="form_details.mobile" @mobile_action="handle_mobile_number"/>
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Gender</span>

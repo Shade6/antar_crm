@@ -10,6 +10,7 @@ import { useRoute, useRouter } from "vue-router"; // Import useRouter for naviga
 import EditIcon from "@/components/icons/EditIcon.vue";
 import Email2Icon from "@/components/icons/Email2Icon.vue";
 import PinIcon from "@/components/icons/PinIcon.vue";
+
 const route = useRoute(); // Use route to access route parameters
 const router = useRouter(); // Initialize router for navigation
 const contacts = ref({});
