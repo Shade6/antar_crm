@@ -49,6 +49,9 @@ module.exports = (sequelize, Sequelize) => {
           is: /^[0-9]{10}$/, // Only accept 10 digit numbers
         },
       },
+      code:{
+        type: Sequelize.STRING,
+      },
       mobile_no: {
         type: Sequelize.INTEGER,
       },

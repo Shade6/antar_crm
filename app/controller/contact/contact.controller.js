@@ -14,6 +14,7 @@ exports.createContact = async (req, res) => {
       last_name,
       email,
       mobile,
+      code,
       gender,
       designation,
       company_name,
@@ -21,6 +22,7 @@ exports.createContact = async (req, res) => {
       industry
     } = req.body;
     const tenant_id = req.tenant;
+    console.log(req.body)
     // Create a new contact entry
     if (!address?.value) {
       return res.json({ message: "Address is required", statusCode: 400 });
@@ -36,7 +38,8 @@ exports.createContact = async (req, res) => {
       designation: designation,
       company_name: company_name,
       address_contact_id: address?.value, // Assuming address is an object with a value property
-      industry:industry.value
+      industry:industry.value,
+      code:code,
     };
     console.log(details);
     const newContact = await Contact.create(details);

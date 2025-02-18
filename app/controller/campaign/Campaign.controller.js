@@ -182,7 +182,7 @@ exports.createCampaignList = async (req, res) => {
 
 
       for(let contact of req.body.contact_list){
-        const find_contact = await Contacts.findOne({where:{contact_id:contact.value}})
+        const find_contact = await Contacts.findOne({where:{contact_id:contact}})
         if(!find_contact){
             await CampaignListMember.destroy({where:{campaign_list_id:list.id}})
             await CampaignList.destroy({where:{id:list.id}})
@@ -196,7 +196,7 @@ exports.createCampaignList = async (req, res) => {
 
         await CampaignListMember.create({
           campaign_list_id:list.id,
-          contact_id:contact.value,
+          contact_id:contact,
           created_by:req.user
         })
       }
@@ -209,7 +209,7 @@ exports.createCampaignList = async (req, res) => {
         statusCode: 200,
       });
 
-    console.log(req.body)
+
 
 
   } catch (error) {
