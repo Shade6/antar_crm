@@ -12,7 +12,7 @@
       :columns="[
         { label: 'Name', key: 'name', icon: 'user', width: '180px' },
         { label: 'Email', key: 'email', width: '180px' },
-        { label: 'Phone', key: 'phone', width: '150px' },
+        { label: 'Phone', key: 'mobile_no', width: '150px' },
         { label: 'Organization', key: 'organization', width: '180px' },
         { label: 'Last Modified', key: 'modified', width: '150px' },
       ]"
@@ -131,7 +131,7 @@ const fetch_contact = async () => {
     id: item?.contact_id,
     name: item?.first_name || "N/A",
     email: item?.email_id || "N/A",
-    phone: item?.phone || "N/A",
+    mobile_no: item?.mobile_no || "N/A",
     organization: item?.company_name || "N/A",
     modified: item?.created_on || "N/A",
   }));

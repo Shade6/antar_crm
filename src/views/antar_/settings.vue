@@ -7,6 +7,7 @@ import Subscription from "@/components/antar_ui/settings/Subscription.vue";
 import Email from "@/components/antar_ui/settings/email/Email.vue";
 import ScoringRules from "@/components/antar_ui/settings/ScoringRules.vue";
 import CampaignEmail from "@/components/antar_ui/settings/CampaignEmail.vue";
+import Ai from "@/components/antar_ui/settings/Ai.vue";
 
 const page = ref(null);
 
@@ -206,6 +207,37 @@ const handle_back = () => {
       
       
     </div>
+    <div class="mb-2 mt-10">
+      <span class="text-2xl">AI</span>
+    </div>
+    <div class="flex gap-5">
+      <div
+        style="cursor: pointer"
+        class="p-5 rounded-sm shadow-lg w-64 flex justify-between"
+        @click="page = 'ai'"
+      >
+        <span>Manage AI</span>
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="feather feather-arrow-up-right"
+          >
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </div>
+      </div>
+      
+      
+    </div>
   </div>
 
   <div v-else-if="page == 'territory_list'">
@@ -228,6 +260,9 @@ const handle_back = () => {
   </div>
   <div v-else-if="page == 'campaign_email'">
       <CampaignEmail/>
+  </div>
+  <div v-else-if="page == 'ai'">
+      <Ai/>
   </div>
 </template>
 

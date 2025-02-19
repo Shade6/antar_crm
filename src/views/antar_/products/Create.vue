@@ -12,6 +12,8 @@ import {
 } from "frappe-ui";
 import { create_product, create_images } from "@/api/userApi";
 import Nav from "./nav/Nav.vue";
+import Img from "./image/Img.vue";
+
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useRouter } from "vue-router";
@@ -148,8 +150,10 @@ const deleteImage = () => {
 <template>
   <Nav @save="handle_save"></Nav>
   <div class="p-4">
-    <header class="mx-6">Product Image</header>
-    <div class="wrapper flex mx-6" @click="triggerFileInput">
+    <Img />
+    <!-- <MultipleImg/> -->
+    <!-- <header class="mx-6">Product Image</header> -->
+    <!-- <div class="wrapper flex mx-6" @click="triggerFileInput">
       <form class="w-1/2 h-full" action="#">
         <input
           class="file-input"
@@ -159,7 +163,6 @@ const deleteImage = () => {
           multiple
           @change="handleFileChange"
         />
-        <!-- Added multiple attribute and change event -->
         <i class="fas fa-cloud-upload-alt"></i>
         <p>Browse File to Upload</p>
       </form>
@@ -177,7 +180,6 @@ const deleteImage = () => {
             class="uploaded-image"
           />
           <span>{{ image }}</span>
-          <!-- Display uploaded images -->
           <button
             @click="deleteImage"
             class="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
@@ -186,7 +188,10 @@ const deleteImage = () => {
           </button>
         </div>
       </section>
-    </div>
+    </div> -->
+
+
+    
     <div class="mx-4">
       <hr />
 
@@ -350,7 +355,7 @@ const deleteImage = () => {
 </template>
 
 <style scoped>
-::selection {
+/* ::selection {
   color: #fff;
   background: #4f5053;
 }
@@ -452,5 +457,5 @@ section .details span {
 }
 .uploaded-area i.fa-check {
   font-size: 16px;
-}
+} */
 </style>

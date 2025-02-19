@@ -1,7 +1,7 @@
 <script setup>
 import Nav from "./nav/Nav.vue";
 import { onMounted, ref } from "vue";
-import { Button, Dialog, Autocomplete, TextInput } from "frappe-ui";
+import { Button, Dialog, Autocomplete, TextInput ,DatePicker} from "frappe-ui";
 
 import {
   find_all_industry,
@@ -33,6 +33,9 @@ const form_details = ref({
   industry_id: null,
   status: null,
   owner_id: null,
+  company_constitution:null,
+  incorporation_date:null,
+  department:null
 });
 
 const fetch = async () => {
@@ -231,6 +234,56 @@ onMounted(fetch);
           ]"
           v-model="form_details.gender"
           placeholder="Select gender"
+        />
+      </div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Company Constitution.</span>
+        <TextInput
+          class="text-gray-500 font-medium text-sm my-1"
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter company constitution"
+          :disabled="false"
+          :modelValue="form_details.company_constitution"
+          v-model="form_details.company_constitution"
+        />
+      </div>
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Company Incorporation Date</span>
+       
+          <DatePicker
+            v-model="form_details.incorporation_date"
+            variant="subtle"
+            placeholder="company incorporation date"
+            :disabled="false"
+           
+          />
+     
+      </div>
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Department</span>
+        <Autocomplete
+          :options="[
+            {
+              label: 'Female',
+              value: 'Female',
+            },
+            {
+              label: 'Male',
+              value: 'Male',
+            },
+            {
+              label: 'Other',
+              value: 'Other',
+            },
+          ]"
+          v-model="form_details.gender"
+          placeholder="Select Department"
         />
       </div>
     </div>

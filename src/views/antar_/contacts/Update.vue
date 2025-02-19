@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput, Switch } from "frappe-ui";
 import CreateAddress from "@/components/modal/CreateAddress.vue";
 import Nav from "@/views/antar_/contacts/nav/Nav.vue";
+import Mobile from "@/utils/Mobile.vue"
 import {
   find_all_industry,
   find_all_territories,
@@ -36,6 +37,10 @@ const form_details = ref({
   designation: null,
   company_name: null,
   address: null,
+  industry:null,
+  code:null,
+  mobile: null,
+  source:null
 });
 
 const fetch = async () => {
@@ -140,16 +145,20 @@ const fetchContactById = async (contactId) => {
     form_details.value.first_name = res.data.first_name;
     form_details.value.last_name = res.data.last_name;
     form_details.value.email = res.data.email_id;
-    form_details.value.mobile = res.data.phone;
+    form_details.value.mobile = res.data.mobile_no;
     form_details.value.gender = res.data.gender;
     form_details.value.designation = res.data.designation;
     form_details.value.company_name = res.data.company_name;
+    form_details.value.code = res.data.mobile_code;
+    form_details.value.source = res.data.source;
+    form_details.value.industry = res.data.industry_id
+    // form_details.value.address = res.data.address_contact_id
 
     // Push the current address to address list
-    if (res.data.address_contact) {
+    if (res.data.address_contact_id) {
       const currentAddress = {
-        label: res.data.address_contact.address_title,
-        value: res.data.address_contact.address_id,
+        label: res.data?.address_contact?.address_title,
+        value: res.data?.address_contact?.address_contact_id,
       };
       console.log(currentAddress, '00--1');
       console.log(address_list.value, '00--2');
@@ -161,7 +170,8 @@ const fetchContactById = async (contactId) => {
       console.log(currentAddress, '00');
    
     } else {
-      console.error('Address data not found');
+      console.log('Address data not found',res.data);
+      // show_error(res.data.message);
     }
   } else {
     show_error(res);
@@ -174,6 +184,10 @@ onMounted(async () => {
   await fetch();
   await fetchContactById(contactId);
 });
+const handle_mobile_number =(data)=>{
+  form_details.value.code = data.country.code
+  form_details.value.mobile = data.number
+}
 </script>
 
 <template>
@@ -181,36 +195,53 @@ onMounted(async () => {
 
   <div class="mx-4">
     <hr />
-    <div class="p-2 w-full">
-      <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
-      <Autocomplete
-        class="w-[90%]"
-        :options="[
-          {
-            label: 'Master',
-            value: 'Master',
-          },
-          {
-            label: 'Miss',
-            value: 'Miss',
-          },
-          {
-            label: 'Mr',
-            value: 'Mr',
-          },
-          {
-            label: 'Mrs',
-            value: 'Mrs',
-          },
-          {
-            label: 'Ms',
-            value: 'Ms',
-          },
-        ]"
-        v-model="form_details.salutation"
-        placeholder="Select salutation"
-      />
-    </div>
+    <div class="flex">
+      
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Salutation</span>
+        <Autocomplete
+          class="w-[90%]"
+          :options="[
+            {
+              label: 'Master',
+              value: 'Master',
+            },
+            {
+              label: 'Miss',
+              value: 'Miss',
+            },
+            {
+              label: 'Mr',
+              value: 'Mr',
+            },
+            {
+              label: 'Mrs',
+              value: 'Mrs',
+            },
+            {
+              label: 'Ms',
+              value: 'Ms',
+            },
+          ]"
+          v-model="form_details.salutation"
+          placeholder="Select salutation"
+        />
+      </div>
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1">Email</span>
+        <TextInput
+          class="text-gray-500 font-medium text-sm my-1"
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter email address"
+          :disabled="false"
+          :modelValue="form_details.email"
+          v-model="form_details.email"
+        />
+      </div>
+  </div>
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">First Name</span>
@@ -241,34 +272,11 @@ onMounted(async () => {
         />
       </div>
     </div>
-    <div class="p-2 w-full">
-      <span class="text-gray-500 font-medium text-sm my-1">Email</span>
-      <TextInput
-        class="text-gray-500 font-medium text-sm my-1"
-        :type="'text'"
-        :ref_for="true"
-        size="sm"
-        variant="subtle"
-        placeholder="enter email address"
-        :disabled="false"
-        :modelValue="form_details.email"
-        v-model="form_details.email"
-      />
-    </div>
     <div class="flex justify-between">
       <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-        <TextInput
-          :type="'text'"
-          :ref_for="true"
-          size="sm"
-          variant="subtle"
-          placeholder="enter mobile number"
-          :disabled="false"
-          :modelValue="form_details.mobile"
-          v-model="form_details.mobile"
-        />
-      </div>
+         <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
+         <Mobile :code="form_details.code" :mobile="form_details.mobile" @mobile_action="handle_mobile_number"/>
+        </div>
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
         <Autocomplete
@@ -292,7 +300,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="">
+    <div class="flex">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">company name</span>
         <TextInput
@@ -320,7 +328,18 @@ onMounted(async () => {
           v-model="form_details.designation"
         />
       </div>
-      <div class="">
+      
+    </div>
+    <div class="flex">
+      <div class="p-2 w-1/2">
+          <span class="text-gray-500 font-medium text-sm my-1">Industry</span>
+          <Autocomplete
+            :options="industry_list"
+            v-model="form_details.industry"
+            placeholder="Select Industry"
+          />
+        </div>
+        <div class="w-1/2">
         <span class="text-gray-500 font-medium text-sm my-1">Address</span>
         <div class="p-2 w-full flex justify-center">
           <div class="w-[87%]">
@@ -330,15 +349,40 @@ onMounted(async () => {
               :modelValue="form_details.address"
               placeholder="Select address"
               :hideSearch="true"
-              class="w-[90%]"
+                class="w-[90%]"
             />
           </div>
-          <div class="w-[20%] mx-3">
+          <div class="w-[30%] mx-3"> 
             <CreateAddress :type="'contact'" @get_all_address="fetch" />
           </div>
         </div>
       </div>
     </div>
+    <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Source</span>
+          <Autocomplete
+            :options="[
+              {
+                label: 'Trader',
+                value: 'Trader',
+              },
+              {
+                label: 'Manufacturer',
+                value: 'Manufacturer',
+              },
+              {
+                label: 'Services',
+                value: 'Services',
+              },
+              {
+                label: 'Aggregator',
+                value: 'Aggregator',
+              },
+            ]"
+            v-model="form_details.source"
+            placeholder="Select source"
+          />
+        </div>
   </div>
 </template>
 

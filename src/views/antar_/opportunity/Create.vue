@@ -9,7 +9,7 @@ import {
   create_deal,
   get_all_organization,
   get_all_contact,
-  get_all_product
+  get_all_product,
 } from "@/api/userApi.js";
 
 import "@/assets/toast.css";
@@ -24,6 +24,7 @@ const product_list = ref([]);
 const checked = ref({
   organization: false,
   contact: false,
+  recurring: 'one_time',
 });
 const form_details = ref({
   salutation: null,
@@ -42,7 +43,8 @@ const form_details = ref({
   owner_id: null,
   opportunity_name: null,
   opportunity_value: null,
-  product:null
+  product: null,
+  recurring: null,
 });
 
 const organization_list = ref([]);
@@ -54,14 +56,14 @@ const fetch = async () => {
     users_res,
     organization_res,
     contact_res,
-    product_res
+    product_res,
   ] = await Promise.all([
     find_all_industry(),
     find_all_territories(),
     findAllUsers(),
     get_all_organization(),
     get_all_contact(),
-    get_all_product()
+    get_all_product(),
   ]);
   if (industry_res.statusCode == 200) {
     industry_list.value = industry_res.data.map((val, i) => ({
@@ -99,11 +101,11 @@ const fetch = async () => {
       value: val.contact_id,
     }));
   }
-  if(product_res.statusCode==200){
-    product_list.value = product_res.data.map((val)=>({
-      label:val.product_name,
-      value:val.product_id
-    }))
+  if (product_res.statusCode == 200) {
+    product_list.value = product_res.data.map((val) => ({
+      label: val.product_name,
+      value: val.product_id,
+    }));
   }
 };
 const show_error = (res) => {
@@ -431,50 +433,99 @@ onMounted(fetch);
       </div>
     </div>
     <hr class="my-3" />
+   
     <div class="flex justify-between">
       <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1"
-            >opportunity name
-          </span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter opportunity name"
-            :disabled="false"
-            :modelValue="form_details.opportunity_name"
-            v-model="form_details.opportunity_name"
-          />
-        </div>
-
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1"
-            >opportunity value
-          </span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter opportunity value"
-            :disabled="false"
-            :modelValue="form_details.opportunity_value"
-            v-model="form_details.opportunity_value"
-          />
-        </div>
-        <div class="p-2 w-full">
-          <span class="text-gray-500 font-medium text-sm my-1">Product/Service</span>
-          <Autocomplete
-            :options="product_list"
-              v-model="form_details.product"
-              placeholder="Select product/service"
-            :multiple="true"
-          />
-        </div>
+        <span class="text-gray-500 font-medium text-sm my-1"
+          >opportunity name
+        </span>
+        <TextInput
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter opportunity name"
+          :disabled="false"
+          :modelValue="form_details.opportunity_name"
+          v-model="form_details.opportunity_name"
+        />
       </div>
+
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1"
+          >opportunity value
+        </span>
+        <TextInput
+          :type="'text'"
+          :ref_for="true"
+          size="sm"
+          variant="subtle"
+          placeholder="enter opportunity value"
+          :disabled="false"
+          :modelValue="form_details.opportunity_value"
+          v-model="form_details.opportunity_value"
+        />
+      </div>
+      <div  class="p-2 w-full">
+      <span class="text-gray-500 font-medium text-sm">Recurring</span>
+      <Autocomplete
+        :options="[
+          {
+            label: 'One Time',
+            value: 'one_time',
+          },
+          {
+            label: 'Recurring',
+            value: 'Recurring',
+          },
+        ]"
+        v-model="checked.recurring"
+        placeholder="Select gender"
+      />
+    </div>
+      <div v-if="checked.recurring.value == 'Recurring'" class="p-2 w-full">
+      <span class="text-gray-500 font-medium text-sm">Recurring</span>
+      <Autocomplete
+        :options="[
+          {
+            label: 'Daily',
+            value: 'Daily',
+          },
+          {
+            label: 'Weekly',
+            value: 'Weekly',
+          },
+          {
+            label: 'Monthly',
+            value: 'Monthly',
+          },
+          {
+            label: 'Quarterly',
+            value: 'Quarterly',
+          },
+          {
+            label: 'Annually',
+            value: 'Annually',
+          },
+        ]"
+        v-model="form_details.recurring"
+        placeholder="Select gender"
+      />
+    </div>
+    </div>
     <div>
       <div class="flex justify-between">
+        <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm my-1"
+          >Product/Service</span
+        >
+        <Autocomplete
+          :options="product_list"
+          v-model="form_details.product"
+          placeholder="Select product/service"
+          :multiple="true"
+        />
+      </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Status </span>
           <Autocomplete
@@ -518,6 +569,7 @@ onMounted(fetch);
             placeholder="Select owner"
           />
         </div>
+        
       </div>
     </div>
   </div>

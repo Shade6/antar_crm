@@ -35,7 +35,8 @@ const form_details = ref({
   designation: null,
   company_name: null,
   address: null,
-  industry:null
+  industry:null,
+  source:null
 });
 
 const fetch = async () => {
@@ -229,16 +230,6 @@ const handle_mobile_number =(data)=>{
       
         <div class="p-2 w-full">
          <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-           <!-- <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter mobile number"
-            :disabled="false"
-            :modelValue="form_details.mobile"
-            v-model="form_details.mobile"
-          /> -->
           <Mobile @mobile_action="handle_mobile_number"/>
         </div>
         <div class="p-2 w-full">
@@ -331,9 +322,34 @@ const handle_mobile_number =(data)=>{
           </div>
         </div>
       </div>
+      
       </div>
       
-
+      <div class="p-2 w-full">
+          <span class="text-gray-500 font-medium text-sm my-1">Source</span>
+          <Autocomplete
+            :options="[
+              {
+                label: 'Trader',
+                value: 'Trader',
+              },
+              {
+                label: 'Manufacturer',
+                value: 'Manufacturer',
+              },
+              {
+                label: 'Services',
+                value: 'Services',
+              },
+              {
+                label: 'Aggregator',
+                value: 'Aggregator',
+              },
+            ]"
+            v-model="form_details.source"
+            placeholder="Select source"
+          />
+        </div>
   </div>
 </template>
 
