@@ -73,6 +73,15 @@ module.exports = (sequelize, Sequelize) => {
       revenue:{
         type: Sequelize.INTEGER,
       },
+      company_Constitution:{
+         type:Sequelize.STRING
+      },
+      company_incorporation_date:{
+        type:Sequelize.DATE
+      },
+      department_id:{
+        type: Sequelize.UUID,
+      },
       changed_by: {
         type: Sequelize.UUID, // Match the data type in `Leads`
         allowNull: false,

@@ -71,11 +71,13 @@ db.lead_score = require("./leads/LeadScore.js")(sequelize,Sequelize)
 
 db.address_contact = require("./opportunity/AddressContact.js")(sequelize,Sequelize)
 db.address_org = require("./opportunity/AddressOrg.js")(sequelize,Sequelize)
-db.product = require("./Product.js")(sequelize,Sequelize)
 db.contact_mapping = require('./opportunity/ContactMapping.js')(sequelize,Sequelize)
 db.estimate = require("./opportunity/Estimate.js")(sequelize,Sequelize)
 db.estimate_type = require("./opportunity/EstimateItem.js")(sequelize,Sequelize)
-db.product_mapping= require("./ProductMapping.js")(sequelize,Sequelize)
+
+db.product_mapping= require("./product/ProductMapping.js")(sequelize,Sequelize)
+db.product_files = require("./product/ProductFile.js")(sequelize,Sequelize)
+db.product = require("./product/Product.js")(sequelize,Sequelize)
 
 db.invoice = require('./subscription/invoice.js')(sequelize,Sequelize)
 db.payment = require('./subscription/payment.js')(sequelize,Sequelize)
@@ -98,6 +100,11 @@ db.email_campaign_analytics = require("./campaign/EmailCampaignAnalytics.js")(se
 db.whatsapp_campaign_analytics = require("./campaign/WhatsappCampaignAnalytics.js")(sequelize,Sequelize)
 db.campaign_email = require("./campaign/CampaignEmail.js")(sequelize,Sequelize)
 
+
+//-------------------
+// Association definitions
+db.product.hasMany(db.product_files, { foreignKey: 'product_id', as: 'productFiles' });
+db.product_files.belongsTo(db.product, { foreignKey: 'product_id', as: 'product' });
 
 //-------------------
 db.industry.hasMany(db.contacts, { //---this is the reference 

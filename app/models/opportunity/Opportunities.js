@@ -62,6 +62,10 @@ module.exports = (sequelize, Sequelize) => {
     first_responded_on: {
       type: Sequelize.STRING,
     },
+    recurring:{
+      type:Sequelize.ENUM,
+      values:["Daily", "Weekly", "Monthly", "Quarterly", "Annually"]
+    },
     created_by: {
       type: Sequelize.UUID,
     },

@@ -43,17 +43,20 @@ module.exports = (sequelize, Sequelize) => {
       gender: {
         type: Sequelize.STRING,
       },
-      phone: {
+      mobile_no: {
         type: Sequelize.STRING,
         validate: {
-          is: /^[0-9]{10}$/, // Only accept 10 digit numbers
+          isNumeric: {
+            msg: "Please check the mobile number. Only digits are allowed.",
+          },
+          len: {
+            args: [10, 10],
+            msg: "Please check the mobile number. It must be exactly 10 digits.",
+          },
         },
-      },
-      code:{
+      },      
+      mobile_code:{
         type: Sequelize.STRING,
-      },
-      mobile_no: {
-        type: Sequelize.INTEGER,
       },
       company_name: {
         type: Sequelize.STRING,
@@ -66,6 +69,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       industry_id:{
         type: Sequelize.UUID,
+      },
+      source:{
+        type:Sequelize.ENUM,
+        values:["Trader", "Manufacturer", "Services", "Aggregator"]
       },
       created_by: {
         type: Sequelize.UUID,
