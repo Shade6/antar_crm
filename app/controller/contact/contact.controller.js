@@ -122,7 +122,7 @@ exports.update_contact = async (req, res) => {
         statusCode: 400,
       });
     }
-    console.log(mobile.length)
+   
     if(mobile){
       if(mobile.length != 10){
           return res.json({message:'please provide 10 digit number',statusCode :400})
@@ -187,6 +187,7 @@ exports.getContacts = async (req, res) => {
     const contacts = await Contact.findAll({
       where: {
         tenant_id: tenant_id,
+        converted:false
       },
       include:{
         model:Industry,
@@ -354,7 +355,8 @@ exports.contact_filter = async (req, res) => {
           [Op[type]]:
             type === "like" || type === "iLike" ? `%${search}%` : search,
         },
-        tenant_id:tenant_id
+        tenant_id:tenant_id,
+        converted:false
       },
     });
 

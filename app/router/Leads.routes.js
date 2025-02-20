@@ -247,5 +247,11 @@ module.exports = (app) => {
     AccessChecker.access_amend,
     controller.convert_lead
   )
+  router.post("/convert_contact_to_lead",
+    Authenticator.user,
+    Subscription.check_subscription,
+    AccessChecker.access_amend,
+    controller.convert_contact_to_lead
+  )
   app.use("/api/v1/crm/", router);
 };

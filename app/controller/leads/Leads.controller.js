@@ -8,13 +8,14 @@ const Territory = db.territory;
 const Industry = db.industry;
 const LeadScore = db.lead_score;
 const ActivityLog = db.activity_log;
-const Contact = db.contacts
-const Organization = db.organization
-const Opportunity = db.opportunity
-const ProductMapping = db.product_mapping
+const Contact = db.contacts;
+const Organization = db.organization;
+const Opportunity = db.opportunity;
+const ProductMapping = db.product_mapping;
+const emailValidator = require("email-validator");
 exports.create_lead = async (req, res) => {
   try {
-    console.log(req.body);
+  
     const {
       salutation,
       first_name,
@@ -29,36 +30,28 @@ exports.create_lead = async (req, res) => {
       revenue,
       industry_id,
       status,
+      code,
       owner_id,
+      company_constitution,
+      incorporation_date,
+      department
     } = req.body;
     const tenant_id = req.tenant;
-    console.log("start ---------");
-    const validation = field_checker.checkNullValues({
-      salutation: salutation.value,
-      first_name: first_name,
-      last_name: last_name,
-      organization: organization,
-      status: status.value,
-      email: email,
-      mobile: mobile,
-    });
-    if (!validation.isValid) {
-      return res.json({
-        message: `${validation.field} cannot be null`,
-        statusCode: 400,
+    let owner = null;
+    if (owner_id && owner_id?.value) {
+      const find_owner = await Users.findOne({
+        where: { user_id: owner_id.value, tenant_id: tenant_id },
       });
+      owner = find_owner.user_id;
+    } else {
+      owner = req.user;
     }
 
-    const find_owner = await Users.findOne({
-      where: { user_id: owner_id.value, tenant_id: tenant_id },
-    });
 
-    if (!find_owner) {
-      return res.json({ message: "owner not found", statusCode: 400 });
-    }
     let score = 0;
-    let lead_value;
+    let lead_value ='Cold';
     const find_lead_score = await LeadScore.findOne();
+
     if (find_lead_score) {
       const territory_in_score = find_lead_score.territory;
       const industry_in_score = find_lead_score.industry;
@@ -66,13 +59,13 @@ exports.create_lead = async (req, res) => {
       const number_of_employees_in_score = find_lead_score.number_of_employees;
       const annual_revenue_in_score = find_lead_score.annual_revenue;
 
-      if (territory_id) {
+      if (territory_id && territory_id?.value) {
         const find_territory = JSON.parse(territory_in_score).some(
           (val) => val.value == territory_id.value
         );
         find_territory ? (score = score + find_lead_score.territory_value) : 0;
       }
-      if (industry_id) {
+      if (industry_id && industry_id?.value) {
         const find_industry = JSON.parse(industry_in_score).some(
           (val) => val.value == industry_id.value
         );
@@ -83,7 +76,7 @@ exports.create_lead = async (req, res) => {
           ? (score = score + find_lead_score.annual_revenue_value)
           : 0;
       }
-      if (employees) {
+      if (employees && employees?.value) {
         const find_employees = JSON.parse(number_of_employees_in_score).some(
           (val) => val.value == employees.value
         );
@@ -115,44 +108,64 @@ exports.create_lead = async (req, res) => {
         score <= find_lead_score.cold_lead_is_lesser_than
       ) {
         lead_value = "Cold";
+      }else{
+        lead_value = "Cold";
+      }
+    }
+    if (!first_name || !first_name.trim()) {
+      return res.status(200).json({
+        message: "Please add a valid first name. The name cannot be empty ",
+        statusCode: 400,
+      });
+    }
+    if (email) {
+      if (!emailValidator.validate(email)) {
+        return res.json({
+          message: "invalid email ! please check the email",
+          statusCode: 400,
+        });
       }
     }
 
-    const create_ = await Leads.create(
-      {
-        salutation: salutation.value ?? "",
-        first_name: first_name ?? "",
-        last_name: last_name ?? "",
-        lead_name:
-          find_owner.first_name ?? "" + " " + find_owner.last_name ?? " ",
-        company: organization ?? null,
-        contact: mobile ?? null,
-        email: email ?? null,
-        gender: gender.value ?? null,
-        website: website ?? null,
-        status: status.value ?? null,
-        employees: employees.value ?? null,
-        territory_id: territory_id.value ?? null,
-        assigned_to: req.user,
-        industry_id: industry_id.value ?? null,
-        revenue: revenue,
-        lead_score: score,
-        lead_value: lead_value,
-        created_by: find_owner.user_id,
-        changed_by: req.user,
-        created_at: new Date(),
-        updated_at: new Date(),
-        tenant_id: tenant_id,
-      },
-      {
-        tracker_id: req.tracker_id, // Pass extra ID through options
-      }
-    );
+    const details = {
+      salutation: salutation?.value ?? "",
+      first_name: first_name ?? "",
+      last_name: last_name ?? "",
+      company: organization ?? null,
+      mobile_no: mobile ?? null,
+      mobile_code: code ,
+      email: email ?? null,
+      gender: gender?.value ?? null,
+      website: website ?? null,
+      status: status?.value ?? "New",
+      employees: employees?.value ?? null,
+      territory_id: territory_id?.value ?? null,
+      assigned_to: owner,
+      industry_id: industry_id?.value ?? null,
+      revenue: revenue,
+      lead_score: score,
+      lead_value: lead_value,
+      company_Constitution:company_constitution ?? null,
+      company_incorporation_date:incorporation_date ?? null,
+      department_id:department?.value ?? null ,
+      created_by: req.user,
+      changed_by: req.user,
+      created_at: new Date(),
+      updated_at: new Date(),
+      tenant_id: tenant_id,
+    };
+
+    console.log(details,']]]]]');
+ 
+    const create_ = await Leads.create(details, {
+      tracker_id: req.tracker_id, // Pass extra ID through options
+    });
+
     if (create_) {
       await LeadAssignee.create({
-        user_id: find_owner.user_id,
+        user_id: owner,
         lead_id: create_.lead_id,
-        assigned_by: find_owner.user_id,
+        assigned_by: req.user,
         assigned_at: new Date(),
       });
       return res.json({
@@ -185,7 +198,7 @@ exports.getLeads = async (req, res) => {
       where: {
         lead_id: find_assignees.map((val) => val.lead_id),
         tenant_id: tenant_id,
-        converted:false,
+        converted: false,
       },
     });
     return res.json({
@@ -209,7 +222,7 @@ exports.find_single_lead = async (req, res) => {
       });
     }
     const find_all = await Leads.findOne({
-      where: { lead_id: lead_id, tenant_id: tenant_id,converted:false },
+      where: { lead_id: lead_id, tenant_id: tenant_id, converted: false },
       include: [
         {
           model: Territory,
@@ -737,80 +750,83 @@ exports.convert_lead = async (req, res) => {
       opportunity_name,
       opportunity_value,
       product,
+      code,
+      recurring
     } = req.body;
 
     // Find lead
     const find_lead = await Leads.findOne({ where: { lead_id } });
 
     if (!find_lead) {
-      return res.status(400).json({ message: "Lead not found", statusCode: 400 });
+      return res
+        .status(400)
+        .json({ message: "Lead not found", statusCode: 400 });
     }
-   console.log(req.body)
+    console.log(req.body,'[[[');
 
-    // return res.json({message:'complete',statusCode:200})
 
-    const getValue = (data, defaultValue = "") => {
-      if (data && typeof data === "object" && "value" in data) {
-        return data.value;
-      }
-      return data ?? defaultValue;
-    };
-    
+    // return res.json({})
+
+
     // Create Contact
+    if(!first_name){
+      return res.status(200).json({message:'first name is required',statusCode:400})
+    }
+    if(!organization){
+      return res.status(200).json({message:'organization name is required',statusCode:400})
+    }
     const create_Contact = await Contact.create({
-      first_name: getValue(first_name),
+      first_name: first_name ?? null,
       tenant_id: req.tenant,
-      last_name: getValue(last_name),
-      email_id: getValue(email),
-      user_id: getValue(owner_id),
-      status: getValue(status, "New"),
-      salutation: getValue(salutation),
-      gender: getValue(gender),
-      phone: getValue(mobile, null),
-      company_name: getValue(organization),
+      last_name: last_name ?? null,
+      email_id: email ?? null,
+      user_id: owner_id?.value ?? owner_id ?? req.user ,
+      status: status ?? "New",
+      salutation: salutation?.value ?? salutation ?? null,
+      gender: gender?.value ?? gender ?? null,
+      mobile_no: mobile ?? null,
+      mobile_code:code ?? null,
+      company_name: organization ?? null,
     });
-    
+
     // Create Organization
     const create_Organization = await Organization.create({
-      organization_name: getValue(organization),
-      no_of_employees: getValue(employees, null),
-      annual_revenue: getValue(revenue, null),
-      website: getValue(website),
+      organization_name: organization,
+      no_of_employees:employees?.value ?? employees ?? null, 
+      annual_revenue: revenue,
+      website: website,
       tenant_id: req.tenant,
-      territory_id: getValue(territory_id, null),
-      industry_id: getValue(industry_id, null),
+      territory_id:territory_id?.value ?? territory_id ?? null,
+      industry_id: industry_id?.value ?? industry_id ?? null,
       created_on: new Date(),
     });
-    
+
     // Create Opportunity
     const create_Opportunity = await Opportunity.create({
       organization_id: create_Organization.organization_id,
       tenant_id: req.tenant,
-      opportunity_name: getValue(opportunity_name),
-      opportunity_value: getValue(opportunity_value, 0),
+      opportunity_name:opportunity_name ?? "",
+      opportunity_value: opportunity_value ?? 0,
       contact_id: create_Contact.contact_id,
-      opportunity_owner_id: getValue(owner_id),
+      opportunity_owner_id: owner_id?.value ?? owner_id ?? req.user,
       lead_id: lead_id,
       status: "New",
-      created_by: getValue(owner_id),
+      recurring:recurring?.value ?? recurring ?? null,
+      created_by: req.user,
       created_on: new Date(),
     });
-    
-    
 
-    if(product.length >0){
-      for (let pro of product){
-          await ProductMapping.create({
-            opportunity_id:create_Opportunity.opportunity_id,
-            product_id :pro.value
-          })
+    if (product && product?.length > 0) {
+      for (let pro of product) {
+        await ProductMapping.create({
+          opportunity_id: create_Opportunity.opportunity_id,
+          product_id: pro.value,
+        });
       }
     }
 
     find_lead.converted = true;
-    find_lead.save()
-
-
+    find_lead.save();
 
     return res.status(201).json({
       message: "Lead converted successfully",
@@ -819,9 +835,241 @@ exports.convert_lead = async (req, res) => {
       organization: create_Organization,
       opportunity: create_Opportunity,
     });
-
   } catch (error) {
-    return res.status(500).json({ message: error.message, statusCode: 500 });
+    return res.status(200).json({ message: error.message, statusCode: 500 });
   }
 };
 
+// exports. = async (req, res) => {
+//   try {
+//     const {
+//       contact_id,
+//       salutation,
+//       first_name,
+//       last_name,
+//       email,
+//       mobile,
+//       code,
+//       gender,
+//       organization,
+//       website,
+//       employees,
+//       territory_id,
+//       revenue,
+//       industry_id,
+//       status,
+//       owner_id,
+//       company_constitution,
+//       incorporation_date,
+//       department,
+//     } = req.body;
+//     console.log(req.body);
+
+//     const details = {
+//       lead_id: null,
+//       salutation: null,
+//       tenant_id: null,
+//       first_name: null,
+//       last_name: null,
+//       lead_name: null,
+//       company: null,
+//       contact: null,
+//       email: null,
+//       gender: null,
+//       lead_source: null,
+//       lead_score: null,
+//       lead_value: null,
+//       website: null,
+//       status: null,
+//       converted: null,
+//       employees: null,
+//       assigned_to: null,
+//       territory_id: null,
+//       industry_id: null,
+//       revenue: null,
+//       company_Constitution: null,
+//       company_incorporation_date: null,
+//       department_id: null,
+//       changed_by: null,
+//       created_at: null,
+//       updated_at: null,
+//       created_by: null,
+//     };
+//   } catch (error) {
+//     return res.status(200).json({ message: error.message, statusCode: 500 });
+//   }
+// };
+
+
+exports.convert_contact_to_lead = async (req, res) => {
+  try {
+  
+    const {
+      contact_id,
+      salutation,
+      first_name,
+      last_name,
+      email,
+      mobile,
+      gender,
+      organization,
+      website,
+      employees,
+      territory_id,
+      revenue,
+      industry_id,
+      status,
+      code,
+      owner_id,
+      company_constitution,
+      incorporation_date,
+      department
+    } = req.body;
+    const tenant_id = req.tenant;
+    let owner = null;
+    if (owner_id && owner_id?.value) {
+      const find_owner = await Users.findOne({
+        where: { user_id: owner_id.value, tenant_id: tenant_id },
+      });
+      owner = find_owner.user_id;
+    } else {
+      owner = req.user;
+    }
+
+
+    let score = 0;
+    let lead_value ='Cold';
+    const find_lead_score = await LeadScore.findOne();
+
+    if (find_lead_score) {
+      const territory_in_score = find_lead_score.territory;
+      const industry_in_score = find_lead_score.industry;
+      const job_title_in_score = find_lead_score.job_title;
+      const number_of_employees_in_score = find_lead_score.number_of_employees;
+      const annual_revenue_in_score = find_lead_score.annual_revenue;
+
+      if (territory_id && territory_id?.value) {
+        const find_territory = JSON.parse(territory_in_score).some(
+          (val) => val.value == territory_id.value
+        );
+        find_territory ? (score = score + find_lead_score.territory_value) : 0;
+      }
+      if (industry_id && industry_id?.value) {
+        const find_industry = JSON.parse(industry_in_score).some(
+          (val) => val.value == industry_id.value
+        );
+        find_industry ? (score = score + find_lead_score.industry_value) : 0;
+      }
+      if (revenue) {
+        parseInt(revenue) >= find_lead_score.annual_revenue
+          ? (score = score + find_lead_score.annual_revenue_value)
+          : 0;
+      }
+      if (employees && employees?.value) {
+        const find_employees = JSON.parse(number_of_employees_in_score).some(
+          (val) => val.value == employees.value
+        );
+        find_employees
+          ? (score = score + find_lead_score.number_of_employees_value)
+          : 0;
+      }
+      if (organization) {
+        const find_organization = JSON.parse(job_title_in_score).some(
+          (val) =>
+            String(val.value).toLowerCase() === organization.toLowerCase()
+        );
+        find_organization
+          ? (score = score + find_lead_score.job_title_value)
+          : 0;
+      }
+      if (
+        score >= find_lead_score.hot_lead_is_greater_than &&
+        score <= find_lead_score.hot_lead_is_lesser_than
+      ) {
+        lead_value = "Hot";
+      } else if (
+        score >= find_lead_score.warm_lead_is_greater_than &&
+        score <= find_lead_score.warm_lead_is_lesser_than
+      ) {
+        lead_value = "Warm";
+      } else if (
+        score >= find_lead_score.cold_lead_is_greater_than &&
+        score <= find_lead_score.cold_lead_is_lesser_than
+      ) {
+        lead_value = "Cold";
+      }else{
+        lead_value = "Cold";
+      }
+    }
+    if (!first_name || !first_name.trim()) {
+      return res.status(200).json({
+        message: "Please add a valid first name. The name cannot be empty ",
+        statusCode: 400,
+      });
+    }
+    if (email) {
+      if (!emailValidator.validate(email)) {
+        return res.json({
+          message: "invalid email ! please check the email",
+          statusCode: 400,
+        });
+      }
+    }
+const find_contact = await Contact.findOne({where:{contact_id:contact_id}})
+   if(!find_contact){
+      return res.json({message:'contact not found',statusCode:400})
+   }
+
+    const details = {
+      contact_id:contact_id,
+      salutation: salutation?.value ?? salutation ??  "",
+      first_name: first_name ?? "",
+      last_name: last_name ?? "",
+      company: organization ?? null,
+      mobile_no: mobile ?? null,
+      mobile_code: code ,
+      email: email ?? null,
+      gender: gender?.value ?? gender ?? null,
+      website: website ?? null,
+      status: status?.value ?? "New",
+      employees: employees?.value ?? null,
+      territory_id: territory_id?.value ?? null,
+      assigned_to: owner,
+      industry_id: industry_id?.value ?? industry_id ?? null,
+      revenue: revenue,
+      lead_score: score,
+      lead_value: lead_value,
+      company_Constitution:company_constitution ?? null,
+      company_incorporation_date:incorporation_date ?? null,
+      department_id:department?.value ?? department ?? null ,
+      created_by: req.user,
+      changed_by: req.user,
+      created_at: new Date(),
+      updated_at: new Date(),
+      tenant_id: tenant_id,
+    };
+
+    const create_ = await Leads.create(details, {
+      tracker_id: req.tracker_id, // Pass extra ID through options
+    });
+
+    if (create_) {
+      await LeadAssignee.create({
+        user_id: owner,
+        lead_id: create_.lead_id,
+        assigned_by: req.user,
+        assigned_at: new Date(),
+      });
+      await Contact.update({converted:true},{where:{contact_id:contact_id}})
+      return res.json({
+        message: "lead converted and saved successfully",
+        statusCode: 200,
+        data: create_,
+      });
+    } else {
+      return res.json({ message: "lead created failed", statusCode: 400 });
+    }
+  } catch (error) {
+    return res.json({ message: error.message, statusCode: 500 });
+  }
+};

@@ -27,34 +27,37 @@ exports.createOrganization = async (req, res) => {
       image,
     } = req.body;
     const tenant_id = req.tenant
+
     console.log(req.body);
-    if (address?.length == 0) {
-      return res
-        .status(200)
-        .json({ message: "Address is required", statusCode: 400 });
+    if(!organization_name){
+      return res.json({message:'organization name is empty',statusCode:400})
     }
+
     const organizationData = {
       organization_name: organization_name,
-      website: website,
+      website: website ?? null,
       annual_revenue: parseInt(annual_revenue) || null,
       no_of_employees: no_of_employee?.value || null, // Assuming you want the value from the object
       industry_id: industry?.value || null, // Assuming you want the value from the object
       territory_id: territory?.value || null, // Assuming you want the value from the object
-      website: website,
+      website: website ?? null,
       created_by: req.user,
       image: image || "",
       created_on: new Date(),
+      changed_on:new Date(),
       tenant_id:tenant_id
     };
     console.log(organizationData);
     const newOrganization = await Organization.create(organizationData);
-    for (let address_data of address) {
-      console.log(address_data, "--------");
-      await AddressOrg.update(
-        { organization_id: newOrganization.organization_id },
-        { where: { address_org_id: address_data.value } }
-      );
+    if (address && address?.length > 0  ) {
+      for (let address_data of address) {
+        await AddressOrg.update(
+          { organization_id: newOrganization.organization_id },
+          { where: { address_org_id: address_data.value } }
+        );
+      }
     }
+
 
     return res.status(200).json({
       message: "Organization created successfully",
@@ -69,9 +72,33 @@ exports.createOrganization = async (req, res) => {
 exports.updateOrganization = async (req, res) => {
   try {
     const { id } = req.params;
-    const organizationData = req.body;
+
+    console.log(req.body)
+    const {
+      organization_name,
+      website,
+      annual_revenue,
+      no_of_employee,
+      industry,
+      address,
+      territory
+    } = req.body
     const tenant_id = req.tenant
-    const [updated] = await Organization.update(organizationData, {
+    if(!organization_name){
+      return res.json({message:'organization name is required',statusCode:400})
+    }
+    const details = {
+      organization_name:organization_name,
+      no_of_employees:no_of_employee ?? null,
+      annual_revenue:annual_revenue ??null,
+      organization_logo:"",
+      website:website ?? null,
+      industry_id:industry?.value ?? industry ?? null,
+      territory_id:territory?.value ?? territory ?? null,
+      changed_on:new Date()
+    }
+    console.log(details,'0000000000000000000000')
+    const [updated] = await Organization.update(details, {
       where: { org_id: id ,tenant_id:tenant_id},
     });
     if (updated) {
@@ -83,9 +110,9 @@ exports.updateOrganization = async (req, res) => {
         data: updatedOrganization,
       });
     }
-    return res.status(404).json({ message: "Organization not found" });
+    return res.status(200).json({ message: "Organization not found" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(200).json({ message: error.message });
   }
 };
 
@@ -110,6 +137,10 @@ exports.getAllOrganizations = async (req, res) => {
       where:{
         tenant_id:tenant_id
       },
+      include:{
+        model:Industry,
+        as:'industry'
+      }
     });
     return res.status(200).json({
       data: organizations,
@@ -279,21 +310,24 @@ exports.updateOrganization = async (req, res) => {
         organization_name: organization_name,
         website: website,
         annual_revenue: parseInt(annual_revenue) || null,
-        no_of_employees: no_of_employee.value,
-        industry_id: industry.value,
-        territory_id: territory.value,
-        image: image || organization.image,
-        tenant_id:tenant_id
+        no_of_employees: no_of_employee?.value ?? no_of_employee ?? null,
+        industry_id: industry?.value ?? industry ?? null,
+        territory_id: territory?.value ?? territory ?? null,
+        image: image || organization?.image ,
+        tenant_id:tenant_id,
+        changed_on:new Date(),
       },
       {
         where: { organization_id: organization_id,tenant_id:tenant_id },
       }
     );
-    for (let address_data of address) {
-      await AddressOrg.update(
-        { organization_id: organization_id },
-        { where: { address_org_id: address_data.value } }
-      );
+    if(address && address?.length > 0 ){
+      for (let address_data of address) {
+        await AddressOrg.update(
+          { organization_id: organization_id },
+          { where: { address_org_id: address_data.value } }
+        );
+      }
     }
     return res.json({
       message: "Organization updated successfully",

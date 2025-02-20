@@ -20,13 +20,13 @@ module.exports = (sequelize, Sequelize) => {
       last_name: {
         type: Sequelize.STRING,
       },
-      lead_name: {
-        type: Sequelize.STRING,
-      },
       company: {
         type: Sequelize.STRING,
       },
-      contact: {
+      mobile_no: {
+        type: Sequelize.STRING,
+      },
+      mobile_code:{
         type: Sequelize.STRING,
       },
       email: {
@@ -55,6 +55,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
+      contact_id:{
+        type: Sequelize.UUID, 
+      },
       employees:{
         type: Sequelize.STRING,
       },
@@ -64,11 +67,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       territory_id:{
         type: Sequelize.UUID, // Match the data type in `Leads`
-        allowNull: false,
+        allowNull: true,
       },
       industry_id:{
         type: Sequelize.UUID, // Match the data type in `Leads`
-        allowNull: false,
+        allowNull: true,
       },
       revenue:{
         type: Sequelize.INTEGER,

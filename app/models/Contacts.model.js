@@ -70,6 +70,10 @@ module.exports = (sequelize, Sequelize) => {
       industry_id:{
         type: Sequelize.UUID,
       },
+      converted:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       source:{
         type:Sequelize.ENUM,
         values:["Trader", "Manufacturer", "Services", "Aggregator"]
