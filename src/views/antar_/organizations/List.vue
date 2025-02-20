@@ -95,15 +95,23 @@
   import { get_all_organization,delete_organization,organization_filter } from '@/api/userApi';
   const toast = useToast();
   const lead_list = ref([]);
+  const formatDate = (isoDate) => {
+  if (!isoDate) return 'N/A';
+  const date = new Date(isoDate);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
   const fetch_organization = async()=>{
     const res = await get_all_organization()
     lead_list.value = res.data.map((item) => ({
         id:item.organization_id,
         organization: item.organization_name || 'N/A',
         website: item.website || 'N/A',
-        industry: item.industry || 'N/A',
+        industry: item.industry?.industry_name || 'N/A',
         annual_revenue: item.annual_revenue || 'N/A',
-        last_modified: item.last_modified || 'N/A',
+        last_modified: formatDate(item?.changed_on),
         image:item.image || ''
       }));
   }

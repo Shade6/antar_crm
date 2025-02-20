@@ -2,7 +2,7 @@
 import Nav from "./nav/Nav.vue";
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput ,DatePicker} from "frappe-ui";
-
+import Mobile from "@/utils/Mobile.vue"
 import {
   find_all_industry,
   find_all_territories,
@@ -24,6 +24,7 @@ const form_details = ref({
   last_name: null,
   email: null,
   mobile: null,
+  code:null,
   gender: null,
   organization: null,
   website: null,
@@ -120,6 +121,10 @@ const handle_save_lead = async () => {
     });
   }
 };
+const handle_mobile_number =(data)=>{
+  form_details.value.code = data.country.code
+  form_details.value.mobile = data.number
+}
 onMounted(fetch);
 </script>
 <template>
@@ -203,18 +208,9 @@ onMounted(fetch);
         />
       </div>
       <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-        <TextInput
-          :type="'text'"
-          :ref_for="true"
-          size="sm"
-          variant="subtle"
-          placeholder="enter mobile number"
-          :disabled="false"
-          :modelValue="form_details.mobile"
-          v-model="form_details.mobile"
-        />
-      </div>
+         <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
+         <Mobile :code="form_details.code" :mobile="form_details.mobile" @mobile_action="handle_mobile_number"/>
+        </div>
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
         <Autocomplete

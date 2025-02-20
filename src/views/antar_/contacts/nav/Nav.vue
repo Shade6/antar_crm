@@ -10,7 +10,7 @@ import {
 } from "frappe-ui";
 
 const router = useRouter();
-const emit = defineEmits(["save", "update"]);
+const emit = defineEmits(["save", "update","convert"]);
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
@@ -70,7 +70,7 @@ onMounted(() => {
         route: "/antar_/contacts",
       },
       {
-        label: "Convert Contact",
+        label: `Convert Contact To Lead ${router.currentRoute?.value?.hash}` ,
         icon: "",
       },
     ];
@@ -110,6 +110,9 @@ const converter = () => {
   router.push(`/antar_/contacts/convert_contact#${contactId}`);
 };
 
+const handle_convert = ()=>{
+  emit("convert");
+}
 </script>
 
 
@@ -191,6 +194,21 @@ const converter = () => {
         @click="converter"
       >
         Convert to Lead
+      </Button>
+      <Button
+        v-if="router.currentRoute.value.path == '/antar_/contacts/convert_contact'"
+        :variant="'solid'"
+        :ref_for="true"
+        theme="gray"
+        size="sm"
+        label="Button"
+        :loading="false"
+        :loadingText="null"
+        :disabled="false"
+        :link="null"
+        @click="handle_convert"
+      >
+        save & convert
       </Button>
     </div>
   </div>

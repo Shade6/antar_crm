@@ -1160,8 +1160,9 @@ export const create_campaign_email = async (data) => {
   return (await axiosInstance.post(`/create_campaign_email?mdl=${switchStore().pageId}`, data)).data;
 };
 
-
-
+export const convert_contact_to_lead = async (data) => {
+  return (await axiosInstance.post(`/convert_contact_to_lead?mdl=${switchStore().pageId}`, data)).data;
+};
 
 
 export const superset_login = async () => {

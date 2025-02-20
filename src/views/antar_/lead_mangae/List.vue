@@ -42,20 +42,7 @@ const fetch = async () => {
       modified: val.modified || new Date().toLocaleDateString(),
     }));
   } else {
-    toast.error(res.message, {
-      position: "top-right",
-      duration: 3000,
-      dismissible: true,
-      style: {
-        background: "#FFF5F5",
-        color: "black",
-        padding: "4px 20px",
-        borderRadius: "8px",
-        fontSize: "16px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-        borderLeft: "5px solid red",
-      },
-    });
+     return
   }
 };
 const handle_search = async (data) => {

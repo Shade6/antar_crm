@@ -138,14 +138,14 @@ const fetch_organization = async (id) => {
   const res = await get_only_organization_by_id(id);
   if (res.statusCode == 200) {
     form_details.value = {  
-      organization_id: res.data.organization.organization_id,
-      organization_name: res.data.organization.organization_name,
-      website: res.data.organization.website,
-      annual_revenue: res.data.organization.annual_revenue,
-      no_of_employee:res.data.organization.no_of_employees,
-      industry: res.data.organization.industry.industry_id,
-      territory: res.data.organization.territory.territory_id,
-      address: res.data.address.address ? res.data.address.map((val, i) => (val.address_org_id)) : [],
+      organization_id: res.data?.organization?.organization_id,
+      organization_name: res.data?.organization?.organization_name,
+      website: res.data.organization?.website,
+      annual_revenue: res.data.organization?.annual_revenue,
+      no_of_employee:res.data.organization?.no_of_employees,
+      industry: res.data.organization?.industry?.industry_id,
+      territory: res.data.organization?.territory?.territory_id,
+      address: res.data?.address?.address ? res.data.address.map((val, i) => (val.address_org_id)) : [],
      
     };
      if(res.data?.address){
@@ -154,7 +154,7 @@ const fetch_organization = async (id) => {
           value: val.address_org_id,
         })));
      }
-     Image_set.value = res.data.organization.image
+     Image_set.value = res.data.organization.image == '' ?null :res.data.organization.image
   } else {
     show_error(res);
   }

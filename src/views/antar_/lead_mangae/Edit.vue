@@ -5,7 +5,7 @@
 import Nav from "./nav/Nav.vue";
 import { onMounted, ref } from "vue";
 import { Button, Dialog, Autocomplete, TextInput } from "frappe-ui";
-
+import Mobile from "@/utils/Mobile.vue"
 import {
   find_all_industry,
   find_all_territories,
@@ -21,7 +21,9 @@ const router = useRouter();
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 const toast = useToast();
-
+const checked = ref({
+  recurring: "one_time",
+});
 const industry_list = ref([]);
 const territory_list = ref([]);
 const user_list = ref([]);
@@ -35,6 +37,7 @@ const form_details = ref({
   last_name: null,
   email: null,
   mobile: null,
+  code:null,
   gender: null,
   organization: null,
   website: null,
@@ -46,7 +49,8 @@ const form_details = ref({
   owner_id: null,
   opportunity_name: null,
   opportunity_value: null,
-  product:null
+  product:null,
+  recurring:null
 });
 
 const fetch = async () => {
@@ -165,6 +169,8 @@ const handle_save_lead = async () => {
     });
   }
 };
+
+
 onMounted(fetch);
 
 
@@ -201,6 +207,10 @@ const handle_convert_lead = async()=>{
       },
     });
   }
+}
+const handle_mobile_number =(data)=>{
+  form_details.value.code = data.country.code
+  form_details.value.mobile = data.number
 }
 </script>
 <template>
@@ -290,18 +300,9 @@ const handle_convert_lead = async()=>{
         />
       </div>
       <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-        <TextInput
-          :type="'text'"
-          :ref_for="true"
-          size="sm"
-          variant="subtle"
-          placeholder="enter mobile number"
-          :disabled="false"
-          :modelValue="form_details.mobile"
-          v-model="form_details.mobile"
-        />
-      </div>
+         <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
+         <Mobile :code="form_details.code" :mobile="form_details.mobile" @mobile_action="handle_mobile_number"/>
+        </div>
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Gender</span>
         <Autocomplete
@@ -466,6 +467,55 @@ const handle_convert_lead = async()=>{
           />
         </div>
         <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm">Recurring</span>
+        <Autocomplete
+          :options="[
+            {
+              label: 'One Time',
+              value: 'one_time',
+            },
+            {
+              label: 'Recurring',
+              value: 'Recurring',
+            },
+          ]"
+          v-model="checked.recurring"
+          placeholder="Select gender"
+        />
+      </div>
+      <div v-if="checked.recurring.value == 'Recurring'" class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm">Recurring</span>
+        <Autocomplete
+          :options="[
+            {
+              label: 'Daily',
+              value: 'Daily',
+            },
+            {
+              label: 'Weekly',
+              value: 'Weekly',
+            },
+            {
+              label: 'Monthly',
+              value: 'Monthly',
+            },
+            {
+              label: 'Quarterly',
+              value: 'Quarterly',
+            },
+            {
+              label: 'Annually',
+              value: 'Annually',
+            },
+          ]"
+          v-model="form_details.recurring"
+          placeholder="Select gender"
+        />
+      </div>
+    
+      </div>
+    <div class="flex justify-between">
+      <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Product/Service</span>
           <Autocomplete
             :options="product_list"
@@ -474,8 +524,6 @@ const handle_convert_lead = async()=>{
             :multiple="true"
           />
         </div>
-      </div>
-    <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1">Status </span>
         <Autocomplete

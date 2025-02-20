@@ -11,7 +11,7 @@ import {
   get_all_contact,
   get_all_product,
 } from "@/api/userApi.js";
-
+import Mobile from "@/utils/Mobile.vue";
 import "@/assets/toast.css";
 import { useToast } from "vue-toast-notification";
 import { useRouter } from "vue-router";
@@ -24,7 +24,7 @@ const product_list = ref([]);
 const checked = ref({
   organization: false,
   contact: false,
-  recurring: 'one_time',
+  recurring: "one_time",
 });
 const form_details = ref({
   salutation: null,
@@ -32,6 +32,7 @@ const form_details = ref({
   last_name: null,
   email: null,
   mobile: null,
+  code: null,
   gender: null,
   organization: null,
   website: null,
@@ -167,6 +168,11 @@ const handle_save_deal = async () => {
     });
   }
 };
+
+const handle_mobile_number = (data) => {
+  form_details.value.code = data.country.code;
+  form_details.value.mobile = data.number;
+};
 onMounted(fetch);
 </script>
 
@@ -270,15 +276,10 @@ onMounted(fetch);
         </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Mobile No</span>
-          <TextInput
-            :type="'text'"
-            :ref_for="true"
-            size="sm"
-            variant="subtle"
-            placeholder="enter mobile number"
-            :disabled="false"
-            :modelValue="form_details.mobile"
-            v-model="form_details.mobile"
+          <Mobile
+            :code="form_details.code"
+            :mobile="form_details.mobile"
+            @mobile_action="handle_mobile_number"
           />
         </div>
         <div class="p-2 w-full">
@@ -433,7 +434,7 @@ onMounted(fetch);
       </div>
     </div>
     <hr class="my-3" />
-   
+
     <div class="flex justify-between">
       <div class="p-2 w-full">
         <span class="text-gray-500 font-medium text-sm my-1"
@@ -466,66 +467,66 @@ onMounted(fetch);
           v-model="form_details.opportunity_value"
         />
       </div>
-      <div  class="p-2 w-full">
-      <span class="text-gray-500 font-medium text-sm">Recurring</span>
-      <Autocomplete
-        :options="[
-          {
-            label: 'One Time',
-            value: 'one_time',
-          },
-          {
-            label: 'Recurring',
-            value: 'Recurring',
-          },
-        ]"
-        v-model="checked.recurring"
-        placeholder="Select gender"
-      />
-    </div>
+      <div class="p-2 w-full">
+        <span class="text-gray-500 font-medium text-sm">Recurring</span>
+        <Autocomplete
+          :options="[
+            {
+              label: 'One Time',
+              value: 'one_time',
+            },
+            {
+              label: 'Recurring',
+              value: 'Recurring',
+            },
+          ]"
+          v-model="checked.recurring"
+          placeholder="Select gender"
+        />
+      </div>
       <div v-if="checked.recurring.value == 'Recurring'" class="p-2 w-full">
-      <span class="text-gray-500 font-medium text-sm">Recurring</span>
-      <Autocomplete
-        :options="[
-          {
-            label: 'Daily',
-            value: 'Daily',
-          },
-          {
-            label: 'Weekly',
-            value: 'Weekly',
-          },
-          {
-            label: 'Monthly',
-            value: 'Monthly',
-          },
-          {
-            label: 'Quarterly',
-            value: 'Quarterly',
-          },
-          {
-            label: 'Annually',
-            value: 'Annually',
-          },
-        ]"
-        v-model="form_details.recurring"
-        placeholder="Select gender"
-      />
-    </div>
+        <span class="text-gray-500 font-medium text-sm">Recurring</span>
+        <Autocomplete
+          :options="[
+            {
+              label: 'Daily',
+              value: 'Daily',
+            },
+            {
+              label: 'Weekly',
+              value: 'Weekly',
+            },
+            {
+              label: 'Monthly',
+              value: 'Monthly',
+            },
+            {
+              label: 'Quarterly',
+              value: 'Quarterly',
+            },
+            {
+              label: 'Annually',
+              value: 'Annually',
+            },
+          ]"
+          v-model="form_details.recurring"
+          placeholder="Select gender"
+        />
+      </div>
     </div>
     <div>
       <div class="flex justify-between">
         <div class="p-2 w-full">
-        <span class="text-gray-500 font-medium text-sm my-1"
-          >Product/Service</span
-        >
-        <Autocomplete
-          :options="product_list"
-          v-model="form_details.product"
-          placeholder="Select product/service"
-          :multiple="true"
-        />
-      </div>
+          <span class="text-gray-500 font-medium text-sm my-1"
+            >Product/Service</span
+          >
+          <Autocomplete
+            :options="product_list"
+            v-model="form_details.product"
+            placeholder="Select product/service"
+            :multiple="true"
+          />
+        </div>
         <div class="p-2 w-full">
           <span class="text-gray-500 font-medium text-sm my-1">Status </span>
           <Autocomplete
@@ -569,7 +570,6 @@ onMounted(fetch);
             placeholder="Select owner"
           />
         </div>
-        
       </div>
     </div>
   </div>
